@@ -2,10 +2,10 @@
 type: "current-state"
 tier: "hot"
 status: "current"
-last_updated: "2026-08-14T00:11:06+02:00"
-last_verified: "2026-08-14T00:11:06+02:00"
-verified_against_runtime_head: "a7c4f03b5fae5804d47c6e1a3d470e903a89d47f"
-verified_against_pr_head: "f2f7831fdaead6667b6eb53c0021a7bc0377eebf"
+last_updated: "2026-08-14T01:06:00+02:00"
+last_verified: "2026-08-14T01:06:00+02:00"
+verified_against_runtime_head: "3daccfe49991d93edc95a8bcada696b675182286"
+verified_against_pr_head: "08b63f8a14fb64021f79277e7069e9aee11327f9"
 freshness_class: "runtime-sensitive"
 ---
 # Current State
@@ -18,35 +18,26 @@ freshness_class: "runtime-sensitive"
 | P0-A state | **OPEN** |
 | PR | #10 |
 | PR state | OPEN, not merged |
-| PR mergeability snapshot | GitHub reports `mergeable=false`; do not equate this alone with a semantic/code conflict because runtime-data `main` continues to move |
-| PR head | `f2f7831fdaead6667b6eb53c0021a7bc0377eebf` |
-| Exact head CI | GREEN — run `31741469276` |
-| Runtime/Data `main` HEAD | `a7c4f03b5fae5804d47c6e1a3d470e903a89d47f` |
-| Latest main commit | `auto: tennis live 22:11` |
-| Latest main change class | runtime/data-only Tennis heartbeat |
-| CEO merge decision | **NO MERGE yet** |
-| Next Builder action | Final P0-A closure task in [[CURRENT_TASK]] |
+| Reviewed PR head | `08b63f8a14fb64021f79277e7069e9aee11327f9` |
+| Exact head CI | **GREEN** — run `31752148258` |
+| CI limitation | does not execute Playwright/frontend smoke |
+| Runtime/Data `main` HEAD | `3daccfe49991d93edc95a8bcada696b675182286` |
+| Latest main commit | `auto: tennis live 23:05` |
+| CEO merge decision | **NO MERGE** |
+| Next Builder action | `TASK-P0A-010` |
+
+## Review result
+
+TASK-P0A-009 materially improved remote containment, retry separation, cancel durability and real browser submission, but six closure blockers remain. See [[CURRENT_BLOCKERS]].
+
+Builder reported the mandatory-submit test passes, while the full frontend suite still contains a failing legacy-signal P0-A test. Independent code inspection confirms a test/UX-contract mismatch.
 
 ## Workstreams
 
-- **P0-A:** OPEN — four final semantic/verification blockers.
-- **P0-B Monitoring Truth:** PLANNED / BLOCKED by P0-A.
-- **P0-C Privacy & Persistence:** PLANNED / BLOCKED by P0-A; migration should run with P0-B truth monitoring.
-- **P0-D Governance & Data Integrity:** PLANNED / BLOCKED.
-- **Model Integrity:** PLANNED after P0 core.
-- **Wave 3D Production Trust:** PLANNED after corrected semantics exist.
+- **P0-A:** OPEN — `TASK-P0A-010`.
+- **P0-B/C/D:** PLANNED / BLOCKED.
+- **Model Integrity / Wave 3D:** PLANNED later.
 
 ## Product score
 
-- Current Production Score: **4.1 / 10**
-- Projected after fully verified P0-A: **~4.7 / 10**
-- 10.0 remains literal near-flawless quality; no score inflation.
-
-## Current interpretation
-
-The exact P0-A CI is green, but semantic approval is withheld because CI does not currently prove all final queue-durability and browser-submit invariants.
-
-See:
-- [[CURRENT_BLOCKERS]]
-- [[workstreams/P0-A]]
-- [[product/SCORECARD]]
+Production remains **4.1 / 10**. Unmerged branch code receives no production credit.

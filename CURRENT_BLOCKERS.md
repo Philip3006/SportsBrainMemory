@@ -2,54 +2,19 @@
 type: "current-blockers"
 tier: "hot"
 status: "current"
-last_updated: "2026-08-14T00:03:00+02:00"
+last_updated: "2026-08-14T01:06:00+02:00"
 freshness_class: "runtime-sensitive"
 workstream: "P0-A"
 ---
 # Current Blockers
 
-These are the **merge-blocking** findings for the active P0-A workstream.
+Merge blockers after CEO review of PR #10 head `08b63f8a14fb64021f79277e7069e9aee11327f9`:
 
-## FND-20260814-001 — Remote durability clean-tree gap
+1. [[findings/records/FND-20260814-001]] — durability can false-ACK if critical Git commands fail.
+2. [[findings/records/FND-20260814-002]] — authoritative zero/negative bankroll is misclassified RETRY.
+3. [[findings/records/FND-20260814-003]] — mixed cancellation+placement durability proof is missing.
+4. [[findings/records/FND-20260814-004]] — Playwright proves at least one, not exactly one submit.
+5. [[findings/records/FND-20260814-030]] — consumer source validation defaults/normalizes instead of exact literals.
+6. [[findings/records/FND-20260814-031]] — legacy/incomplete recommendation auto-downgrades to Manual and browser suite is red.
 
-**Severity:** P0  
-**Status:** OPEN  
-**Workstream:** P0-A
-
-`_durable_push()` can treat no staged diff as proof of remote durability even if a previous local commit was never pushed.
-
-See `findings/records/FND-20260814-001.md`.
-
-## FND-20260814-002 — Retryable bankroll failure can be permanently ACKed
-
-**Severity:** P0  
-**Status:** OPEN  
-**Workstream:** P0-A
-
-Authoritative bankroll unavailable can flow through generic rejection and delete an otherwise valid pending intent.
-
-See `findings/records/FND-20260814-002.md`.
-
-## FND-20260814-003 — Cancellation lacks the same durable ACK boundary
-
-**Severity:** P0  
-**Status:** OPEN  
-**Workstream:** P0-A
-
-Cancel request can mutate local ledger and clear queue before canonical remote durability is proven.
-
-See `findings/records/FND-20260814-003.md`.
-
-## FND-20260814-004 — Focused Playwright submit proof is conditional
-
-**Severity:** P0  
-**Status:** OPEN  
-**Workstream:** P0-A
-
-The current submit test can pass without proving an actual `/pending_bets` request if confirm remains disabled.
-
-See `findings/records/FND-20260814-004.md`.
-
-## Rule
-
-Any new confirmed CEO finding in the active workstream must be added here and to [[CURRENT_TASK]] before the next Builder execution.
+No merge until all six close, the complete frontend smoke suite is green, exact new-head CI is green, and CEO re-verifies.

@@ -2,8 +2,8 @@
 type: "finding-index"
 tier: "hot"
 status: "current"
-last_updated: "2026-08-14T00:03:00+02:00"
-count: "26"
+last_updated: "2026-08-14T01:06:00+02:00"
+count: "28"
 ---
 # Open Findings
 
@@ -33,3 +33,5 @@ count: "26"
 - [[findings/records/FND-20260814-024]]
 - [[findings/records/FND-20260814-025]]
 - [[findings/records/FND-20260814-026]]
+- [[findings/records/FND-20260814-030]]
+- [[findings/records/FND-20260814-031]]
