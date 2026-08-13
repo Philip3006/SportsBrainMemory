@@ -1,0 +1,933 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-14T00:11:06+02:00",
+  "memory_name": "SportsBrain Shared Memory",
+  "current_task": "TASK-P0A-009",
+  "current_runtime_data_head": "a7c4f03b5fae5804d47c6e1a3d470e903a89d47f",
+  "current_pr10_head": "f2f7831fdaead6667b6eb53c0021a7bc0377eebf",
+  "current_pr10_ci_run": "31741469276",
+  "context_packet_soft_limit_tokens": 8000,
+  "context_packet_estimated_tokens": 4083,
+  "files": [
+    {
+      "path": ".gitignore",
+      "summary": ".gitignore",
+      "tier": "warm",
+      "bytes": 160,
+      "estimated_tokens": null,
+      "sha256": "9636f8a9790206aee4370417a325cf5b8e3bd3e1f1a9331f607f2bd4174931d7"
+    },
+    {
+      "path": "BOOTSTRAP.md",
+      "summary": "SportsBrain Bootstrap",
+      "tier": "hot",
+      "bytes": 2151,
+      "estimated_tokens": 534,
+      "sha256": "492008e9771a758276169fd7fdb573ba36db9feb1ef779a342f6bbde6699213f"
+    },
+    {
+      "path": "CLAUDE.md",
+      "summary": "SportsBrain Builder Memory Rules",
+      "tier": "hot",
+      "bytes": 1338,
+      "estimated_tokens": 334,
+      "sha256": "340dfb92de8f9f98036ded38e4b525782eaad92bfdea5d2990403b25eeebc311"
+    },
+    {
+      "path": "CURRENT_BLOCKERS.md",
+      "summary": "Current Blockers",
+      "tier": "hot",
+      "bytes": 1555,
+      "estimated_tokens": 386,
+      "sha256": "3d7573ea3e8198361aa86c47a43263b9e96ea96d64460114c162975a3ede0d04"
+    },
+    {
+      "path": "CURRENT_PRIORITIES.md",
+      "summary": "Current Priorities",
+      "tier": "hot",
+      "bytes": 699,
+      "estimated_tokens": 174,
+      "sha256": "35c47e799a21cc6019af144047c5a15b7943c669e81473728dccc76dc1e14873"
+    },
+    {
+      "path": "CURRENT_STATE.md",
+      "summary": "Current State",
+      "tier": "hot",
+      "bytes": 1973,
+      "estimated_tokens": 491,
+      "sha256": "122cc29e20da451196b1926d71b10fc995cc8d17f21733b8571ecda69e06c13b"
+    },
+    {
+      "path": "CURRENT_TASK.md",
+      "summary": "TASK-P0A-009 — Final P0-A Closure",
+      "tier": "hot",
+      "bytes": 3351,
+      "estimated_tokens": 834,
+      "sha256": "043f2e61793e0b8376775dbc88410a9729d301e3d57b9bd4981af00cd009821c"
+    },
+    {
+      "path": "README.md",
+      "summary": "SportsBrain Shared Memory",
+      "tier": "warm",
+      "bytes": 1642,
+      "estimated_tokens": 404,
+      "sha256": "0f9557e35819471dced2d4c0c5de7a0f2da35b0facecfeff3375a75cf86a36b5"
+    },
+    {
+      "path": "SETUP.md",
+      "summary": "SportsBrain Shared Memory — Setup",
+      "tier": "warm",
+      "bytes": 2512,
+      "estimated_tokens": 625,
+      "sha256": "b52c1955371a1e4eedd261a3620afb33556452a2c8214e83be7e5fb5cd9d8ae3"
+    },
+    {
+      "path": "VALIDATION_REPORT.md",
+      "summary": "SportsBrain Shared Memory — Validation Report",
+      "tier": "cold",
+      "bytes": 2644,
+      "estimated_tokens": 660,
+      "sha256": "e5c8745e648da8e7906d206501f9b33d959558728be684c18a044375a8054284"
+    },
+    {
+      "path": "_meta/ID_REGISTRY.md",
+      "summary": "ID Registry",
+      "tier": "warm",
+      "bytes": 4861,
+      "estimated_tokens": 1184,
+      "sha256": "bfc06ed406e776df66e7df6e3d6688a8ff4168260c7bb58184c642995ad942be"
+    },
+    {
+      "path": "_meta/MEMORY_RULES.md",
+      "summary": "Memory Rules",
+      "tier": "warm",
+      "bytes": 1567,
+      "estimated_tokens": 391,
+      "sha256": "21ac4d4b57c7f2b7406c08bf4c7351fe6e7be566b63d298f576d49033452bcd6"
+    },
+    {
+      "path": "_meta/SCHEMA.md",
+      "summary": "Memory Schema",
+      "tier": "warm",
+      "bytes": 1063,
+      "estimated_tokens": 261,
+      "sha256": "1a34df3510da9b32f9d620f0c4fff1072274a7afb897f0cac790d33a415f274b"
+    },
+    {
+      "path": "_meta/SOURCE_HIERARCHY.md",
+      "summary": "Source / Evidence Hierarchy",
+      "tier": "warm",
+      "bytes": 514,
+      "estimated_tokens": 128,
+      "sha256": "ba186c03d0a0dea886d44a8391586df908565c5b74f12d977da4cdfd336e35d0"
+    },
+    {
+      "path": "_meta/UPDATE_PROTOCOL.md",
+      "summary": "Update Protocol",
+      "tier": "warm",
+      "bytes": 764,
+      "estimated_tokens": 191,
+      "sha256": "e8f2cf1b3fc51df23ca29f5904c42d44dfa6f790ee61afc935b16710ce095866"
+    },
+    {
+      "path": "architecture/DATA_AND_PERSISTENCE.md",
+      "summary": "Data & Persistence Architecture",
+      "tier": "warm",
+      "bytes": 1230,
+      "estimated_tokens": 304,
+      "sha256": "3bb18bb62d2e7f34732659ac89638a17b39c84ecc52320a4f33e4b70211f5ef7"
+    },
+    {
+      "path": "architecture/EXECUTION_AND_RELEASE.md",
+      "summary": "Execution Planes & Release Provenance",
+      "tier": "warm",
+      "bytes": 901,
+      "estimated_tokens": 225,
+      "sha256": "c4970b1d9fae1d50e91d75174ad4c66e28799d297df3fc410a7a57a88df6daf3"
+    },
+    {
+      "path": "architecture/SYSTEM_MAP.md",
+      "summary": "Canonical System Map",
+      "tier": "warm",
+      "bytes": 32548,
+      "estimated_tokens": 8095,
+      "sha256": "33ff9e372cdfb772814903b781492477e837ffcd4be91c47a82bfa603a754aa9"
+    },
+    {
+      "path": "architecture/TRUTH_AND_WRITERS.md",
+      "summary": "Truth Owners & Writer Governance",
+      "tier": "warm",
+      "bytes": 1456,
+      "estimated_tokens": 362,
+      "sha256": "cf72d3c64a6c441fa1b540fbeecdde5d47905002f8782ef90f3ca86eeda6cea0"
+    },
+    {
+      "path": "builder/CONTEXT_CONTRACT.md",
+      "summary": "Claude Context Contract",
+      "tier": "warm",
+      "bytes": 1102,
+      "estimated_tokens": 273,
+      "sha256": "674dc576553a9cb29bb91cd75d7b7dbb28f5dbcbea78aafaac48adf28f8498e8"
+    },
+    {
+      "path": "builder/CURRENT_CONTEXT_PACKET.md",
+      "summary": "SportsBrain Current Context Packet",
+      "tier": "generated",
+      "bytes": 16473,
+      "estimated_tokens": 4104,
+      "sha256": "212315cd1f4212895b2dde5155370b3505045a997f228956c1ecf1f8cfe79b5a"
+    },
+    {
+      "path": "builder/REPORT_TEMPLATE.md",
+      "summary": "Builder Report Template",
+      "tier": "warm",
+      "bytes": 476,
+      "estimated_tokens": 119,
+      "sha256": "7b216dee3f678e1e99e00123658eab832f9ef77818b090aa119c1c7a93e808dc"
+    },
+    {
+      "path": "builder/START_HERE.md",
+      "summary": "Claude Builder — Start Here",
+      "tier": "hot",
+      "bytes": 738,
+      "estimated_tokens": 184,
+      "sha256": "27414775f90a28f523cdb9bc2289662109df2b1dd7b5ff8b0c7b2952475d27bd"
+    },
+    {
+      "path": "builder/TASK_TEMPLATE.md",
+      "summary": "Builder Task Template",
+      "tier": "warm",
+      "bytes": 434,
+      "estimated_tokens": 108,
+      "sha256": "447675de2511f05297f71cdc4511c6bee3871e2522ec716b45e3ea8982a551ee"
+    },
+    {
+      "path": "decisions/INDEX.md",
+      "summary": "Decision Index",
+      "tier": "warm",
+      "bytes": 1856,
+      "estimated_tokens": 451,
+      "sha256": "1bddd0db1ddb912dcfff08b9d23890a5470a38c4a85694dc0be9c36969355d1c"
+    },
+    {
+      "path": "decisions/records/DEC-0001.md",
+      "summary": "DEC-0001 — CEO is strictly read-only",
+      "tier": "warm",
+      "bytes": 462,
+      "estimated_tokens": 115,
+      "sha256": "e1d391c4499305ab8cf240f8829f2bddfc93abc3fe4b484afc4e8429970fdaf8"
+    },
+    {
+      "path": "decisions/records/DEC-0002.md",
+      "summary": "DEC-0002 — Claude is the normal Builder",
+      "tier": "warm",
+      "bytes": 478,
+      "estimated_tokens": 119,
+      "sha256": "d6ff4bb9b8f012c52b29d6d3e44c1e372d70566ee7f442417e5c31c3d7c599b9"
+    },
+    {
+      "path": "decisions/records/DEC-0003.md",
+      "summary": "DEC-0003 — No merge without explicit approval and rollback awareness",
+      "tier": "warm",
+      "bytes": 496,
+      "estimated_tokens": 123,
+      "sha256": "c27967e801b6e213f64bf306de830abbb748436dc40e008ca712f6c3cfb4dddb"
+    },
+    {
+      "path": "decisions/records/DEC-0004.md",
+      "summary": "DEC-0004 — Maximum three active bets",
+      "tier": "warm",
+      "bytes": 456,
+      "estimated_tokens": 113,
+      "sha256": "c6d94030b7edd79bb3867bda4887308b2b6c06a045d1bc19e4bce3ca987e8ea4"
+    },
+    {
+      "path": "decisions/records/DEC-0005.md",
+      "summary": "DEC-0005 — Five-percent bankroll hard cap",
+      "tier": "warm",
+      "bytes": 481,
+      "estimated_tokens": 119,
+      "sha256": "668525ecb2b1eba1773f073e9c01067535b726cbeaf604b41a6052ecb0fd77af"
+    },
+    {
+      "path": "decisions/records/DEC-0006.md",
+      "summary": "DEC-0006 — No auto-betting",
+      "tier": "warm",
+      "bytes": 466,
+      "estimated_tokens": 116,
+      "sha256": "0256979fc423952a5d50ed1bbc821159e8dcf390c2b01b9e928714fcd340b2d1"
+    },
+    {
+      "path": "decisions/records/DEC-0007.md",
+      "summary": "DEC-0007 — Failed required gate never production",
+      "tier": "warm",
+      "bytes": 484,
+      "estimated_tokens": 120,
+      "sha256": "0c4d8c4032bc8d50dce8478ebf4e94b4daefdeaaf71aba905ee7c7cacdf48036"
+    },
+    {
+      "path": "decisions/records/DEC-0008.md",
+      "summary": "DEC-0008 — One concept has one canonical truth owner",
+      "tier": "warm",
+      "bytes": 447,
+      "estimated_tokens": 111,
+      "sha256": "3b05b8974f59af164f1299598ab029dc696a43f55d89c79f010e789c908af2ec"
+    },
+    {
+      "path": "decisions/records/DEC-0009.md",
+      "summary": "DEC-0009 — Source Release SHA is distinct from Runtime/Data HEAD",
+      "tier": "warm",
+      "bytes": 471,
+      "estimated_tokens": 117,
+      "sha256": "261fddb3c399b2c2ac179a584842470fa2efee03bb1db4ad4024be1e7c776535"
+    },
+    {
+      "path": "decisions/records/DEC-0010.md",
+      "summary": "DEC-0010 — Production score and projected score are separate",
+      "tier": "warm",
+      "bytes": 476,
+      "estimated_tokens": 118,
+      "sha256": "81644e0181fce15fd2b69cb316c6c3b60d4c849e26c0f6b1ce4d6595bfc8f05a"
+    },
+    {
+      "path": "decisions/records/DEC-0011.md",
+      "summary": "DEC-0011 — Queue ACK follows durable canonical mutation",
+      "tier": "warm",
+      "bytes": 486,
+      "estimated_tokens": 121,
+      "sha256": "26f3b229ed9147959ee559c4ddfbef165229b83e3a2a532755dad4dac1e24f25"
+    },
+    {
+      "path": "decisions/records/DEC-0012.md",
+      "summary": "DEC-0012 — Public product data and private user state must be separated",
+      "tier": "warm",
+      "bytes": 496,
+      "estimated_tokens": 123,
+      "sha256": "77e89bd014229c7d60d7f122d1ab8929597bebdfa42d5d7a7aa5783f05a22d86"
+    },
+    {
+      "path": "decisions/records/DEC-0013.md",
+      "summary": "DEC-0013 — Plan early, finalize Builder prompt late",
+      "tier": "warm",
+      "bytes": 508,
+      "estimated_tokens": 126,
+      "sha256": "0cec10f44b82d42731a9b7d5b0f3b94bd81b4cda0ec15c4c47bba5b14a502eac"
+    },
+    {
+      "path": "decisions/records/DEC-0014.md",
+      "summary": "DEC-0014 — Selective shared-memory retrieval",
+      "tier": "warm",
+      "bytes": 471,
+      "estimated_tokens": 117,
+      "sha256": "8ed817e497ac4b6ea7a96dcf6f2db29c60c04584aa152c49cbc5480078408bc2"
+    },
+    {
+      "path": "decisions/records/DEC-0015.md",
+      "summary": "DEC-0015 — 10.0 means effectively flawless",
+      "tier": "warm",
+      "bytes": 486,
+      "estimated_tokens": 121,
+      "sha256": "d609a201ae1b960ef85667e61f73a03ac3790259a4af87d8fb0df3ff87ddd819"
+    },
+    {
+      "path": "decisions/records/DEC-0016.md",
+      "summary": "DEC-0016 — P0 implementation order is A → B → C → D",
+      "tier": "warm",
+      "bytes": 498,
+      "estimated_tokens": 122,
+      "sha256": "0b4c9da08f28a62a71b4d243004fde7e2e914a98cc3e98f5086eb3f7f3907fad"
+    },
+    {
+      "path": "decisions/records/DEC-0017.md",
+      "summary": "DEC-0017 — Actionable current odds must match exact market proposition",
+      "tier": "warm",
+      "bytes": 477,
+      "estimated_tokens": 118,
+      "sha256": "462968b5622d3a374e90946471cd438c3450adee6b7c362bb99e851782a46625"
+    },
+    {
+      "path": "decisions/records/DEC-0018.md",
+      "summary": "DEC-0018 — Tennis LIVE requires authoritative evidence",
+      "tier": "warm",
+      "bytes": 439,
+      "estimated_tokens": 109,
+      "sha256": "254de3993a781a9b138324df37babae78b3c6f6fa495dc75a2cf21039dffae9e"
+    },
+    {
+      "path": "decisions/records/DEC-0019.md",
+      "summary": "DEC-0019 — Production measurement requires explicit provenance",
+      "tier": "warm",
+      "bytes": 499,
+      "estimated_tokens": 124,
+      "sha256": "9a13d65c6fb2945a357f375092863b823907f6bf8ca71707277820f467e6f66b"
+    },
+    {
+      "path": "decisions/records/DEC-0020.md",
+      "summary": "DEC-0020 — AI healer becomes diagnosis/recovery-only",
+      "tier": "warm",
+      "bytes": 518,
+      "estimated_tokens": 129,
+      "sha256": "3874cf857ca5b4855baba957ce7a58bffda385296d9f5a308c1e1e1ff9b35808"
+    },
+    {
+      "path": "decisions/records/DEC-0021.md",
+      "summary": "DEC-0021 — Shared Memory is private Markdown/Git; Obsidian is UI",
+      "tier": "warm",
+      "bytes": 480,
+      "estimated_tokens": 119,
+      "sha256": "34a96e466840663f59a1d5f3354cfec865311e129f1ee81ae1247caaaf623724"
+    },
+    {
+      "path": "decisions/records/DEC-0022.md",
+      "summary": "DEC-0022 — No MCP in Shared Memory V1",
+      "tier": "warm",
+      "bytes": 489,
+      "estimated_tokens": 121,
+      "sha256": "2e564482283cf39aef48db65e44295e1ee32f5a64ce7bfdc6c3bfe8713b30a5a"
+    },
+    {
+      "path": "domains/FOOTBALL.md",
+      "summary": "Football Domain",
+      "tier": "warm",
+      "bytes": 631,
+      "estimated_tokens": 154,
+      "sha256": "e7db29a98ce7e881def66caae5f5e723154d432abe182c029bd5117790f8a6b1"
+    },
+    {
+      "path": "domains/LEDGER_AND_MEASUREMENT.md",
+      "summary": "Ledger & Measurement",
+      "tier": "warm",
+      "bytes": 945,
+      "estimated_tokens": 236,
+      "sha256": "fefebf624f811c638e4246171169dfebd4d4f5330995218ec0f9cde152f99849"
+    },
+    {
+      "path": "domains/MODELS.md",
+      "summary": "Models",
+      "tier": "warm",
+      "bytes": 886,
+      "estimated_tokens": 221,
+      "sha256": "91ba46379cba596bd0bd15231ce6c32a0f3549b31a648147b34dfd11c3c444e8"
+    },
+    {
+      "path": "domains/MONITORING_AND_RECOVERY.md",
+      "summary": "Monitoring & Recovery",
+      "tier": "warm",
+      "bytes": 836,
+      "estimated_tokens": 209,
+      "sha256": "1bf57b66a4f23fa5b9dbdf771c045add3b587c6e164a187f15a503d29cbb974d"
+    },
+    {
+      "path": "domains/ODDS_AND_PROVIDERS.md",
+      "summary": "Odds & Providers",
+      "tier": "warm",
+      "bytes": 858,
+      "estimated_tokens": 214,
+      "sha256": "65fd972da08022820d209476127386f1b9ed82d882562eef9da5e55c4031a1f5"
+    },
+    {
+      "path": "domains/PWA_AND_WORKER.md",
+      "summary": "PWA & Cloudflare Worker",
+      "tier": "warm",
+      "bytes": 882,
+      "estimated_tokens": 220,
+      "sha256": "6473a738b57cce590dd8548eddf49ec933579338832243d987be4a087c2e4bb5"
+    },
+    {
+      "path": "domains/SECURITY_AND_PRIVACY.md",
+      "summary": "Security & Privacy",
+      "tier": "warm",
+      "bytes": 810,
+      "estimated_tokens": 202,
+      "sha256": "bfaf1fd0336904f63189c5d5ca40a0bd83afdb536ad389df7c521f2c5948c856"
+    },
+    {
+      "path": "domains/TENNIS.md",
+      "summary": "Tennis Domain",
+      "tier": "warm",
+      "bytes": 1095,
+      "estimated_tokens": 273,
+      "sha256": "9431b0b02a998281de5edc4651fecabaa0e12dddac0875c9cb347dce6008a604"
+    },
+    {
+      "path": "findings/OPEN.md",
+      "summary": "Open Findings",
+      "tier": "warm",
+      "bytes": 1171,
+      "estimated_tokens": 292,
+      "sha256": "eb5276b7b8f92d7e57f76762cce045f3944f96835de3a169721e1d4def22d7f9"
+    },
+    {
+      "path": "findings/RESOLVED.md",
+      "summary": "Resolved / Historical Findings",
+      "tier": "warm",
+      "bytes": 268,
+      "estimated_tokens": 67,
+      "sha256": "15dcaa275e87e356252e8b83361c257486f8d09bc78b1d437448c660db71824e"
+    },
+    {
+      "path": "findings/records/FND-20260814-001.md",
+      "summary": "FND-20260814-001 — Remote durability is not proven by a clean staging area",
+      "tier": "warm",
+      "bytes": 1047,
+      "estimated_tokens": 261,
+      "sha256": "2c983392504c4863aefd856d80082b431cc0574ca37a0a51ed3633fd8f506037"
+    },
+    {
+      "path": "findings/records/FND-20260814-002.md",
+      "summary": "FND-20260814-002 — Retryable authoritative-bankroll failure can become permanent rejection",
+      "tier": "warm",
+      "bytes": 918,
+      "estimated_tokens": 229,
+      "sha256": "f252c9e688331f9e09e30b5d6d1e3aaf3938fb03229c9c8938823b0166bbedcb"
+    },
+    {
+      "path": "findings/records/FND-20260814-003.md",
+      "summary": "FND-20260814-003 — Cancellation does not share placement durable-ACK semantics",
+      "tier": "warm",
+      "bytes": 967,
+      "estimated_tokens": 241,
+      "sha256": "741b3c3270bfb7f499c3980ace8fe981c0ec16a88dc4e98d3aba73e672550ea7"
+    },
+    {
+      "path": "findings/records/FND-20260814-004.md",
+      "summary": "FND-20260814-004 — Focused Playwright submit proof can pass without an actual submit",
+      "tier": "warm",
+      "bytes": 955,
+      "estimated_tokens": 238,
+      "sha256": "d8b9c299638205bafee71c22570430a0e5ec653667fe4684192594345a4712d3"
+    },
+    {
+      "path": "findings/records/FND-20260814-005.md",
+      "summary": "FND-20260814-005 — Health can report status=ok with exit_code=1",
+      "tier": "warm",
+      "bytes": 848,
+      "estimated_tokens": 211,
+      "sha256": "880bd76e32a21d10ad612fa78e0ba92e54a550071ae23533e9c79fe0fb39f4e1"
+    },
+    {
+      "path": "findings/records/FND-20260814-006.md",
+      "summary": "FND-20260814-006 — Health cadence model has drifted from actual workflow schedules",
+      "tier": "warm",
+      "bytes": 932,
+      "estimated_tokens": 232,
+      "sha256": "020442085b56bd52395cda63c9d406f14b72c777d4e04b9d7d8e1533dd3748c9"
+    },
+    {
+      "path": "findings/records/FND-20260814-007.md",
+      "summary": "FND-20260814-007 — Recovery maps reference inactive/nonexistent workflow filenames",
+      "tier": "warm",
+      "bytes": 841,
+      "estimated_tokens": 209,
+      "sha256": "f74c9ce7c8e0f24d89ad33b1842ffedb388a7e8765eeb49dc5d9baf5b079647e"
+    },
+    {
+      "path": "findings/records/FND-20260814-008.md",
+      "summary": "FND-20260814-008 — Windowed Bundesliga2 jobs are modeled as globally periodic",
+      "tier": "warm",
+      "bytes": 822,
+      "estimated_tokens": 205,
+      "sha256": "2c9bab316513da0af83bb6553aefcf854a598fdf313136699901e37102f09386"
+    },
+    {
+      "path": "findings/records/FND-20260814-009.md",
+      "summary": "FND-20260814-009 — Event-driven consumer is modeled as a fixed 2-minute job",
+      "tier": "warm",
+      "bytes": 788,
+      "estimated_tokens": 196,
+      "sha256": "ac5a9a28cb4ef9ee81fdd1c66cdacf7eb7644a2c28a6b84cc58a5190c5012c2b"
+    },
+    {
+      "path": "findings/records/FND-20260814-010.md",
+      "summary": "FND-20260814-010 — Odds refresher execution is missing from aggregate health coverage",
+      "tier": "warm",
+      "bytes": 880,
+      "estimated_tokens": 219,
+      "sha256": "c02baf7f63c50f4a68149dfa5c79fcdda19339749efe03d83fdd36098335a25d"
+    },
+    {
+      "path": "findings/records/FND-20260814-011.md",
+      "summary": "FND-20260814-011 — Personal ledger and DB are tracked in public repository",
+      "tier": "warm",
+      "bytes": 821,
+      "estimated_tokens": 204,
+      "sha256": "fad06bb581da097d75fda4b20dd000934cd7046002af3cb2a23e41825106d1c2"
+    },
+    {
+      "path": "findings/records/FND-20260814-012.md",
+      "summary": "FND-20260814-012 — Public signals snapshot contains bankroll/open-bet private state",
+      "tier": "warm",
+      "bytes": 849,
+      "estimated_tokens": 211,
+      "sha256": "6776a2ec219b9eac521a231f95b2761b5b38b243aa9b92a80854323429670750"
+    },
+    {
+      "path": "findings/records/FND-20260814-013.md",
+      "summary": "FND-20260814-013 — Unauthenticated Worker default-user snapshot can expose private state",
+      "tier": "warm",
+      "bytes": 859,
+      "estimated_tokens": 214,
+      "sha256": "231cd2ecc5e8086385e4f9a96d89e057903499f12059d1d0caf231e18c12fc79"
+    },
+    {
+      "path": "findings/records/FND-20260814-014.md",
+      "summary": "FND-20260814-014 — Privacy/legal text contradicts actual persistence architecture",
+      "tier": "warm",
+      "bytes": 822,
+      "estimated_tokens": 205,
+      "sha256": "c055e6897e6cbf118f6413ada7cfcdebaae611de7e0a23af3e3a8e5c3e670790"
+    },
+    {
+      "path": "findings/records/FND-20260814-015.md",
+      "summary": "FND-20260814-015 — AI healer has autonomous source edit/commit/push capability",
+      "tier": "warm",
+      "bytes": 832,
+      "estimated_tokens": 207,
+      "sha256": "69dc29b61eec6986b2aa663463694dbaa6c5b9efc3ddad0b80a3036f292bcbd9"
+    },
+    {
+      "path": "findings/records/FND-20260814-016.md",
+      "summary": "FND-20260814-016 — Tennis production LIVE mode is governed by broad user override",
+      "tier": "warm",
+      "bytes": 865,
+      "estimated_tokens": 215,
+      "sha256": "eea1fb403b8b7640284ee79019dbbe4efdbb26a7f9b5575c466d35eb7185761b"
+    },
+    {
+      "path": "findings/records/FND-20260814-017.md",
+      "summary": "FND-20260814-017 — Automated Git writers use inconsistent persistence primitives",
+      "tier": "warm",
+      "bytes": 881,
+      "estimated_tokens": 219,
+      "sha256": "ff5fb15c1ff9cf11b0eae4c6228232182539e3e3c95ce5bb4c3a68ae092e5424"
+    },
+    {
+      "path": "findings/records/FND-20260814-018.md",
+      "summary": "FND-20260814-018 — Runtime-data commits continuously obscure source-release provenance",
+      "tier": "warm",
+      "bytes": 867,
+      "estimated_tokens": 216,
+      "sha256": "9aa519ee710eb7a674d26cc63943290e48763cee4e99cd493d8692b4ce9831b1"
+    },
+    {
+      "path": "findings/records/FND-20260814-019.md",
+      "summary": "FND-20260814-019 — Tennis non-H2H refresh can attach H2H-B odds to unrelated markets",
+      "tier": "warm",
+      "bytes": 858,
+      "estimated_tokens": 213,
+      "sha256": "336d1243037124cff91b1e73d878c6fcd1c61892d721e4a12fd70eee98bc1ba5"
+    },
+    {
+      "path": "findings/records/FND-20260814-020.md",
+      "summary": "FND-20260814-020 — Tennis fixture identity is not globally unique across event instances",
+      "tier": "warm",
+      "bytes": 862,
+      "estimated_tokens": 215,
+      "sha256": "9c5af662731e304f5b62745cd4a610c4700845b602e5591c02e82543d7d35fa5"
+    },
+    {
+      "path": "findings/records/FND-20260814-021.md",
+      "summary": "FND-20260814-021 — Tennis LGBM train/live RollingState semantics differ",
+      "tier": "warm",
+      "bytes": 868,
+      "estimated_tokens": 216,
+      "sha256": "8139ffb9a50ad477439971a585f47e202fecc0b8f30daf485f1dd5bd86a31f06"
+    },
+    {
+      "path": "findings/records/FND-20260814-022.md",
+      "summary": "FND-20260814-022 — Historical production measurement population is contaminated",
+      "tier": "warm",
+      "bytes": 914,
+      "estimated_tokens": 228,
+      "sha256": "2399d942b66ad8f52f7d193de8c4045c74b5136b4405619bce2cfec1bd155f34"
+    },
+    {
+      "path": "findings/records/FND-20260814-023.md",
+      "summary": "FND-20260814-023 — Historical Tennis rows contain blank/wm2026 identity contamination",
+      "tier": "warm",
+      "bytes": 891,
+      "estimated_tokens": 222,
+      "sha256": "aabac17f338ab296989dc1823d0454c69d136b2f7c7f7fd9fe53dc5882d3916f"
+    },
+    {
+      "path": "findings/records/FND-20260814-024.md",
+      "summary": "FND-20260814-024 — Tennis schedule authority metadata can drift across source/odds_source fields",
+      "tier": "warm",
+      "bytes": 865,
+      "estimated_tokens": 215,
+      "sha256": "b31655a46e79049c87ff5e393f696bef9acbe69880bbfc03f76669d96a2984b2"
+    },
+    {
+      "path": "findings/records/FND-20260814-025.md",
+      "summary": "FND-20260814-025 — TennisExplorer parsing can leak tournament context across fixtures",
+      "tier": "warm",
+      "bytes": 815,
+      "estimated_tokens": 203,
+      "sha256": "b9f18bf29872b54e4a5ebeb11c270fcba73697a5624dd2ec24bfdf30c3156e5f"
+    },
+    {
+      "path": "findings/records/FND-20260814-026.md",
+      "summary": "FND-20260814-026 — Closing-odds proposition parity is not fully verified",
+      "tier": "warm",
+      "bytes": 830,
+      "estimated_tokens": 206,
+      "sha256": "a3309e107d4cd8ce4734b7b03a9984d921412f493dee4ad4c69c786057fb1beb"
+    },
+    {
+      "path": "findings/records/FND-20260814-027.md",
+      "summary": "FND-20260814-027 — Fabricated fallback odds in PWA were previously possible",
+      "tier": "warm",
+      "bytes": 864,
+      "estimated_tokens": 215,
+      "sha256": "603d36cf78d8d10e137fd628b8e2d621d1413058f2d6f8c24e00ef3332e4436f"
+    },
+    {
+      "path": "findings/records/FND-20260814-028.md",
+      "summary": "FND-20260814-028 — Elapsed-time Tennis false-LIVE behavior was materially hardened",
+      "tier": "warm",
+      "bytes": 853,
+      "estimated_tokens": 212,
+      "sha256": "413a1828696637496a2e460a46f95203c3c74c7aa0891160b3fc150620772862"
+    },
+    {
+      "path": "findings/records/FND-20260814-029.md",
+      "summary": "FND-20260814-029 — Runtime bots previously contaminated source branches",
+      "tier": "warm",
+      "bytes": 877,
+      "estimated_tokens": 218,
+      "sha256": "8222a601f7c5c39c2fc8e8cf028edc508cb2fdaee50b6f34ebd79bda04a74cc1"
+    },
+    {
+      "path": "history/AUDIT_INDEX.md",
+      "summary": "Audit Index",
+      "tier": "cold",
+      "bytes": 601,
+      "estimated_tokens": 150,
+      "sha256": "bdba986495e53578ada4af9f5eeab388aabface14f80577c20e3a2869f51a12b"
+    },
+    {
+      "path": "history/INCIDENT_TIMELINE.md",
+      "summary": "Incident Timeline",
+      "tier": "cold",
+      "bytes": 1357,
+      "estimated_tokens": 334,
+      "sha256": "c735d7146c67674187254d7594e7594090869d24ab925ab809c41bc66370fbc6"
+    },
+    {
+      "path": "history/archive/2026-08-13/SPORTSBRAIN_CEO_SCORECARD_2026-08-13.md",
+      "summary": "SportsBrain — CEO Product Audit & Canonical Scorecard",
+      "tier": "cold",
+      "bytes": 27037,
+      "estimated_tokens": 6683,
+      "sha256": "f48438239495a05a0a0a908f3675209498395c76c355cb86dfc3c6fed3f888c3"
+    },
+    {
+      "path": "history/archive/2026-08-13/SPORTSBRAIN_CLAUDE_CONTEXT_CONTRACT_2026-08-13.md",
+      "summary": "SportsBrain — Claude Context Contract",
+      "tier": "cold",
+      "bytes": 7009,
+      "estimated_tokens": 1742,
+      "sha256": "0f7c67910fcfc84dab7d3d813c4f823c8a021d2b2010d65b40293eb4a8c52127"
+    },
+    {
+      "path": "history/archive/2026-08-13/SPORTSBRAIN_INVARIANT_REGISTRY_2026-08-13.md",
+      "summary": "SportsBrain — Canonical Invariant Registry",
+      "tier": "cold",
+      "bytes": 67000,
+      "estimated_tokens": 16472,
+      "sha256": "533481b6e6882308e16beee50d90fe7a40085130df323c85dba105facce1db3a"
+    },
+    {
+      "path": "history/archive/2026-08-13/SPORTSBRAIN_P0B_EXECUTION_PLANE_MATRIX_2026-08-13.md",
+      "summary": "SportsBrain — P0-B Execution Plane & Schedule Matrix",
+      "tier": "cold",
+      "bytes": 10699,
+      "estimated_tokens": 2663,
+      "sha256": "9474841022824e1907ecf389c59f9ef4a29f3de0df4285e010d93714296b07ba"
+    },
+    {
+      "path": "history/archive/2026-08-13/SPORTSBRAIN_P0C_PRIVACY_MIGRATION_BLUEPRINT_2026-08-13.md",
+      "summary": "SportsBrain — P0-C Privacy & Persistence Migration Blueprint",
+      "tier": "cold",
+      "bytes": 13172,
+      "estimated_tokens": 3244,
+      "sha256": "36e89a1db3c037eee34e4641f994c7f0a685ad79cd828809c19aabf8b77723ee"
+    },
+    {
+      "path": "history/archive/2026-08-13/SPORTSBRAIN_P0D_WRITER_GOVERNANCE_MATRIX_2026-08-13.md",
+      "summary": "SportsBrain — P0-D Writer & Governance Matrix",
+      "tier": "cold",
+      "bytes": 13409,
+      "estimated_tokens": 3341,
+      "sha256": "73bbd78436d399cc9e9fcc17a3ba7bc40f9d28b4a03e7629561a256bb7e50b80"
+    },
+    {
+      "path": "history/archive/2026-08-13/SPORTSBRAIN_P0_EXECUTION_BLUEPRINT_2026-08-13.md",
+      "summary": "SportsBrain — P0 Execution Blueprint",
+      "tier": "cold",
+      "bytes": 26345,
+      "estimated_tokens": 6544,
+      "sha256": "2bbceb46374ce84da1db62b4d9de2e3f98d35194569eef874ef79a0dd0d816f2"
+    },
+    {
+      "path": "history/archive/2026-08-13/SPORTSBRAIN_SYSTEM_MAP_2026-08-13.md",
+      "summary": "SportsBrain — Canonical System Map",
+      "tier": "cold",
+      "bytes": 32250,
+      "estimated_tokens": 8020,
+      "sha256": "f97ab5823fa0dca737ae9b9a4c703625b70dd4daa5550de74ed6850a344305d8"
+    },
+    {
+      "path": "invariants/BETTING_RISK.md",
+      "summary": "Betting Risk Invariants",
+      "tier": "warm",
+      "bytes": 16530,
+      "estimated_tokens": 4131,
+      "sha256": "395bfa890bb6938674f3812f3fe625eca012ff4eb66f134ef72efdd4716a7363"
+    },
+    {
+      "path": "invariants/INDEX.md",
+      "summary": "Invariant Index",
+      "tier": "warm",
+      "bytes": 640,
+      "estimated_tokens": 157,
+      "sha256": "942ba6343b02dfb718be88c17a526f78be2ee85d7385f619aaf4ea07f5edd282"
+    },
+    {
+      "path": "invariants/MODELS_MEASUREMENT.md",
+      "summary": "Models Measurement Invariants",
+      "tier": "warm",
+      "bytes": 10487,
+      "estimated_tokens": 2621,
+      "sha256": "5ee97c30c3c5fb3c3aaf8629c0dc89dcb82ff48be728b3a6e774e3db4bb91688"
+    },
+    {
+      "path": "invariants/ODDS_TENNIS.md",
+      "summary": "Odds Tennis Invariants",
+      "tier": "warm",
+      "bytes": 12171,
+      "estimated_tokens": 3042,
+      "sha256": "615058983be536000d42ff3d72bead6071c87fbd7a4bf6c23536f639a5fcca6a"
+    },
+    {
+      "path": "invariants/QUEUE_DATA.md",
+      "summary": "Queue Data Invariants",
+      "tier": "warm",
+      "bytes": 14428,
+      "estimated_tokens": 3606,
+      "sha256": "6d42cf7c478052911b513a7d7b9157fedd298d494c1585d71303356a21e9ba40"
+    },
+    {
+      "path": "invariants/RELEASE_MONITORING.md",
+      "summary": "Release Monitoring Invariants",
+      "tier": "warm",
+      "bytes": 14821,
+      "estimated_tokens": 3705,
+      "sha256": "1ff75941d1ec5a5508a3892ad4cd3f67e1a3d601b28d7b35e63ee56a26d60724"
+    },
+    {
+      "path": "invariants/SECURITY_GOVERNANCE.md",
+      "summary": "Security Governance Invariants",
+      "tier": "warm",
+      "bytes": 13940,
+      "estimated_tokens": 3485,
+      "sha256": "a6b2558cfb539fcc4f742a4b758073746dcd9fbdb0f29fb44b41f2de5b0f9340"
+    },
+    {
+      "path": "product/ROADMAP.md",
+      "summary": "Roadmap",
+      "tier": "warm",
+      "bytes": 693,
+      "estimated_tokens": 173,
+      "sha256": "27c172ca1b605f94b4d2bf9d4311fd25cda7fcaae8b1276617e9c65b3da5a520"
+    },
+    {
+      "path": "product/SCORECARD.md",
+      "summary": "SportsBrain Canonical Scorecard",
+      "tier": "warm",
+      "bytes": 1011,
+      "estimated_tokens": 252,
+      "sha256": "7a4da91543a77d94b9c8a1fce47be8f1bbb9265d345817e67f093e81be011170"
+    },
+    {
+      "path": "product/VISION_AND_PRINCIPLES.md",
+      "summary": "Product Vision & Principles",
+      "tier": "warm",
+      "bytes": 946,
+      "estimated_tokens": 236,
+      "sha256": "ed3787c384897b7fd04454d2fdfb1577982563cf34662756f8e18f77e845db74"
+    },
+    {
+      "path": "tools/apply_update.py",
+      "summary": "apply_update.py",
+      "tier": "warm",
+      "bytes": 2294,
+      "estimated_tokens": 573,
+      "sha256": "83f7706dbad329bb532d917240474d239ed62ad5d2f883cef50f45ca3ec44e5c"
+    },
+    {
+      "path": "tools/build_context.py",
+      "summary": "build_context.py",
+      "tier": "warm",
+      "bytes": 3135,
+      "estimated_tokens": 783,
+      "sha256": "bb2595f505aab00e66b50350cedc0bbceda1c4b4bd5701f7960bf0d5ccb2c4c7"
+    },
+    {
+      "path": "tools/validate_memory.py",
+      "summary": "Required files",
+      "tier": "warm",
+      "bytes": 4633,
+      "estimated_tokens": 1158,
+      "sha256": "d3fcd2ff18160a649e47b2c1c9245b20dcf07427a2caa066773b08f619bb5ed2"
+    },
+    {
+      "path": "workstreams/MODEL_INTEGRITY.md",
+      "summary": "Model Integrity",
+      "tier": "warm",
+      "bytes": 665,
+      "estimated_tokens": 166,
+      "sha256": "deccf95ad0a7067fd3794de434f376c4200813b3bb46269da05a432233a3430d"
+    },
+    {
+      "path": "workstreams/P0-A.md",
+      "summary": "P0-A — Canonical Betting Safety",
+      "tier": "warm",
+      "bytes": 1432,
+      "estimated_tokens": 355,
+      "sha256": "ec8bb34d59c5a90fda6d8bafbd096ba85d438ea8ce03feb5a65d01b95ef82733"
+    },
+    {
+      "path": "workstreams/P0-B.md",
+      "summary": "P0-B — Monitoring Truth",
+      "tier": "warm",
+      "bytes": 1151,
+      "estimated_tokens": 287,
+      "sha256": "3e34671894507a92c2a9fb443288ec5c7675d172f0de44d362acee1d093196cd"
+    },
+    {
+      "path": "workstreams/P0-C.md",
+      "summary": "P0-C — Privacy & Persistence",
+      "tier": "warm",
+      "bytes": 1077,
+      "estimated_tokens": 268,
+      "sha256": "b8b0cd05ebcf9d6bb0a270ee80dfee9fe70b51757aa918490101c1b4bd3fed5f"
+    },
+    {
+      "path": "workstreams/P0-D.md",
+      "summary": "P0-D — Governance & Data Integrity",
+      "tier": "warm",
+      "bytes": 773,
+      "estimated_tokens": 192,
+      "sha256": "97adaa8cc82e2b021ce5d451c0a8aef063fd501fc4cde4f873dc4d2fd071df19"
+    },
+    {
+      "path": "workstreams/WAVE_3D.md",
+      "summary": "Wave 3D — Production Trust Monitor",
+      "tier": "warm",
+      "bytes": 756,
+      "estimated_tokens": 188,
+      "sha256": "7a55f7b428fc140e366ab87a7ab9cacfec3550a7c26f4d090dae21c6f7893052"
+    }
+  ]
+}
