@@ -2,44 +2,34 @@
 type: "builder-task"
 tier: "hot"
 status: "current"
-task_id: "TASK-P0A-010"
+task_id: "TASK-P0A-011"
 workstream: "P0-A"
-last_updated: "2026-08-14T01:06:00+02:00"
+last_updated: "2026-08-14T01:31:00+02:00"
 freshness_class: "runtime-sensitive"
 invariants:
   - QUEUE-001
   - QUEUE-002
   - QUEUE-003
-  - QUEUE-004
-  - QUEUE-005
   - QUEUE-006
   - QUEUE-007
   - QUEUE-008
-  - BET-003
   - BET-004
   - BET-005
   - BET-019
   - BET-020
   - REL-009
-  - UX-008
 findings:
   - FND-20260814-001
-  - FND-20260814-002
   - FND-20260814-003
-  - FND-20260814-004
-  - FND-20260814-030
   - FND-20260814-031
 required_context:
   - workstreams/P0-A.md
   - invariants/QUEUE_DATA.md#QUEUE-001
   - invariants/QUEUE_DATA.md#QUEUE-002
   - invariants/QUEUE_DATA.md#QUEUE-003
-  - invariants/QUEUE_DATA.md#QUEUE-004
-  - invariants/QUEUE_DATA.md#QUEUE-005
   - invariants/QUEUE_DATA.md#QUEUE-006
   - invariants/QUEUE_DATA.md#QUEUE-007
   - invariants/QUEUE_DATA.md#QUEUE-008
-  - invariants/BETTING_RISK.md#BET-003
   - invariants/BETTING_RISK.md#BET-004
   - invariants/BETTING_RISK.md#BET-005
   - invariants/BETTING_RISK.md#BET-019
@@ -47,78 +37,91 @@ required_context:
   - invariants/RELEASE_MONITORING.md#REL-009
   - architecture/DATA_AND_PERSISTENCE.md
 ---
-# TASK-P0A-010 — Final Closure Correction
+# TASK-P0A-011 — Queue Identity + Final Recommendation Actionability
 
 ## Mission
 
-Close all six remaining P0-A blockers on existing PR #10. Do not merge or start downstream work.
+Close the final three verified P0-A blockers on PR #10. Do not merge or start P0-B/C/D.
 
 ## Reviewed state
 
-- PR head: `08b63f8a14fb64021f79277e7069e9aee11327f9`
-- exact-head CI: GREEN (`31752148258`)
-- full frontend smoke is not green
-- runtime/data main moves independently.
+- CEO-reviewed PR head: `a90be4c492b736b348dba9b3847c3b1d9823031a`
+- exact-head CI: GREEN (`31753905213`)
+- runtime/data main moves independently
+- builder reports local consumer 48/48, Playwright 12/12, Python 1528/1528 green
+- production remains unchanged/uncredited until merge.
 
-## Required closure
+## 1. FND-20260814-001 — staged-diff command errors fail closed
 
-### FND-20260814-001 — fail closed on Git durability-command errors
-- `git add` nonzero → failure/no accepted ACK.
-- current `fetch origin main` required before containment claim.
-- merge-base: 0=contained, 1=not-contained push path, >1=verification failure.
-- failed pull/rebase cannot be ignored before push.
-- deterministic add/fetch/merge-base/local-ahead/contained/push/ACK-retry tests.
+In `_durable_push()` handle `git diff --cached --quiet` explicitly:
+- rc 0 = no staged changes;
+- rc 1 = staged changes;
+- rc >1 = Git verification error → return False / no ACK.
 
-### FND-20260814-002 — correct decision semantics
-- `bankroll is None` / lookup failure → RETRY.
-- finite authoritative `bankroll <= 0` → permanent risk REJECT.
-- open-count exception remains RETRY.
-- tests for None/zero/negative/positive.
+Add deterministic rc>1 test. Preserve all other newly-correct Git error handling.
 
-### FND-20260814-003 — prove mixed cancellation + placement
-Use real orchestration/call-order tests for one run containing both mutation types, failure ordering and ACK-retry idempotency. Do not redesign if current ordering is safe.
+## 2. FND-20260814-003 — cancellation queue must have exact-intent ACK semantics
 
-### FND-20260814-004 — exactly one submit
-- assert exactly one `/pending_bets` request (`== 1`);
-- assert POST;
-- preserve source=value, signal_id, current odds, <=5% stake and JS assertions;
-- no conditional pass.
+Current clear-all `DELETE /cancel_requests` is unsafe.
 
-### FND-20260814-030 — exact consumer source
-- exact string `value` or `manual` only;
-- no default, trim or case normalization;
-- malformed/missing source permanent REJECT;
-- deterministic consumer tests.
+Required invariants:
+- ACK/deletion may remove only the exact cancellation intent whose durable outcome is proven;
+- an unresolved/not-found cancel remains retryable;
+- a cancellation for a placement fetched in the same run cannot be lost;
+- a new cancellation arriving after consumer GET cannot be erased by ACK of older requests;
+- push failure leaves affected cancel intents queued;
+- ACK failure retry is idempotent;
+- placement and cancellation may share one durable push if the final remote state for both is proven before either ACK.
 
-### FND-20260814-031 — legacy recommendation stays non-actionable
-CEO contract: a legacy/incomplete recommendation that fails canonical Value actionability must not automatically become a Manual action on that recommendation card. Manual betting remains only via a clearly explicit separate manual-entry flow.
-- smallest safe UI change;
-- do not weaken/delete `test_p0a_legacy_signal_cannot_open_value_modal`;
-- preserve explicit Manual flow elsewhere;
-- complete `tests/frontend/test_pwa_smoke.py` must be green.
+Preferred implementation: stable cancel request IDs + per-item DELETE endpoint analogous to pending bets. An equally safe transactional design is acceptable, but clear-all ACK is not.
 
-## Expected files
+Deterministic tests must include:
+1. same bet has pending placement + cancel request in the same run;
+2. two cancel requests where one succeeds and one is unresolved/retryable;
+3. newly/concurrently queued cancel survives ACK of an older one (test Worker/per-item deletion semantics);
+4. cancel push failure → no cancel ACK;
+5. cancel ACK failure → retry idempotent;
+6. mixed placement+cancel ordering proves exact corresponding durability before ACK, not merely counts of pushes/deletes.
 
-- `scripts/consume_pending_bets.py`
-- `tests/scripts/test_consume_pending_bets.py`
-- `tests/frontend/test_pwa_smoke.py`
-- `docs/js/views.js`
-- `docs/js/bets.js` only if directly required.
+Expected files may now include `cloudflare/worker.js` and Node Worker tests because cancellation identity lives at the queue boundary.
+
+## 3. FND-20260814-031 — no recommendation→Manual downgrade
+
+CEO contract:
+- recommendation/model-tip surfaces may place a bet only when backed by a fully actionable canonical Value signal;
+- failure/missing canonical actionability makes the recommendation informational/non-actionable;
+- changing hidden `source` to `manual` is not an acceptable bypass.
+
+Required:
+- `sigCard`: missing/stale current data or otherwise non-actionable Value recommendation must not render a Manual fallback bet button;
+- `predCard` / model-tip / all-odds recommendation buttons with no canonical signal must not directly open a Manual bet flow;
+- do not build a new manual-entry feature in this task;
+- if an already-existing genuinely separate user-selected manual-entry UI exists, preserve it; otherwise no Manual path is preferable to recommendation auto-downgrade;
+- update Playwright/JS tests so legacy, missing-current-data and model-tip noncanonical recommendation surfaces prove no bet action;
+- canonical actionable Value submit remains green.
 
 ## Forbidden scope
 
-No P0-B/C/D, Model Integrity, Wave 3D, privacy migration, monitoring redesign or unrelated cleanup.
+No P0-B monitoring redesign, P0-C privacy, P0-D governance/model rollout, Model Integrity, Wave 3D, unrelated cleanup or feature work.
 
 ## Git safety
 
-Re-fetch remote first. Use isolated clean worktree. Preserve original dirty worktree. No force push, destructive reset/history rewrite, or merge.
+Re-fetch remote. Isolated clean worktree. Preserve original dirty worktree. No force push, destructive reset, history rewrite or merge.
 
 ## Required gates
 
-Focused durability/consumer tests; full relevant Python suite; **complete frontend Playwright suite**; Node Worker contract; Ruff; push same PR branch; exact new-head CI green.
+- focused new durability/cancellation identity tests;
+- Worker cancellation endpoint tests if Worker changes;
+- full consumer suite;
+- full relevant Python suite;
+- complete frontend Playwright suite;
+- Node Worker contract tests;
+- Ruff regression;
+- push same PR branch;
+- exact new-head CI green.
 
-If CI is not completed, report WAITING, not COMPLETE.
+If exact new-head CI is not complete, report WAITING, not COMPLETE.
 
 ## Report
 
-Status; task/findings; exact head; current runtime-data main; changed files; evidence for six findings; exact test counts including full Playwright; exact new-head CI; residual risk; merge recommendation; STOP.
+Return only Status; task/finding IDs; exact head; runtime-data main; changed files; evidence for all three findings; exact test counts; exact new-head CI; residual risks; merge recommendation; STOP.
