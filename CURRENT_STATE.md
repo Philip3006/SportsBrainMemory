@@ -5,7 +5,7 @@ status: "current"
 last_updated: "2026-08-14T01:57:00+02:00"
 last_verified: "2026-08-14T01:57:00+02:00"
 verified_against_runtime_head: "602df91d85f7931db6186d95ffd8889f8f65dfb4"
-verified_against_pr_head: "fd52d1b858dc08caae355de7ed9fab3a36ed47a9"
+verified_against_pr_head: "5aeae738bcd357c1ee6b36f666fe6ebfb59396da"
 freshness_class: "runtime-sensitive"
 ---
 # Current State
@@ -30,7 +30,7 @@ freshness_class: "runtime-sensitive"
 Independently verified:
 - FND-001 resolved on candidate branch.
 - FND-003 materially improved but still has a real concurrent KV read-modify-write loss race and an exposed clear-all endpoint.
-- FND-031 materially improved, but compact mode remains an alternate recommendation→Manual betting path.
+- FND-031 is resolved on the candidate branch.
 
 Builder reports all local gates green. Exact GitHub CI `31755460760` is independently green.
 

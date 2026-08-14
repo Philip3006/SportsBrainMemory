@@ -57,6 +57,16 @@ Required:
 
 Do not broaden into general queue redesign beyond what is required for this cancellation safety invariant.
 
+
+### CEO correction after review of `5aeae738b`
+
+The per-intent storage design is accepted, but one final namespace defect remains:
+- `_cancelIntentPrefix(DEFAULT_USER)` must not be the broad `cancel_intent:` prefix because it also matches `cancel_intent:{other_user}:...` keys.
+- namespace the default user explicitly (`cancel_intent:philip:` or equivalent stable canonical user namespace);
+- add a Worker test proving default-user listing cannot see another user's cancel intent.
+
+This is the only newly required correction. Do not reopen already-closed compact-mode work.
+
 ## FND-20260814-031 — compact mode must not bypass actionability
 
 Current normal card/model-tip paths are fixed. Compact mode still creates a clickable bet control and `source=manual` when `_cIsValueActionable` is false.

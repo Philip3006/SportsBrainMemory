@@ -8,11 +8,10 @@ workstream: "P0-A"
 ---
 # Current Blockers
 
-Merge blockers after CEO review of PR #10 head `fd52d1b858dc08caae355de7ed9fab3a36ed47a9`:
+Merge blocker after CEO review of PR #10 head `5aeae738bcd357c1ee6b36f666fe6ebfb59396da`:
 
-1. [[findings/records/FND-20260814-003]] — cancellation IDs/per-item endpoint exist, but whole-array KV read-modify-write can still lose concurrent intents; clear-all DELETE remains exposed.
-2. [[findings/records/FND-20260814-031]] — normal/model-tip recommendation paths are fixed, but compact mode still downgrades non-actionable recommendations to Manual.
+1. [[findings/records/FND-20260814-003]] — default-user `cancel_intent:` prefix overlaps non-default user namespaces; explicit per-user prefix required.
 
 Resolved in this review: FND-001.
 
-No merge until both blockers close, required tests and exact new-head CI are green, and CEO re-verifies.
+No merge until this final blocker closes, required tests and exact new-head CI are green, and CEO re-verifies.
