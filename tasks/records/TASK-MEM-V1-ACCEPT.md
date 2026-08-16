@@ -2,12 +2,12 @@
 id: TASK-MEM-V1-ACCEPT
 type: task
 title: Memory V1 Installation Acceptance
-status: draft
+status: completed
 canonical: true
 tier: warm
 workstream: MEMORY_V1
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-16T13:04:00+02:00
+updated_at: 2026-08-16T14:00:00+02:00
 freshness_class: release-bound
 budget_class: standard
 source_paths:

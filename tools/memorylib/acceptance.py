@@ -52,8 +52,30 @@ def run(root:Path):
             details.append(f'{o.object_id}:ERR:{e}')
     gates.append(('task_context_contracts',ctx_ok,'; '.join(details)))
 
+    active_tasks=[o for o in reg.objects if o.object_type=='task' and o.status in {'approved','active'}]
+    n_active=len(active_tasks)
     ctext=(root/'CURRENT_TASK.md').read_text(encoding='utf-8')
-    gates.append(('no_active_builder_task','**NONE**' in ctext,''))
+    if n_active==0:
+        task_ok='**NONE**' in ctext
+        task_detail='' if task_ok else 'CURRENT_TASK should say NONE for idle state'
+    elif n_active==1:
+        t=active_tasks[0]
+        task_ok=t.object_id in ctext
+        task_detail='' if task_ok else f'CURRENT_TASK should reference {t.object_id}'
+    else:
+        task_ok=False
+        task_detail=f'multiple active tasks: {[o.object_id for o in active_tasks]}'
+    gates.append(('builder_lifecycle_consistent',task_ok and n_active<=1,task_detail))
+    if n_active==1:
+        t=active_tasks[0]
+        try:
+            build_context(root,t.object_id)
+            approved_ok=True
+            approved_detail=t.object_id
+        except Exception as e:
+            approved_ok=False
+            approved_detail=str(e)
+        gates.append(('approved_task_executable',approved_ok,approved_detail))
 
     p0=(root/'workstreams/P0-A.md').read_text(encoding='utf-8')
     gates.append(('p0a_closed','status: closed' in p0 and 'EVD-P0A-PROD-001' in p0,''))
