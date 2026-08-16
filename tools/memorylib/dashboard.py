@@ -85,6 +85,7 @@ def render_all(root:Path):
         'P0-A historical findings 001–004 are resolved production and are not blockers.\n'
     ))
     _STATUS_RANK={'active':0,'planned_ready':1,'planned':2}
+    _WS_RANK={'P0-A':0,'P0-B':1,'P0-C':2,'P0-D':3,'MODEL-INTEGRITY':4,'WAVE-3D':5}
     prio_lines=[]
     n=1
     active_ws=active[0].meta.get('workstream') if active else None
@@ -96,7 +97,7 @@ def render_all(root:Path):
                 if o.object_type=='workstream'
                 and o.status not in {'closed'}
                 and o.meta.get('workstream',o.object_id)!=active_ws]
-    pending_ws.sort(key=lambda o:(_STATUS_RANK.get(o.status,9),o.relpath))
+    pending_ws.sort(key=lambda o:(_STATUS_RANK.get(o.status,9),_WS_RANK.get(o.meta.get('workstream',o.object_id),99),o.relpath))
     for o in pending_ws:
         ws_name=o.meta.get('workstream',o.object_id)
         prio_lines.append(f'{n}. Execute {ws_name} workstream.')

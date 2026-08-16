@@ -2,12 +2,12 @@
 id: TASK-P0B-001
 type: task
 title: Execution Truth
-status: approved
+status: completed
 canonical: true
 tier: warm
 workstream: P0-B
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-16T14:00:00+02:00
+updated_at: 2026-08-16T23:00:00+02:00
 freshness_class: release-bound
 budget_class: standard
 findings:
@@ -20,6 +20,10 @@ source_paths:
   - src/monitoring/health_writer.py
   - src/monitoring/aggregate_health.py
   - tests/monitoring/test_health_truth.py
+evidence:
+  - EVD-P0B-001-PROD-001
+verified_by:
+  - VER-P0B-001-PROD-001
 ---
 # TASK-P0B-001 — Execution Truth
 

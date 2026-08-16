@@ -9,10 +9,10 @@ generated: true
 ## Now
 
 - Memory version: **V1.0.0 acceptance-ready**
-- Source release: `1d2ae06232a1d15e8a70cc16b0f6f138e0943f4f`
-- Runtime/data HEAD observed: `1d45663835c20b696d327a8b2ab8002250cad12a`
-- Current Builder task: **TASK-P0B-001**
-- Open P0 findings: **9**
+- Source release: `5dc8ff7dd7434420ad856187fdde74d98dc04dbc`
+- Runtime/data HEAD observed: `3944b6b81a649498f058280dbf0a2ebe8258ad0c`
+- Current Builder task: **TASK-P0B-002**
+- Open P0 findings: **8**
 - Product score: **RECOMPUTE REQUIRED**
 
 ## Attention
