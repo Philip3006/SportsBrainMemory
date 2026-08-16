@@ -1,7 +1,8 @@
 ---
+id: WS-P0-D
 type: "workstream"
 tier: "warm"
-status: "planned_blocked"
+status: "planned_ready"
 workstream: "P0-D"
 last_updated: "2026-08-14T00:03:00+02:00"
 freshness_class: "release-bound"
@@ -29,3 +30,8 @@ Bound every writer, separate hard safety policy from tuning, govern model/Tennis
 ## Dependency
 
 Do not start while P0-A remains open.
+
+
+## V1 readiness note
+
+Writer/governance implementation is prebuilt and split by authority class.

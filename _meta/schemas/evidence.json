@@ -1,0 +1,251 @@
+{
+  "additional_properties": false,
+  "object_type": "evidence",
+  "properties": {
+    "belongs_to": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "blocked_by": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "blocks": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "canonical": {
+      "type": "boolean"
+    },
+    "consumes": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "decisions": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "depends_on": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "derived_from": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "domain": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "evidence_type": {
+      "type": "string"
+    },
+    "executes_on": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "expires_with": {
+      "type": "string"
+    },
+    "exposes": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "feeds": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "findings": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "freshness_class": {
+      "enum": [
+        "runtime-sensitive",
+        "release-bound",
+        "model-bound",
+        "strategy-bound",
+        "stable",
+        "historical"
+      ],
+      "type": "string"
+    },
+    "governed_by": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "id": {
+      "pattern": "[A-Za-z0-9][A-Za-z0-9_-]*",
+      "type": "string"
+    },
+    "implements": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "invariants": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "last_updated": {
+      "type": "string"
+    },
+    "last_verified": {
+      "type": "string"
+    },
+    "observed_at": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "publishes": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "reads": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "related": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "resolves": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "scope": {
+      "type": "string"
+    },
+    "sha": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "stores": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "superseded_by": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "supersedes": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "tested_by": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "tier": {
+      "enum": [
+        "hot",
+        "warm",
+        "cold"
+      ],
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "triggered_by": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "type": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "valid_from": {
+      "type": "string"
+    },
+    "valid_until": {
+      "type": "string"
+    },
+    "verified_at": {
+      "type": "string"
+    },
+    "verified_by": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "workstream": {
+      "type": "string"
+    },
+    "writes": {
+      "type": [
+        "array",
+        "string"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "status"
+  ],
+  "schema_version": 1
+}

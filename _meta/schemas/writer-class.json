@@ -1,0 +1,94 @@
+{
+  "additional_properties": true,
+  "object_type": "writer-class",
+  "properties": {
+    "authority": {
+      "type": "string"
+    },
+    "canonical": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "depends_on": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "evidence": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "findings": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "forbidden": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "freshness_class": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "invariants": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "last_updated": {
+      "type": "string"
+    },
+    "last_verified": {
+      "type": "string"
+    },
+    "related": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "source_paths": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "status": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "workstream": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "status",
+    "canonical"
+  ],
+  "schema_version": 1
+}

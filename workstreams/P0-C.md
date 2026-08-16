@@ -1,7 +1,8 @@
 ---
+id: WS-P0-C
 type: "workstream"
 tier: "warm"
-status: "planned_blocked"
+status: "planned_ready"
 workstream: "P0-C"
 last_updated: "2026-08-14T00:03:00+02:00"
 freshness_class: "release-bound"
@@ -35,3 +36,8 @@ Mature target preference: transactional private database. A separate private Git
 ## Dependency
 
 Implement after P0-A and with P0-B truth monitoring in place for migration safety.
+
+
+## V1 readiness note
+
+Privacy/persistence design is prebuilt; execute after monitoring truth sequencing permits.

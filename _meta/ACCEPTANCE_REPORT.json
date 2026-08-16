@@ -1,0 +1,40 @@
+{
+  "acceptance_gates": {
+    "failed": 0,
+    "passed": 8
+  },
+  "accepted_at": "2026-08-16T13:38:00+02:00",
+  "build_id": "SBMEM-V1-20260816-FINAL-R1",
+  "compileall": "PASS",
+  "notes": [
+    "No active Builder task; all future SportsBrain tasks remain draft and non-executable.",
+    "Generated views are idempotent.",
+    "All 13 draft context previews fit within hard budgets.",
+    "5,000-object registry scale gate passes.",
+    "Installer is transactional and retains rollback backups under .memory-backups/.",
+    "Package manifest integrity is verified before mutation.",
+    "Final ZIP re-extract and installer smoke are required before release."
+  ],
+  "regressions_closed": [
+    "Tracked V0 findings FND-20260814-030 and FND-20260814-031 are explicitly migrated to resolved_production.",
+    "Local .claude/settings.local.json is unmanaged and excluded from package integrity/fingerprint.",
+    "Local Obsidian workspace state and .DS_Store are unmanaged and excluded from canonical fingerprint.",
+    "Installer diagnostics distinguish missing_from_package from unexpected_in_package.",
+    "Realistic overlay install with stale FND-030/031 plus local Claude/Obsidian state passes and preserves unmanaged files."
+  ],
+  "source_memory_baseline": "67444780f8ed0a1340a935934638a7cbd3dfe83b",
+  "sportsbrain_runtime_data_head_observed": "1d45663835c20b696d327a8b2ab8002250cad12a",
+  "sportsbrain_source_release_sha": "1d2ae06232a1d15e8a70cc16b0f6f138e0943f4f",
+  "status": "ACCEPTANCE_READY",
+  "unit_tests": {
+    "count": 29,
+    "failed": 0,
+    "passed": 29
+  },
+  "validator": {
+    "errors": 0,
+    "id_count": 99,
+    "object_count": 181,
+    "warnings": 0
+  }
+}

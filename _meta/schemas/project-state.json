@@ -1,0 +1,96 @@
+{
+  "additional_properties": true,
+  "object_type": "project-state",
+  "properties": {
+    "canonical": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "depends_on": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "evidence": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "findings": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "freshness_class": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "invariants": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "last_updated": {
+      "type": "string"
+    },
+    "last_verified": {
+      "type": "string"
+    },
+    "production_verified": {
+      "type": "boolean"
+    },
+    "related": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "runtime_data_head": {
+      "type": "string"
+    },
+    "source_paths": {
+      "type": [
+        "array",
+        "string"
+      ]
+    },
+    "source_release_sha": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "workstream": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "status",
+    "canonical",
+    "source_release_sha",
+    "runtime_data_head"
+  ],
+  "schema_version": 1
+}

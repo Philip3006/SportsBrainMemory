@@ -1,7 +1,8 @@
 ---
+id: WS-MODEL
 type: "workstream"
 tier: "warm"
-status: "planned"
+status: "planned_ready"
 workstream: "MODEL-INTEGRITY"
 last_updated: "2026-08-14T00:03:00+02:00"
 freshness_class: "release-bound"
@@ -21,3 +22,8 @@ Prove that the live-serving Tennis feature distribution matches the training/hol
 - distribution parity report
 - Brier/logloss/calibration comparison
 - gate outcome based on serving path, not only historical trainer path.
+
+
+## V1 readiness note
+
+Execute Train/Live parity → Measurement population → Promotion gate in order.

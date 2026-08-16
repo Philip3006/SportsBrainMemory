@@ -7,3 +7,9 @@
 memory-update*.json
 *.tmp
 __pycache__/
+.memory-build/
+.memory-backups/
+*.pyc
+
+# Local Claude session state
+.claude/settings.local.json

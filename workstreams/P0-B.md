@@ -1,7 +1,8 @@
 ---
+id: WS-P0-B
 type: "workstream"
 tier: "warm"
-status: "planned_blocked"
+status: "planned_ready"
 workstream: "P0-B"
 last_updated: "2026-08-14T00:03:00+02:00"
 freshness_class: "release-bound"
@@ -46,3 +47,8 @@ Publish:
 ## Dependency
 
 Do not implement until P0-A closes.
+
+
+## V1 readiness note
+
+Next product implementation workstream after Memory V1 acceptance.

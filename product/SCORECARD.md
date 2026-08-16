@@ -1,8 +1,8 @@
 ---
 type: "scorecard"
 tier: "warm"
-status: "current"
-last_updated: "2026-08-14T00:03:00+02:00"
+status: "recompute_required"
+last_updated: "2026-08-16T13:04:00+02:00"
 freshness_class: "release-bound"
 production_score: "4.1"
 projected_after_p0a: "~4.7"
@@ -39,3 +39,8 @@ Weak:
 - actionability consistency until P0-A closes.
 
 The full 2026-08-13 scorecard source is archived under history.
+
+
+## V1 score integrity note
+
+P0-A is now production verified, but the overall Product Score has **not** been canonically recomputed. The historical 4.1/10 value remains prior evidence only; do not promote the projected ~4.7 to canonical truth without a fresh evidence-backed scorecard review.

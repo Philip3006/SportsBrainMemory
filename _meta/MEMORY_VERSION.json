@@ -1,0 +1,13 @@
+{
+  "memory_name": "SportsBrain Shared Memory",
+  "version": "1.0.1",
+  "schema_version": 1,
+  "build_id": "SBMEM-V1-20260816-FINAL-R1",
+  "status": "acceptance_ready",
+  "source_memory_baseline": "67444780f8ed0a1340a935934638a7cbd3dfe83b",
+  "sportsbrain_source_release_sha": "1d2ae06232a1d15e8a70cc16b0f6f138e0943f4f",
+  "sportsbrain_runtime_data_head_observed": "1d45663835c20b696d327a8b2ab8002250cad12a",
+  "built_at": "2026-08-16T13:38:00+02:00",
+  "governance": "ChatGPT read-only; Claude Builder mutates repos only under approved task.",
+  "accepted_at": "2026-08-16T13:38:00+02:00"
+}
