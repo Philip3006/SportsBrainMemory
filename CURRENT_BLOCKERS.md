@@ -17,4 +17,4 @@ generated: true
 - [[findings/records/FND-20260814-021]]
 - [[findings/records/FND-20260814-022]]
 
-P0-A historical findings 001–004 are resolved production and are not blockers.
+P0-A historical findings 001–004 are resolved production and are not blockers. P0-B3 finding FND-20260814-007 resolved production 2026-08-17.

@@ -9,9 +9,9 @@ generated: true
 ## Now
 
 - Memory version: **V1.0.0 acceptance-ready**
-- Source release: `bb59d180e9d6f8df7a2c78d2d4e82e71e12751c9`
-- Runtime/data HEAD observed: `f95b372607b7ccd6cf5caae244f48cbec3132d69`
-- Current Builder task: **TASK-P0B-003**
+- Source release: `71d952d852ff11077dea2ac05ac82c49a6115d49`
+- Runtime/data HEAD observed: `408f44af5`
+- Current Builder task: **TASK-P0B-004**
 - Open P0 findings: **8**
 - Product score: **RECOMPUTE REQUIRED**
 

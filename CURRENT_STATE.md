@@ -8,10 +8,11 @@ generated: true
 
 ## Technical baseline
 
-- Source release SHA: `bb59d180e9d6f8df7a2c78d2d4e82e71e12751c9`
-- Runtime/data HEAD observed: `f95b372607b7ccd6cf5caae244f48cbec3132d69`
+- Source release SHA: `71d952d852ff11077dea2ac05ac82c49a6115d49`
+- Runtime/data HEAD observed: `408f44af5`
 - P0-A production verification: **VERIFIED**
-- Current Builder task: **TASK-P0B-003**
+- P0-B3 production verification: **VERIFIED**
+- Current Builder task: **TASK-P0B-004**
 - Product score: **RECOMPUTE REQUIRED** — historical 4.1 remains prior evidence only.
 
 ## Workstreams

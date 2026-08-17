@@ -357,7 +357,7 @@ Production Trust detects false Tennis LIVE / open Tennis bet missing from live s
 
 **Severity:** P1  
 **Domain:** Monitoring  
-**Production status:** `not_enforced`  
+**Production status:** `partial`  
 **P0-A overlay status:** `not_enforced`
 
 ### Invariant
@@ -365,13 +365,13 @@ Production Trust detects source-release/CI/runtime-head mismatch.
 
 **Canonical owner:** Release monitor
 
-**Current evidence:** Not currently explicit.
+**Current evidence:** P0-B3 establishes source_release_sha (`71d952d852ff11077dea2ac05ac82c49a6115d49`) and runtime_data_head (`408f44af5`) as separately tracked canonical truths in Memory. Public artifact provenance publication is P0-B4 scope.
 
 **Failure mode:** Unknown production source.
 
 **Production monitor target:** Source release SHA assertion.
 
-**Closure / next action:** P0-B/Wave3D.
+**Closure / next action:** P0-B4 (Release & Publication Provenance).
 
 ## MON-009
 
@@ -565,13 +565,13 @@ Local launchd runtime state is separately observable from GitHub Actions state.
 
 **Canonical owner:** Runtime monitoring
 
-**Current evidence:** Historical reality snapshot showed both; repo health doesn't prove local runtime.
+**Current evidence:** P0-B3 production verification confirms `com.sportsbrain.auto-heal-ai` loaded (StartInterval=900) with natural post-release run at `2026-08-17T19:25:02Z`. Execution-plane distinction is operational for the healer. Full per-job runtime/cloud separation remains partial pending P0-B4.
 
 **Failure mode:** Local job dead while cloud healthy.
 
 **Production monitor target:** Runtime source field / heartbeat origin.
 
-**Closure / next action:** P0-B.
+**Closure / next action:** P0-B4.
 
 ## OPS-007
 
