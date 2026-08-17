@@ -1,6 +1,6 @@
 # SportsBrain V1 Context Packet
 
-Task: TASK-P0B-002
+Task: TASK-P0B-003
 Task status: approved
 Budget class: standard
 
@@ -11,15 +11,140 @@ Use only this scoped task. External current source/runtime evidence outranks sta
 ## Task record
 
 ---
-id: TASK-P0B-002
+id: TASK-P0B-003
 type: task
-title: Schedule & Window Truth
+title: Recovery Truth
 status: approved
 canonical: true
 tier: warm
 workstream: P0-B
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-16T23:00:00+02:00
+updated_at: 2026-08-17T17:00:00+02:00
+freshness_class: release-bound
+budget_class: standard
+findings:
+  - FND-20260814-007
+invariants:
+  - MON-008
+  - OPS-006
+depends_on:
+  - TASK-P0B-002
+source_paths:
+  - scripts/cloud_healer.py
+  - scripts/auto_heal_ai.py
+  - src/monitoring/aggregate_health.py
+  - tests/monitoring/
+---
+# TASK-P0B-003 — Recovery Truth
+
+## Mission
+
+Make recovery capability fail closed and require post-dispatch execution/output evidence before declaring recovered.
+
+## Primary files / boundaries
+
+- `scripts/cloud_healer.py`
+- `scripts/auto_heal_ai.py`
+- `src/monitoring/aggregate_health.py`
+- `tests/monitoring/`
+
+## Adjacent read-only inspection
+
+- `.github/workflows/cloud_healer.yml`
+- `.github/workflows/*.disabled`
+- `.github/workflows/`
+
+## Forbidden scope
+
+- AI source mutation policy implementation
+- P0-C
+- model promotion
+
+## Deterministic gates
+
+- inactive/nonexistent workflow target => RECOVERY_UNAVAILABLE
+- dispatch alone never equals RECOVERED
+- fresh execution + output evidence required
+- unsupported action fails closed
+
+## Production verification
+
+- recovery dashboard distinguishes requested/dispatched/observed/verified/recovered
+
+## Rollback
+
+Restore prior recovery mapping while preserving fail-closed unknown target behavior.
+
+## STOP conditions
+
+- active recovery target identity cannot be established
+- recovery requires source mutation to succeed
+
+## Builder report contract
+
+Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
+
+
+## Required invariants
+
+- MON-008
+- OPS-006
+
+## FND-20260814-007
+
+---
+type: "finding"
+tier: "warm"
+id: "FND-20260814-007"
+status: "open"
+severity: "P1"
+domain: "monitoring"
+workstream: "P0-B"
+invariants:
+  - MON-011
+  - GOV-003
+discovered_by: "CEO"
+last_updated: "2026-08-14T00:03:00+02:00"
+freshness_class: "release-bound"
+---
+# FND-20260814-007 — Recovery maps reference inactive/nonexistent workflow filenames
+
+## Problem / evidence
+
+Healer mappings include workflow names for which current repo contains only `.disabled` variants.
+
+## Failure / impact
+
+Recovery can claim action while target cannot execute.
+
+## Required closure
+
+Verified recovery registry; unavailable target emits RECOVERY_UNAVAILABLE.
+
+## Related invariants
+
+- `MON-011`
+- `GOV-003`
+
+## Verification
+
+Current status: **open**.
+
+For open findings, closure requires independent CEO review against the actual implementation boundary.
+
+
+## TASK-P0B-002
+
+---
+id: TASK-P0B-002
+type: task
+title: Schedule & Window Truth
+status: completed
+canonical: true
+tier: warm
+workstream: P0-B
+created_at: 2026-08-16T13:04:00+02:00
+updated_at: 2026-08-17T17:00:00+02:00
 freshness_class: release-bound
 budget_class: standard
 findings:
@@ -36,6 +161,10 @@ source_paths:
   - src/monitoring/health_writer.py
   - src/monitoring/aggregate_health.py
   - tests/monitoring/test_health_truth.py
+evidence:
+  - EVD-P0B-002-PROD-001
+verified_by:
+  - VER-P0B-002-PROD-001
 ---
 # TASK-P0B-002 — Schedule & Window Truth
 
@@ -90,263 +219,9 @@ Revert expectation registry and aggregate evaluation as one change.
 Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
 
 
-## Required invariants
-
-- MON-002
-- MON-012
-
-## FND-20260814-006
-
----
-type: "finding"
-tier: "warm"
-id: "FND-20260814-006"
-status: "open"
-severity: "P1"
-domain: "monitoring"
-workstream: "P0-B"
-invariants:
-  - MON-002
-  - MON-012
-discovered_by: "CEO"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
----
-# FND-20260814-006 — Health cadence model has drifted from actual workflow schedules
-
-## Problem / evidence
-
-Examples include Tennis Scan expected 4x/day while active workflow runs 8x/day, and Tennis retrain expected weekly while active workflow runs daily.
-
-## Failure / impact
-
-False stale/healthy classifications and recurring configuration drift.
-
-## Required closure
-
-Introduce machine-readable JobExpectation with trigger/window semantics and workflow parity tests.
-
-## Related invariants
-
-- `MON-002`
-- `MON-012`
-
-## Verification
-
-Current status: **open**.
-
-For open findings, closure requires independent CEO review against the actual implementation boundary.
-
-
-## FND-20260814-008
-
----
-type: "finding"
-tier: "warm"
-id: "FND-20260814-008"
-status: "open"
-severity: "P1"
-domain: "monitoring"
-workstream: "P0-B"
-invariants:
-  - MON-002
-discovered_by: "CEO"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
----
-# FND-20260814-008 — Windowed Bundesliga2 jobs are modeled as globally periodic
-
-## Problem / evidence
-
-BL2 live/closing jobs are active only in specific weekly windows but current stale logic uses global intervals.
-
-## Failure / impact
-
-Correctly inactive jobs appear stale for most of the week.
-
-## Required closure
-
-Model expected windows and use inactive/not_expected outside them.
-
-## Related invariants
-
-- `MON-002`
-
-## Verification
-
-Current status: **open**.
-
-For open findings, closure requires independent CEO review against the actual implementation boundary.
-
-
-## FND-20260814-009
-
----
-type: "finding"
-tier: "warm"
-id: "FND-20260814-009"
-status: "open"
-severity: "P1"
-domain: "monitoring"
-workstream: "P0-B"
-invariants:
-  - MON-002
-  - OPS-006
-discovered_by: "CEO"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
----
-# FND-20260814-009 — Event-driven consumer is modeled as a fixed 2-minute job
-
-## Problem / evidence
-
-Primary consume trigger is Worker event dispatch with a 30-minute GitHub fallback.
-
-## Failure / impact
-
-No-event periods can be misclassified as job failure.
-
-## Required closure
-
-Model event_with_fallback trigger semantics.
-
-## Related invariants
-
-- `MON-002`
-- `OPS-006`
-
-## Verification
-
-Current status: **open**.
-
-For open findings, closure requires independent CEO review against the actual implementation boundary.
-
-
-## FND-20260814-010
-
----
-type: "finding"
-tier: "warm"
-id: "FND-20260814-010"
-status: "open"
-severity: "P1"
-domain: "monitoring"
-workstream: "P0-B"
-invariants:
-  - MON-005
-  - OPS-006
-discovered_by: "CEO"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
----
-# FND-20260814-010 — Odds refresher execution is missing from aggregate health coverage
-
-## Problem / evidence
-
-A local launchd odds-refresh process is a core actionability dependency but is not a dedicated aggregate-health job.
-
-## Failure / impact
-
-Odds freshness infrastructure can fail without explicit process health signal.
-
-## Required closure
-
-Add execution-plane visibility; semantic odds trust remains Wave3D.
-
-## Related invariants
-
-- `MON-005`
-- `OPS-006`
-
-## Verification
-
-Current status: **open**.
-
-For open findings, closure requires independent CEO review against the actual implementation boundary.
-
-
-## TASK-P0B-001
-
----
-id: TASK-P0B-001
-type: task
-title: Execution Truth
-status: completed
-canonical: true
-tier: warm
-workstream: P0-B
-created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-16T23:00:00+02:00
-freshness_class: release-bound
-budget_class: standard
-findings:
-  - FND-20260814-005
-invariants:
-  - MON-001
-  - MON-011
-  - OPS-006
-source_paths:
-  - src/monitoring/health_writer.py
-  - src/monitoring/aggregate_health.py
-  - tests/monitoring/test_health_truth.py
-evidence:
-  - EVD-P0B-001-PROD-001
-verified_by:
-  - VER-P0B-001-PROD-001
----
-# TASK-P0B-001 — Execution Truth
-
-## Mission
-
-Make execution status derive from execution evidence so `exit_code != 0` can never publish success.
-
-## Primary files / boundaries
-
-- `src/monitoring/health_writer.py`
-- `src/monitoring/aggregate_health.py`
-- `tests/monitoring/test_health_truth.py`
-
-## Adjacent read-only inspection
-
-- `.github/workflows/*health*`
-- `.github/workflows/*retrain*`
-- `.github/workflows/*closing*`
-
-## Forbidden scope
-
-- schedule redesign
-- privacy migration
-- writer governance
-- model changes
-
-## Deterministic gates
-
-- non-zero exit cannot serialize execution success
-- malformed/unknown execution fails closed
-- existing valid success/degraded cases remain deterministic
-- focused + full monitoring tests
-
-## Production verification
-
-- published health contains no `ok + exit_code!=0` state
-- exact source SHA and runtime-data SHA reported separately
-
-## Rollback
-
-Revert execution-truth helper/writer changes together; do not roll back unrelated runtime data.
-
-## STOP conditions
-
-- runner context cannot supply truthful exit evidence
-- required workflow semantics differ materially from scoped model
-
-## Builder report contract
-
-Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
-
-
 ## External source scope
 
-- `src/monitoring/health_writer.py`
+- `scripts/cloud_healer.py`
+- `scripts/auto_heal_ai.py`
 - `src/monitoring/aggregate_health.py`
-- `tests/monitoring/test_health_truth.py`
+- `tests/monitoring/`

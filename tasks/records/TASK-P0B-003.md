@@ -2,12 +2,12 @@
 id: TASK-P0B-003
 type: task
 title: Recovery Truth
-status: draft
+status: approved
 canonical: true
 tier: warm
 workstream: P0-B
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-16T13:04:00+02:00
+updated_at: 2026-08-17T17:00:00+02:00
 freshness_class: release-bound
 budget_class: standard
 findings:

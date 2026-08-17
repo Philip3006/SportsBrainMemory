@@ -13,8 +13,8 @@ generated: true
 | TASK-MODEL-001 | draft | MODEL_INTEGRITY | complex |
 | TASK-MODEL-002 | draft | MODEL_INTEGRITY | complex |
 | TASK-P0B-001 | completed | P0-B | standard |
-| TASK-P0B-002 | approved | P0-B | standard |
-| TASK-P0B-003 | draft | P0-B | standard |
+| TASK-P0B-002 | completed | P0-B | standard |
+| TASK-P0B-003 | approved | P0-B | standard |
 | TASK-P0B-004 | draft | P0-B | standard |
 | TASK-P0C-001 | draft | P0-C | complex |
 | TASK-P0C-002 | draft | P0-C | complex |
