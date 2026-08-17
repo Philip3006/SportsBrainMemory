@@ -2,7 +2,7 @@
 type: "audit-index"
 tier: "cold"
 status: "active"
-last_updated: "2026-08-17T21:07:18+02:00"
+last_updated: "2026-08-17T22:47:41Z"
 freshness_class: "historical"
 ---
 # Audit Index
@@ -40,3 +40,21 @@ Key outputs:
 - MON-008 partial, OPS-006 partial (evidence updated)
 
 Evidence: EVD-P0B-003-PROD-001. Verification: VER-P0B-003-PROD-001.
+
+## AUD-20260817-P0B4-CLOSURE
+
+P0-B4 Release & Publication Provenance production closure reconciliation.
+
+Key outputs:
+- TASK-P0B-004 closed (completed)
+- FND-20260814-018 resolved_production
+- Source Release SHA advanced to `7cd6c6793419ab1f89c4b3c8e446f7764e84387a` (PR #15, squash merge 2026-08-17T22:20:43Z)
+- Post-merge CI `32075583343` success; provenance recorded at `2026-08-17T22:21:27Z`
+- Natural post-release consume run `32077550579`: source_runtime_consistent=true, runtime/data SHA `b81d606641baaf3765dfbb77a93170023a3ee496`
+- Pages deployment `32077608783` success; cross-surface agreement PASS
+- REL-004 enforced, MON-008 enforced, OPS-006 closure note updated
+- P0-B workstream closed
+- TASK-P0C-001 activated (approved)
+- TASK-P0C-002 remains draft
+
+Evidence: EVD-P0B-004-PROD-001. Verification: VER-P0B-004-PROD-001.

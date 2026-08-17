@@ -77,7 +77,7 @@ Path-excluded data-only HEAD may inherit green source ancestor only when ancestr
 
 **Severity:** P1  
 **Domain:** Release  
-**Production status:** `not_enforced`  
+**Production status:** `enforced`  
 **P0-A overlay status:** `not_enforced`
 
 ### Invariant
@@ -85,13 +85,13 @@ Source Release SHA is published separately from Runtime/Data HEAD.
 
 **Canonical owner:** Build provenance
 
-**Current evidence:** Dashboard build info may use current git HEAD.
+**Current evidence:** P0-B4 production verified 2026-08-17T22:47:41Z. `provenance_meta.json` written by `scripts/record_source_release.py` on each ci_gates success. `docs/data/health.json` publishes `source_release_sha`, `runtime_data_sha`, and `source_runtime_consistent` as separate truths. Natural post-release consume run `32077550579` confirmed `source_runtime_consistent: true` with SHA `b81d606641...` independent of source release SHA `7cd6c679...`. Pages deployment `32077608783` served correct provenance. Evidence: EVD-P0B-004-PROD-001.
 
 **Failure mode:** Users/monitor cannot identify validated source.
 
-**Production monitor target:** Public build_info with both SHAs.
+**Production monitor target:** Public health.json with both SHAs.
 
-**Closure / next action:** P0-B/3D.
+**Closure / next action:** Preserve. OPS-007 (runtime-main churn architecture) remains P0-D scope.
 
 ## REL-005
 
@@ -357,7 +357,7 @@ Production Trust detects false Tennis LIVE / open Tennis bet missing from live s
 
 **Severity:** P1  
 **Domain:** Monitoring  
-**Production status:** `partial`  
+**Production status:** `enforced`  
 **P0-A overlay status:** `not_enforced`
 
 ### Invariant
@@ -365,13 +365,13 @@ Production Trust detects source-release/CI/runtime-head mismatch.
 
 **Canonical owner:** Release monitor
 
-**Current evidence:** P0-B3 establishes source_release_sha (`71d952d852ff11077dea2ac05ac82c49a6115d49`) and runtime_data_head (`408f44af5`) as separately tracked canonical truths in Memory. Public artifact provenance publication is P0-B4 scope.
+**Current evidence:** P0-B4 production verified 2026-08-17T22:47:41Z. Public `docs/data/health.json` carries `source_release_sha`, `runtime_data_sha`, `source_runtime_consistent`, and `source_ci` identity fields. `_check_source_runtime_consistency()` classifies SOURCE..RUNTIME git log against canonical source paths; `source_runtime_consistent: true` confirms no source-changing commits exist between source release and runtime/data HEAD. C5 fix (`fetch-depth: 0` in `consume_pending_bets.yml`) ensures classification succeeds on shallow-clone-free full-history checkout. Evidence: EVD-P0B-004-PROD-001.
 
 **Failure mode:** Unknown production source.
 
-**Production monitor target:** Source release SHA assertion.
+**Production monitor target:** source_runtime_consistent field in published health.json.
 
-**Closure / next action:** P0-B4 (Release & Publication Provenance).
+**Closure / next action:** Preserve. OPS-007 runtime-main architecture remains P0-D scope.
 
 ## MON-009
 
@@ -565,13 +565,13 @@ Local launchd runtime state is separately observable from GitHub Actions state.
 
 **Canonical owner:** Runtime monitoring
 
-**Current evidence:** P0-B3 production verification confirms `com.sportsbrain.auto-heal-ai` loaded (StartInterval=900) with natural post-release run at `2026-08-17T19:25:02Z`. Execution-plane distinction is operational for the healer. Full per-job runtime/cloud separation remains partial pending P0-B4.
+**Current evidence:** P0-B3 production verification confirms `com.sportsbrain.auto-heal-ai` loaded (StartInterval=900) with natural post-release run at `2026-08-17T19:25:02Z`. P0-B4 production verified 2026-08-17T22:47:41Z: per-job runtime/cloud separation now operational via `source_runtime_consistent` field in published health.json. Evidence: EVD-P0B-003-PROD-001, EVD-P0B-004-PROD-001.
 
 **Failure mode:** Local job dead while cloud healthy.
 
 **Production monitor target:** Runtime source field / heartbeat origin.
 
-**Closure / next action:** P0-B4.
+**Closure / next action:** Preserve. OPS-007 runtime-writer architecture scope remains P0-D.
 
 ## OPS-007
 

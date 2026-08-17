@@ -2,12 +2,12 @@
 id: TASK-P0C-001
 type: task
 title: Public / Private Serialization Boundary
-status: draft
+status: approved
 canonical: true
 tier: warm
 workstream: P0-C
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-16T13:04:00+02:00
+updated_at: 2026-08-17T22:47:41Z
 freshness_class: release-bound
 budget_class: complex
 findings:

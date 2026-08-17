@@ -2,9 +2,9 @@
 id: WS-P0-B
 type: "workstream"
 tier: "warm"
-status: "active"
+status: "closed"
 workstream: "P0-B"
-last_updated: "2026-08-16T14:00:00+02:00"
+last_updated: "2026-08-17T22:47:41Z"
 freshness_class: "release-bound"
 ---
 # P0-B — Monitoring Truth

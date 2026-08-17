@@ -2,12 +2,12 @@
 id: TASK-P0B-004
 type: task
 title: Release & Publication Provenance
-status: approved
+status: completed
 canonical: true
 tier: warm
 workstream: P0-B
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-17T21:07:18+02:00
+updated_at: 2026-08-17T22:47:41Z
 freshness_class: release-bound
 budget_class: standard
 findings:
@@ -21,6 +21,10 @@ source_paths:
   - src/monitoring/aggregate_health.py
   - docs/data/
   - scripts/
+evidence:
+  - EVD-P0B-004-PROD-001
+verified_by:
+  - VER-P0B-004-PROD-001
 ---
 # TASK-P0B-004 — Release & Publication Provenance
 

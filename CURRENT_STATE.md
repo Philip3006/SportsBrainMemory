@@ -8,18 +8,17 @@ generated: true
 
 ## Technical baseline
 
-- Source release SHA: `71d952d852ff11077dea2ac05ac82c49a6115d49`
-- Runtime/data HEAD observed: `408f44af5`
+- Source release SHA: `7cd6c6793419ab1f89c4b3c8e446f7764e84387a`
+- Runtime/data HEAD observed: `b81d606641baaf3765dfbb77a93170023a3ee496`
 - P0-A production verification: **VERIFIED**
-- P0-B3 production verification: **VERIFIED**
-- Current Builder task: **TASK-P0B-004**
+- Current Builder task: **TASK-P0C-001**
 - Product score: **RECOMPUTE REQUIRED** — historical 4.1 remains prior evidence only.
 
 ## Workstreams
 
 - **MODEL-INTEGRITY** — planned_ready
 - **P0-A** — closed
-- **P0-B** — active
+- **P0-B** — closed
 - **P0-C** — planned_ready
 - **P0-D** — planned_ready
 - **WAVE-3D** — planned
