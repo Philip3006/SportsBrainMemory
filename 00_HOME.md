@@ -11,7 +11,7 @@ generated: true
 - Memory version: **V1.0.0 acceptance-ready**
 - Source release: `635566bb6f993dae2f937e43fd7c5a9e411fb89a`
 - Runtime/data HEAD observed: `4ab91c924a826903f6f119447d6e1f6b4fa4f509`
-- Current Builder task: **NONE**
+- Current Builder task: **TASK-P0D-001**
 - Open P0 findings: **6**
 - Product score: **RECOMPUTE REQUIRED**
 

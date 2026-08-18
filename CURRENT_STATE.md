@@ -11,7 +11,7 @@ generated: true
 - Source release SHA: `635566bb6f993dae2f937e43fd7c5a9e411fb89a`
 - Runtime/data HEAD observed: `4ab91c924a826903f6f119447d6e1f6b4fa4f509`
 - P0-A production verification: **VERIFIED**
-- Current Builder task: **NONE**
+- Current Builder task: **TASK-P0D-001**
 - Product score: **RECOMPUTE REQUIRED** — historical 4.1 remains prior evidence only.
 
 ## Workstreams
@@ -20,7 +20,7 @@ generated: true
 - **P0-A** — closed
 - **P0-B** — closed
 - **P0-C** — closed
-- **P0-D** — planned_ready
+- **P0-D** — active
 - **WAVE-3D** — planned
 
 Canonical technical state: [[state/records/STATE-20260816-001]]
