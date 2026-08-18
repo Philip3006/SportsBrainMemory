@@ -9,7 +9,6 @@ generated: true
 ## Open P0 findings
 
 - [[findings/records/FND-20260814-011]]
-- [[findings/records/FND-20260814-013]]
 - [[findings/records/FND-20260814-014]]
 - [[findings/records/FND-20260814-015]]
 - [[findings/records/FND-20260814-019]]

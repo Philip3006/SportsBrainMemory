@@ -2,9 +2,9 @@
 id: WS-P0-C
 type: "workstream"
 tier: "warm"
-status: "planned_ready"
+status: "closed"
 workstream: "P0-C"
-last_updated: "2026-08-14T00:03:00+02:00"
+last_updated: "2026-08-18T12:00:00Z"
 freshness_class: "release-bound"
 ---
 # P0-C — Privacy & Persistence

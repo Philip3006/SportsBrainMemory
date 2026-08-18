@@ -496,7 +496,7 @@ All externally published JSON schemas are versioned or backward-compatible.
 
 **Severity:** P1  
 **Domain:** Data  
-**Production status:** `partial`  
+**Production status:** `enforced`  
 **P0-A overlay status:** `partial`
 
 ### Invariant
@@ -504,13 +504,13 @@ User-specific snapshots contain only that user's private financial state.
 
 **Canonical owner:** User isolation
 
-**Current evidence:** Per-user writer exists; Worker fallback to default snapshot remains.
+**Current evidence:** P0C-002 production verified (2026-08-18): authenticated /me endpoint with exact per-user token owner routing; private_serializer.py explicit allowlist enforces per-user serialization; no DEFAULT_USER fallback; Alice token cannot reach Bob's state; /me missing state → 404 (no DEFAULT_USER fallback); public /signals.json contains zero private financial state. Note: physical KV key still maps Philip's owner key to legacy signals_json — this is exact routing, not fallback, which is acceptable for enforced status. Evidence: EVD-P0C-002-PROD-001.
 
 **Failure mode:** Cross-user state exposure.
 
-**Production monitor target:** Requested user vs served snapshot identity.
+**Production monitor target:** Requested user vs served snapshot identity; owner field in /me payload.
 
-**Closure / next action:** P0-C.
+**Closure / next action:** Preserve enforcement; physical KV key migration (P0-D) will complete canonical hygiene.
 
 ## DATA-014
 

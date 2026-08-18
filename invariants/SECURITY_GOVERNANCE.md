@@ -57,7 +57,7 @@ Legal/privacy text matches actual persistence behavior.
 
 **Severity:** P0  
 **Domain:** Security  
-**Production status:** `partial`  
+**Production status:** `enforced`  
 **P0-A overlay status:** `not_enforced`
 
 ### Invariant
@@ -65,19 +65,19 @@ User-specific signal/financial state never falls back to another user's private 
 
 **Canonical owner:** User isolation
 
-**Current evidence:** P0C-001 production verified (2026-08-18): unauthenticated public GET /signals.json now returns zero private financial/account/identity fields — public boundary is sanitized (Worker `9bd2d4f0-30b1-457d-979b-610f6aa2edf2`, HARD GATE 6 passed). Private financial state no longer exposed through unauthenticated public GET. Remaining: deployed P0C-001 architecture still internally sources the public container from the legacy DEFAULT_USER KV snapshot; authenticated/private dual-fetch and removal of DEFAULT_USER dependency are not complete. Evidence: EVD-P0C-001-PROD-001.
+**Current evidence:** P0C-002 production verified (2026-08-18): authenticated /me endpoint deployed with exact per-user token owner routing; no DEFAULT_USER fallback; master token → 403 fail-closed; Alice token cannot reach Bob's state; GET /me no token → 401; GET /me Philip per-user token → exact owner (CI Suite 16 T3/T6); public /signals.json zero private fields (26/26 regression PASS); Worker `8b4f5ad5-c10d-402e-8636-16d0c5b00c97`. Note: physical KV key migration deferred — Philip's exact-owner key still maps to legacy signals_json, which is exact routing not fallback. This is acceptable for enforced status. Evidence: EVD-P0C-002-PROD-001.
 
 **Failure mode:** Cross-user disclosure.
 
 **Production monitor target:** Requested user != payload owner.
 
-**Closure / next action:** TASK-P0C-002 — authenticated private state and removal of default-user fallback semantics required for full enforcement.
+**Closure / next action:** Preserve enforcement; monitor via /me exact-owner routing and HARD GATE 7.
 
 ## SEC-004
 
 **Severity:** P1  
 **Domain:** Security  
-**Production status:** `partial`  
+**Production status:** `enforced`  
 **P0-A overlay status:** `partial`
 
 ### Invariant
@@ -85,19 +85,19 @@ User tokens are scoped, revocable and never exposed in URLs/loggable query strin
 
 **Canonical owner:** Auth boundary
 
-**Current evidence:** Token rotation exists; complete browser transport audit not finished.
+**Current evidence:** P0C-002 production verified (2026-08-18): ?token= long-lived auth ingestion removed from browser; tokens transmitted only via Authorization header Bearer; per-user token scoping and rotation preserved; master token removed from all browser paths (scripts/create_invite.py admin CLI replaces browser flow). Worker `8b4f5ad5-c10d-402e-8636-16d0c5b00c97`, CI `32133192040` Gate 7 PASS. Evidence: EVD-P0C-002-PROD-001.
 
 **Failure mode:** Credential leakage.
 
-**Production monitor target:** Token-location audit.
+**Production monitor target:** Token-location audit; no ?token= parameter in any browser-facing URL.
 
-**Closure / next action:** P0-C.
+**Closure / next action:** Preserve enforcement; monitor via HARD GATE 7 on every release.
 
 ## SEC-005
 
 **Severity:** P1  
 **Domain:** Security  
-**Production status:** `partial`  
+**Production status:** `enforced`  
 **P0-A overlay status:** `partial`
 
 ### Invariant
@@ -105,19 +105,19 @@ Master token is never exposed to browser clients.
 
 **Canonical owner:** Worker auth
 
-**Current evidence:** Architecture distinguishes master/per-user; live secret handling not reverified tonight.
+**Current evidence:** P0C-002 production verified (2026-08-18): _createInvite() and all browser master-token paths removed; scripts/create_invite.py admin CLI replaces browser invite flow; GET /me master token → 403 fail-closed (live production); master token absent from all browser-facing code paths. Worker `8b4f5ad5-c10d-402e-8636-16d0c5b00c97`, CI `32133192040` Gate 7 PASS. Evidence: EVD-P0C-002-PROD-001.
 
 **Failure mode:** Total backend compromise.
 
-**Production monitor target:** Secret exposure scan.
+**Production monitor target:** Secret exposure scan; master token path exclusion in browser bundle.
 
-**Closure / next action:** P0-C.
+**Closure / next action:** Preserve enforcement; monitor via HARD GATE 7 on every release.
 
 ## SEC-006
 
 **Severity:** P1  
 **Domain:** Security  
-**Production status:** `partial`  
+**Production status:** `enforced`  
 **P0-A overlay status:** `partial`
 
 ### Invariant
@@ -125,13 +125,13 @@ Per-user authorization controls every read/write queue and signal operation.
 
 **Canonical owner:** Worker auth
 
-**Current evidence:** Per-user KV routing exists; fallback semantics weaken isolation.
+**Current evidence:** P0C-002 production verified (2026-08-18): exact per-user token owner routing on /me; cross-user auth fixes — rotate_token and token_status reject A-targeting-B; Alice cannot reach Bob's state; master token → 403 on /me; no DEFAULT_USER fallback; sb_user removed as authorization authority. Worker `8b4f5ad5-c10d-402e-8636-16d0c5b00c97`, CI `32133192040` Gate 7 PASS. Evidence: EVD-P0C-002-PROD-001.
 
 **Failure mode:** Cross-user mutation/read.
 
-**Production monitor target:** Authorization matrix tests.
+**Production monitor target:** Authorization matrix tests; HARD GATE 7 on every release.
 
-**Closure / next action:** P0-C.
+**Closure / next action:** Preserve enforcement; monitor via HARD GATE 7.
 
 ## SEC-007
 
@@ -165,13 +165,13 @@ Public Pages contains no secrets/private operational artifacts.
 
 **Canonical owner:** Static publication boundary
 
-**Current evidence:** P0C-001 production verified (2026-08-18): explicit public serializer allowlist deployed with recursive fail-closed private-key assertion. HARD GATE 6 Privacy serialization enforced in CI. Production Pages deployment `32109137419` confirmed `docs/data/signals.json` and `docs/data/signals_philip.json` contain zero forbidden private fields (`bankroll_state`, `open_bets`, `settled_bets`, `default_user`, user identity, private financial state). CEO steady-state re-check confirmed sanitized artifacts survived subsequent bot activity at runtime/data HEAD `4ab91c924a826903f6f119447d6e1f6b4fa4f509`. Deterministic publication scan is now CI-gated. Note: SEC-001 (personal ledger/DB artifacts in public *repository*) remains not_enforced — SEC-008 covers the *Pages publication tree*, not the repository file tree. Evidence: EVD-P0C-001-PROD-001.
+**Current evidence:** P0C-001 production verified (2026-08-18): explicit public serializer allowlist deployed with recursive fail-closed private-key assertion. HARD GATE 6 Privacy serialization enforced in CI. Production Pages deployment `32109137419` confirmed `docs/data/signals.json` and `docs/data/signals_philip.json` contain zero forbidden private fields (`bankroll_state`, `open_bets`, `settled_bets`, `default_user`, user identity, private financial state). CEO steady-state re-check confirmed sanitized artifacts survived subsequent bot activity at runtime/data HEAD `4ab91c924a826903f6f119447d6e1f6b4fa4f509`. Deterministic publication scan is now CI-gated. Note: SEC-001 (personal ledger/DB artifacts in public *repository*) remains not_enforced — SEC-008 covers the *Pages publication tree*, not the repository file tree. Evidence: EVD-P0C-001-PROD-001. P0C-002 no regression: P0C-001 privacy regression 26/26 PASS; HARD GATE 6 passed in CI `32133192040`; public /signals.json zero private fields confirmed. Evidence: EVD-P0C-002-PROD-001.
 
 **Failure mode:** Credential/data exposure.
 
-**Production monitor target:** Public artifact allowlist scan (now CI-gated via HARD GATE 6).
+**Production monitor target:** Public artifact allowlist scan (now CI-gated via HARD GATE 6 and HARD GATE 7).
 
-**Closure / next action:** Preserve enforcement; monitor via HARD GATE 6 on every release.
+**Closure / next action:** Preserve enforcement; monitor via HARD GATE 6 and HARD GATE 7 on every release.
 
 ## SEC-009
 
@@ -185,19 +185,19 @@ Changing repository visibility cannot silently break public PWA availability.
 
 **Canonical owner:** Deployment/privacy migration
 
-**Current evidence:** Pages/repo coupling requires planned migration.
+**Current evidence:** P0C-002 partial mitigation: PWA dual-fetch deployed — public /signals.json and private /me are now independent failure channels. PWA smoke public logged-out 4/4 PASS (CI `32133192040`). Physical Pages/repo migration and visibility change rehearsal remain deferred. Evidence: EVD-P0C-002-PROD-001.
 
 **Failure mode:** Privacy fix causes outage.
 
-**Production monitor target:** Migration rehearsal.
+**Production monitor target:** Migration rehearsal; dual-fetch independence in production.
 
-**Closure / next action:** P0-C.
+**Closure / next action:** P0-D or later — requires Pages/repo decoupling and visibility rehearsal.
 
 ## SEC-010
 
 **Severity:** P1  
 **Domain:** Security  
-**Production status:** `not_enforced`  
+**Production status:** `partial`  
 **P0-A overlay status:** `not_enforced`
 
 ### Invariant
@@ -205,13 +205,13 @@ Multi-user identity has explicit owner metadata in every private snapshot/ledger
 
 **Canonical owner:** Identity schema
 
-**Current evidence:** Filename/KV key imply user; payload ownership metadata not universal.
+**Current evidence:** P0C-002 production verified (2026-08-18): /me payload.owner is the sole authorization authority; _authenticatedOwner sourced only from /me payload.owner; private_serializer.py explicit allowlist enforces owner-scoped serialization; sb_user removed as authorization authority. Physical KV key migration and owner field in every historical ledger artifact deferred. Evidence: EVD-P0C-002-PROD-001.
 
 **Failure mode:** Misrouting undetectable.
 
-**Production monitor target:** owner/user_id field parity.
+**Production monitor target:** owner/user_id field parity across all private artifacts.
 
-**Closure / next action:** P0-C.
+**Closure / next action:** P0-D — requires owner metadata in every private snapshot/ledger artifact (physical KV key migration).
 
 ## GOV-001
 
