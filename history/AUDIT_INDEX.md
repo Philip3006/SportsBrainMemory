@@ -2,7 +2,7 @@
 type: "audit-index"
 tier: "cold"
 status: "active"
-last_updated: "2026-08-17T22:47:41Z"
+last_updated: "2026-08-18T06:56:49Z"
 freshness_class: "historical"
 ---
 # Audit Index
@@ -58,3 +58,27 @@ Key outputs:
 - TASK-P0C-002 remains draft
 
 Evidence: EVD-P0B-004-PROD-001. Verification: VER-P0B-004-PROD-001.
+
+## AUD-20260818-P0C1-CLOSURE
+
+P0-C1 Public / Private Serialization Boundary production closure reconciliation.
+
+Key outputs:
+- TASK-P0C-001 closed (completed)
+- FND-20260814-012 resolved_production
+- FND-20260814-013 remains open — P0C-001 production mitigation complete; remaining closure = TASK-P0C-002 (authenticated private state, no default-user fallback)
+- FND-20260814-011 remains open (ledger artifacts in public repo not addressed)
+- FND-20260814-014 remains open (privacy/legal text not updated)
+- Source Release SHA: `20109387cf42c13c693e33b1642828424ce3be21` (PR #16, merged 2026-08-18T06:55:58Z)
+- Post-merge CI `32109075233` success; all 6 gates passed including HARD GATE 6 Privacy serialization
+- Provenance commit: `ca493fb35646182b4699222801fc74c40c44d233`; recorded_at `2026-08-18T06:56:49Z`
+- Pages deployment `32109137419` success; zero private fields in public signals artifacts
+- Worker deployment `9bd2d4f0-30b1-457d-979b-610f6aa2edf2`; unauthenticated GET zero private fields; no rollback required
+- CEO steady-state re-check: later runtime/data HEAD `4ab91c924a826903f6f119447d6e1f6b4fa4f509` — privacy boundary survived
+- SEC-008 updated to enforced (public Pages contains no private data via deterministic scan + HARD gate)
+- SEC-003 remains partial (unauthenticated boundary sanitized; authenticated isolation incomplete until P0C-002)
+- SEC-001, SEC-002, SEC-004, SEC-005 unchanged (not_enforced or partial)
+- DATA-013 remains partial
+- TASK-P0C-002 activated (draft to approved)
+
+Evidence: EVD-P0C-001-PROD-001. Verification: VER-P0C-001-PROD-001.

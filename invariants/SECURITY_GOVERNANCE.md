@@ -57,7 +57,7 @@ Legal/privacy text matches actual persistence behavior.
 
 **Severity:** P0  
 **Domain:** Security  
-**Production status:** `not_enforced`  
+**Production status:** `partial`  
 **P0-A overlay status:** `not_enforced`
 
 ### Invariant
@@ -65,13 +65,13 @@ User-specific signal/financial state never falls back to another user's private 
 
 **Canonical owner:** User isolation
 
-**Current evidence:** Worker can fallback missing per-user snapshot to default user.
+**Current evidence:** P0C-001 production verified (2026-08-18): unauthenticated public GET /signals.json now returns zero private financial/account/identity fields — public boundary is sanitized (Worker `9bd2d4f0-30b1-457d-979b-610f6aa2edf2`, HARD GATE 6 passed). Private financial state no longer exposed through unauthenticated public GET. Remaining: deployed P0C-001 architecture still internally sources the public container from the legacy DEFAULT_USER KV snapshot; authenticated/private dual-fetch and removal of DEFAULT_USER dependency are not complete. Evidence: EVD-P0C-001-PROD-001.
 
 **Failure mode:** Cross-user disclosure.
 
 **Production monitor target:** Requested user != payload owner.
 
-**Closure / next action:** P0-C.
+**Closure / next action:** TASK-P0C-002 — authenticated private state and removal of default-user fallback semantics required for full enforcement.
 
 ## SEC-004
 
@@ -157,7 +157,7 @@ Push subscriptions are user/privacy scoped and have deletion lifecycle.
 
 **Severity:** P1  
 **Domain:** Security  
-**Production status:** `partial`  
+**Production status:** `enforced`  
 **P0-A overlay status:** `partial`
 
 ### Invariant
@@ -165,13 +165,13 @@ Public Pages contains no secrets/private operational artifacts.
 
 **Canonical owner:** Static publication boundary
 
-**Current evidence:** No known secret claim from current audit, but privacy data coupling exists.
+**Current evidence:** P0C-001 production verified (2026-08-18): explicit public serializer allowlist deployed with recursive fail-closed private-key assertion. HARD GATE 6 Privacy serialization enforced in CI. Production Pages deployment `32109137419` confirmed `docs/data/signals.json` and `docs/data/signals_philip.json` contain zero forbidden private fields (`bankroll_state`, `open_bets`, `settled_bets`, `default_user`, user identity, private financial state). CEO steady-state re-check confirmed sanitized artifacts survived subsequent bot activity at runtime/data HEAD `4ab91c924a826903f6f119447d6e1f6b4fa4f509`. Deterministic publication scan is now CI-gated. Note: SEC-001 (personal ledger/DB artifacts in public *repository*) remains not_enforced — SEC-008 covers the *Pages publication tree*, not the repository file tree. Evidence: EVD-P0C-001-PROD-001.
 
 **Failure mode:** Credential/data exposure.
 
-**Production monitor target:** Public artifact allowlist scan.
+**Production monitor target:** Public artifact allowlist scan (now CI-gated via HARD GATE 6).
 
-**Closure / next action:** P0-C.
+**Closure / next action:** Preserve enforcement; monitor via HARD GATE 6 on every release.
 
 ## SEC-009
 

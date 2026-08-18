@@ -2,12 +2,12 @@
 id: TASK-P0C-002
 type: task
 title: Authenticated Private State & Dual Fetch
-status: draft
+status: approved
 canonical: true
 tier: warm
 workstream: P0-C
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-16T13:04:00+02:00
+updated_at: 2026-08-18T06:56:49Z
 freshness_class: release-bound
 budget_class: complex
 findings:

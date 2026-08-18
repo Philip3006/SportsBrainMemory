@@ -1,6 +1,6 @@
 # SportsBrain V1 Context Packet
 
-Task: TASK-P0C-001
+Task: TASK-P0C-002
 Task status: approved
 Budget class: complex
 
@@ -11,15 +11,203 @@ Use only this scoped task. External current source/runtime evidence outranks sta
 ## Task record
 
 ---
-id: TASK-P0C-001
+id: TASK-P0C-002
 type: task
-title: Public / Private Serialization Boundary
+title: Authenticated Private State & Dual Fetch
 status: approved
 canonical: true
 tier: warm
 workstream: P0-C
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-17T22:47:41Z
+updated_at: 2026-08-18T06:56:49Z
+freshness_class: release-bound
+budget_class: complex
+findings:
+  - FND-20260814-013
+  - FND-20260814-014
+invariants:
+  - SEC-004
+  - SEC-005
+  - SEC-006
+  - SEC-008
+  - SEC-009
+  - SEC-010
+depends_on:
+  - TASK-P0C-001
+source_paths:
+  - cloudflare/worker.js
+  - docs/js/
+  - scripts/
+---
+# TASK-P0C-002 — Authenticated Private State & Dual Fetch
+
+## Mission
+
+Add authenticated per-user private state with no default-user fallback and move PWA to independent public + private fetch channels.
+
+## Primary files / boundaries
+
+- `cloudflare/worker.js`
+- `docs/js/`
+- `scripts/`
+
+## Adjacent read-only inspection
+
+- `results/ledger_*.csv`
+- `results/ledger_*.db`
+- `docs/data/`
+
+## Forbidden scope
+
+- big-bang deletion before dual-fetch verification
+- backend master token in browser
+
+## Deterministic gates
+
+- no token -> private 401
+- A token cannot read/mutate B
+- missing A state never falls back to Philip
+- public works while private unavailable
+- private failure disables betting/history clearly
+- browser master-token absence test
+
+## Production verification
+
+- authenticated /me owner assertion
+- logged-out public product works
+- no private static fallback
+
+## Rollback
+
+Revert PWA private reader to compatibility channel only while keeping new private endpoint dark; never restore public private-state exposure.
+
+## STOP conditions
+
+- identity cannot be derived uniquely from user token
+- private persistence owner cannot be established
+
+## Builder report contract
+
+Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
+
+
+## Required invariants
+
+- SEC-004
+- SEC-005
+- SEC-006
+- SEC-008
+- SEC-009
+- SEC-010
+
+## FND-20260814-013
+
+---
+type: "finding"
+tier: "warm"
+id: "FND-20260814-013"
+status: "open"
+severity: "P0"
+domain: "security"
+workstream: "P0-C"
+invariants:
+  - SEC-003
+  - SEC-006
+discovered_by: "CEO"
+last_updated: "2026-08-18T06:56:49Z"
+freshness_class: "release-bound"
+---
+# FND-20260814-013 — Unauthenticated Worker default-user snapshot can expose private state
+
+## Problem / evidence
+
+Public Worker signals path resolves/falls back to default user's combined snapshot.
+
+## Failure / impact
+
+Missing auth or missing per-user state can reveal another user's private state.
+
+## Required closure
+
+Separate public endpoint and authenticated /me state; never private fallback.
+
+## Related invariants
+
+- `SEC-003`
+- `SEC-006`
+
+## P0C-001 partial mitigation (2026-08-18)
+
+TASK-P0C-001 production verified (Source Release SHA `20109387cf42c13c693e33b1642828424ce3be21`, PR #16, CI `32109075233`). Mitigation delivered:
+- Unauthenticated public response is now sanitized: recursively zero private financial/account/identity fields in production GET /signals.json.
+- Private financial state is no longer exposed through the public GET boundary.
+- Fail-closed public serializer is deployed (Worker `9bd2d4f0-30b1-457d-979b-610f6aa2edf2`).
+
+Remaining exposure:
+- Deployed P0C-001 architecture still internally sources the public container from the legacy DEFAULT_USER KV snapshot.
+- Canonical required closure also calls for: separate authenticated private /me state; no default-user private fallback semantics.
+- These are TASK-P0C-002 scope.
+
+## Verification
+
+Current status: **open** — P0C-001 production mitigation complete; remaining closure dependency = TASK-P0C-002 (authenticated private state and removal of default-user dependency/fallback semantics).
+
+For full closure, independent CEO review required against TASK-P0C-002 implementation boundary.
+
+
+## FND-20260814-014
+
+---
+type: "finding"
+tier: "warm"
+id: "FND-20260814-014"
+status: "open"
+severity: "P0"
+domain: "security"
+workstream: "P0-C"
+invariants:
+  - SEC-002
+discovered_by: "CEO"
+last_updated: "2026-08-14T00:03:00+02:00"
+freshness_class: "release-bound"
+---
+# FND-20260814-014 — Privacy/legal text contradicts actual persistence architecture
+
+## Problem / evidence
+
+Current privacy text says bankroll/bet log are local-only while backend/public ledger persistence exists.
+
+## Failure / impact
+
+Users receive materially inaccurate storage description.
+
+## Required closure
+
+Fix architecture first; update text to deployed reality after migration.
+
+## Related invariants
+
+- `SEC-002`
+
+## Verification
+
+Current status: **open**.
+
+For open findings, closure requires independent CEO review against the actual implementation boundary.
+
+
+## TASK-P0C-001
+
+---
+id: TASK-P0C-001
+type: task
+title: Public / Private Serialization Boundary
+status: completed
+canonical: true
+tier: warm
+workstream: P0-C
+created_at: 2026-08-16T13:04:00+02:00
+updated_at: 2026-08-18T06:56:49Z
 freshness_class: release-bound
 budget_class: complex
 findings:
@@ -41,6 +229,10 @@ source_paths:
   - cloudflare/worker.js
   - docs/data/signals.json
   - docs/data/signals_philip.json
+evidence:
+  - EVD-P0C-001-PROD-001
+verified_by:
+  - VER-P0C-001-PROD-001
 ---
 # TASK-P0C-001 — Public / Private Serialization Boundary
 
@@ -92,268 +284,15 @@ Keep legacy serializer available behind explicit compatibility path until dual-f
 
 Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
 
+## Closure
 
-## Required invariants
+**TASK-P0C-001 is CLOSED / production verified.**
 
-- SEC-001
-- SEC-002
-- SEC-003
-- SEC-004
-- SEC-005
-- DATA-013
-
-## FND-20260814-011
-
----
-type: "finding"
-tier: "warm"
-id: "FND-20260814-011"
-status: "open"
-severity: "P0"
-domain: "security"
-workstream: "P0-C"
-invariants:
-  - SEC-001
-discovered_by: "CEO"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
----
-# FND-20260814-011 — Personal ledger and DB are tracked in public repository
-
-## Problem / evidence
-
-Current public tree includes per-user financial/betting artifacts such as ledger CSV/DB.
-
-## Failure / impact
-
-Personal betting history and financial state exposed publicly.
-
-## Required closure
-
-Migrate private durable state, stop public writes, then clean active tree/history safely.
-
-## Related invariants
-
-- `SEC-001`
-
-## Verification
-
-Current status: **open**.
-
-For open findings, closure requires independent CEO review against the actual implementation boundary.
-
-
-## FND-20260814-012
-
----
-type: "finding"
-tier: "warm"
-id: "FND-20260814-012"
-status: "open"
-severity: "P0"
-domain: "security"
-workstream: "P0-C"
-invariants:
-  - SEC-001
-  - SEC-008
-  - DATA-013
-discovered_by: "CEO"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
----
-# FND-20260814-012 — Public signals snapshot contains bankroll/open-bet private state
-
-## Problem / evidence
-
-Static/public signals payload contains default-user bankroll and open-bet state.
-
-## Failure / impact
-
-Privacy remains broken even if ledger file itself is removed.
-
-## Required closure
-
-Split public product schema from authenticated private user schema.
-
-## Related invariants
-
-- `SEC-001`
-- `SEC-008`
-- `DATA-013`
-
-## Verification
-
-Current status: **open**.
-
-For open findings, closure requires independent CEO review against the actual implementation boundary.
-
-
-## FND-20260814-013
-
----
-type: "finding"
-tier: "warm"
-id: "FND-20260814-013"
-status: "open"
-severity: "P0"
-domain: "security"
-workstream: "P0-C"
-invariants:
-  - SEC-003
-  - SEC-006
-discovered_by: "CEO"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
----
-# FND-20260814-013 — Unauthenticated Worker default-user snapshot can expose private state
-
-## Problem / evidence
-
-Public Worker signals path resolves/falls back to default user's combined snapshot.
-
-## Failure / impact
-
-Missing auth or missing per-user state can reveal another user's private state.
-
-## Required closure
-
-Separate public endpoint and authenticated /me state; never private fallback.
-
-## Related invariants
-
-- `SEC-003`
-- `SEC-006`
-
-## Verification
-
-Current status: **open**.
-
-For open findings, closure requires independent CEO review against the actual implementation boundary.
-
-
-## FND-20260814-014
-
----
-type: "finding"
-tier: "warm"
-id: "FND-20260814-014"
-status: "open"
-severity: "P0"
-domain: "security"
-workstream: "P0-C"
-invariants:
-  - SEC-002
-discovered_by: "CEO"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
----
-# FND-20260814-014 — Privacy/legal text contradicts actual persistence architecture
-
-## Problem / evidence
-
-Current privacy text says bankroll/bet log are local-only while backend/public ledger persistence exists.
-
-## Failure / impact
-
-Users receive materially inaccurate storage description.
-
-## Required closure
-
-Fix architecture first; update text to deployed reality after migration.
-
-## Related invariants
-
-- `SEC-002`
-
-## Verification
-
-Current status: **open**.
-
-For open findings, closure requires independent CEO review against the actual implementation boundary.
-
-
-## TASK-P0B-004
-
----
-id: TASK-P0B-004
-type: task
-title: Release & Publication Provenance
-status: completed
-canonical: true
-tier: warm
-workstream: P0-B
-created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-17T22:47:41Z
-freshness_class: release-bound
-budget_class: standard
-findings:
-  - FND-20260814-018
-invariants:
-  - REL-004
-  - REL-009
-depends_on:
-  - TASK-P0B-003
-source_paths:
-  - src/monitoring/aggregate_health.py
-  - docs/data/
-  - scripts/
-evidence:
-  - EVD-P0B-004-PROD-001
-verified_by:
-  - VER-P0B-004-PROD-001
----
-# TASK-P0B-004 — Release & Publication Provenance
-
-## Mission
-
-Publish source release, exact CI, runtime-data head and publication/build provenance as separate truths.
-
-## Primary files / boundaries
-
-- `src/monitoring/aggregate_health.py`
-- `docs/data/`
-- `scripts/`
-
-## Adjacent read-only inspection
-
-- `.github/workflows/pages*.yml`
-- `.github/workflows/*publish*.yml`
-- `cloudflare/`
-
-## Forbidden scope
-
-- privacy payload redesign except provenance fields
-- model promotion
-
-## Deterministic gates
-
-- source_release_sha does not move on data-only commits
-- runtime_data_sha can move independently
-- published artifact carries schema/build timestamp
-- provenance serialization tests
-
-## Production verification
-
-- public artifact exposes exact source release and runtime data provenance
-- Pages/Worker provenance agrees with deployed evidence
-
-## Rollback
-
-Remove new provenance fields/readers together if incompatible; retain prior public schema.
-
-## STOP conditions
-
-- current deployment identity cannot be resolved
-- provenance field would expose secrets/private state
-
-## Builder report contract
-
-Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
+Source Release SHA: `20109387cf42c13c693e33b1642828424ce3be21` (PR #16, squash merge 2026-08-18T06:55:58Z). Post-merge CI run `32109075233` — success. Exact CI head SHA: `20109387cf42c13c693e33b1642828424ce3be21`. All required gates passed: Compile, Core smoke, Node Worker contracts, Ruff regression, Provenance truth, HARD GATE 6 Privacy serialization. Pages deployment `32109137419` success — production-served `docs/data/signals.json` and `docs/data/signals_philip.json` verified to contain zero forbidden private fields. Worker deployment `9bd2d4f0-30b1-457d-979b-610f6aa2edf2` (previous rollback identity: `01ad0f44-ed45-4b9d-a854-eba0b918f35b` — no rollback required). Production unauthenticated GET /signals.json verified HTTP 200 with zero private financial/account/identity fields. Fail-closed serializer deployed. CEO steady-state re-check confirmed latest observed main HEAD `4ab91c924a826903f6f119447d6e1f6b4fa4f509` still contains no `default_user` or `bankroll_state` in public artifacts — privacy boundary survived subsequent steady-state writer activity. Verified via [[evidence/records/EVD-P0C-001-PROD-001]].
 
 
 ## External source scope
 
-- `scripts/`
 - `cloudflare/worker.js`
-- `docs/data/signals.json`
-- `docs/data/signals_philip.json`
+- `docs/js/`
+- `scripts/`
