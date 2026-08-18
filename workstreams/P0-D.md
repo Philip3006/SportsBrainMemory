@@ -5,7 +5,6 @@ tier: "warm"
 status: "active"
 workstream: "P0-D"
 last_updated: "2026-08-18T00:00:00+02:00"
-started_at: 2026-08-18
 freshness_class: "release-bound"
 ---
 # P0-D — Governance & Data Integrity
