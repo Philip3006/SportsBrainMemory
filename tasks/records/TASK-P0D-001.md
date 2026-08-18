@@ -2,12 +2,12 @@
 id: TASK-P0D-001
 type: task
 title: Standard Runtime Writer Governance
-status: approved
+status: completed
 canonical: true
 tier: warm
 workstream: P0-D
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-18T00:00:00+02:00
+updated_at: 2026-08-18T19:36:30Z
 freshness_class: release-bound
 budget_class: standard
 findings:
@@ -23,7 +23,13 @@ depends_on:
   - TASK-P0C-002
 source_paths:
   - scripts/_git_safe_push.sh
+  - scripts/_bot_commit_push.sh
   - .github/workflows/
+  - tests/monitoring/test_writer_governance.py
+evidence:
+  - EVD-P0D-001-PROD-001
+verified_by:
+  - VER-P0D-001-PROD-001
 ---
 # TASK-P0D-001 — Standard Runtime Writer Governance
 

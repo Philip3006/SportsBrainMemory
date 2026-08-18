@@ -18,6 +18,6 @@ generated: true
 | TASK-P0B-004 | completed | P0-B | standard |
 | TASK-P0C-001 | completed | P0-C | complex |
 | TASK-P0C-002 | completed | P0-C | complex |
-| TASK-P0D-001 | approved | P0-D | standard |
-| TASK-P0D-002 | draft | P0-D | standard |
+| TASK-P0D-001 | completed | P0-D | standard |
+| TASK-P0D-002 | approved | P0-D | standard |
 | TASK-P0D-003 | draft | P0-D | standard |

@@ -2,12 +2,12 @@
 id: TASK-P0D-002
 type: task
 title: Financial Writer Governance
-status: draft
+status: approved
 canonical: true
 tier: warm
 workstream: P0-D
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-16T13:04:00+02:00
+updated_at: 2026-08-18T19:36:30Z
 freshness_class: release-bound
 budget_class: standard
 findings:

@@ -237,7 +237,7 @@ ChatGPT/CEO is read-only to GitHub/project; no mutations.
 
 **Severity:** P0  
 **Domain:** Governance  
-**Production status:** `not_enforced`  
+**Production status:** `partial`  
 **P0-A overlay status:** `not_enforced`
 
 ### Invariant
@@ -245,13 +245,13 @@ Claude/authorized Builder is sole normal source-code mutator.
 
 **Canonical owner:** Builder governance
 
-**Current evidence:** `auto_heal_ai.py` can autonomously edit/commit/push scripts.
+**Current evidence:** P0D-001 (2026-08-18): `_git_safe_push.sh` path allowlist enforced fail-closed via `bot_assert_staged_safe()` — runtime bot writers cannot stage source files (HARD GATE 8). All 8 Class A writers use governed primitive. Source/runtime SHA separation verified in production. Remaining gap: `auto_heal_ai.py` can still autonomously edit/commit/push scripts (AI healer source mutation) → P0D-003.
 
-**Failure mode:** Unreviewed autonomous source mutation.
+**Failure mode:** Unreviewed autonomous source mutation via AI healer path.
 
 **Production monitor target:** Source commit actor/path audit.
 
-**Closure / next action:** P0-D.
+**Closure / next action:** P0D-003 (AI healer source mutation removal).
 
 ## GOV-003
 

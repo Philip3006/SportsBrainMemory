@@ -85,7 +85,7 @@ Source Release SHA is published separately from Runtime/Data HEAD.
 
 **Canonical owner:** Build provenance
 
-**Current evidence:** P0-B4 production verified 2026-08-17T22:47:41Z. `provenance_meta.json` written by `scripts/record_source_release.py` on each ci_gates success. `docs/data/health.json` publishes `source_release_sha`, `runtime_data_sha`, and `source_runtime_consistent` as separate truths. Natural post-release consume run `32077550579` confirmed `source_runtime_consistent: true` with SHA `b81d606641...` independent of source release SHA `7cd6c679...`. Pages deployment `32077608783` served correct provenance. Evidence: EVD-P0B-004-PROD-001.
+**Current evidence:** P0-B4 production verified 2026-08-17T22:47:41Z. `provenance_meta.json` written by `scripts/record_source_release.py` on each ci_gates success. `docs/data/health.json` publishes `source_release_sha`, `runtime_data_sha`, and `source_runtime_consistent` as separate truths. Natural post-release consume run `32077550579` confirmed `source_runtime_consistent: true` with SHA `b81d606641...` independent of source release SHA `7cd6c679...`. Pages deployment `32077608783` served correct provenance. Evidence: EVD-P0B-004-PROD-001. P0D-001 (2026-08-18): source_release_sha `c79603efcc...` (PR #18 squash-merge) correctly recorded; 3 runtime SHAs (d980d04, fd6e6f3, 5117817) advance independently; provenance_meta.json not overwritten by runtime commits. Evidence: EVD-P0D-001-PROD-001.
 
 **Failure mode:** Users/monitor cannot identify validated source.
 
