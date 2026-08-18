@@ -19,5 +19,5 @@ generated: true
 | TASK-P0C-001 | completed | P0-C | complex |
 | TASK-P0C-002 | completed | P0-C | complex |
 | TASK-P0D-001 | completed | P0-D | standard |
-| TASK-P0D-002 | approved | P0-D | standard |
+| TASK-P0D-002 | approved | P0-D | standard | arch-approved 2026-08-18; v2 branch task/TASK-P0D-002-v2 pending CI+merge |
 | TASK-P0D-003 | draft | P0-D | standard |
