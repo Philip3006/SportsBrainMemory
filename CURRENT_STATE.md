@@ -18,9 +18,11 @@ generated: true
 ## Workstreams
 
 - **Stability Engineering** — technically complete; formal 72h soak deferred on external quota.
-- **Top-5 Research** — baseline complete; final audit active; no sealed-data access.
+- **Top-5 Research** — COMPLETE / CEO APPROVED / frozen at `6eaabbec7d0182103d815c72fae4976e261b40aa`; 2425/2526 SEALED.
+- Research completion event: `EVT-20260913-010`.
 - **Top-5 Production Architecture** — complete, disabled by default.
 - **Top-5 Shadow Readiness** — merged hardening; disabled-by-default with no live activation.
-- **Memory V2** — current Builder C workstream; CEO review required for release.
+- **Builder 1** — Top-5 Shadow Integration; **Builder 2** — Top-5 Production Activation Readiness; **Builder 3** — Memory V2.
+- **Top-5 live activation** — NOT APPROVED; Champions League not started and remains after Top-5.
 
 Operational source health and runtime-only events belong in [[_live/LIVE_STATUS]], not canonical Memory history.

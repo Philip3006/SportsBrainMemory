@@ -1,6 +1,7 @@
 {
   "affected_workstreams": ["MODEL-INTEGRITY", "TENNIS"],
-  "builder": "Builder A",
+  "builder": "Builder 1",
+  "builder_number": 1,
   "canonical": true,
   "ceo_gate_state": "verified",
   "domain": "model-integrity",

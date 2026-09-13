@@ -2,6 +2,12 @@
   "additional_properties": false,
   "object_type": "task",
   "properties": {
+    "builder": {
+      "type": "string"
+    },
+    "builder_number": {
+      "type": "integer"
+    },
     "allowed_files": {
       "type": [
         "array",

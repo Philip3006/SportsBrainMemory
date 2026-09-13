@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0, str(ROOT / "tools"))
 from memorylib.dashboard import render_all
 from memorylib.live import render_live_status
+from memorylib.validate import validate
 from memorylib.v2 import MemoryV2Error, build_context_packets, freshness_state, ingest_events
 from sync_memory import seed_vault, sync_repo, sync_vault
 
@@ -25,6 +26,7 @@ def event(event_id: str, *, canonical: bool = True, state: str = "ceo_approved")
         "summary": "Test event",
         "source_repository": "test",
         "builder": "CEO",
+        "builder_number": "CEO",
         "ceo_gate_state": "approved",
         "affected_workstreams": [],
         "findings": [],
@@ -78,7 +80,31 @@ class MemoryV2Tests(unittest.TestCase):
         second = build_context_packets(ROOT)
         self.assertEqual(first, second)
         self.assertEqual(contents, {p.name: p.read_bytes() for p in (ROOT / "builder/context").glob("*.md")})
-        self.assertIn("do not recursively load", (ROOT / "builder/context/BUILDER_C_MEMORY.md").read_text())
+        self.assertIn("BUILDER: 3", (ROOT / "builder/context/BUILDER_3_MEMORY.md").read_text())
+
+    def test_builder_number_is_required_and_matches_identity(self):
+        payload = event("EVT-20260913-904")
+        del payload["builder_number"]
+        with self.assertRaises(MemoryV2Error):
+            ingest_events(Path(tempfile.mkdtemp(prefix="sbmem-v2-builder-required-")), [payload], validate_after=False)
+        payload = event("EVT-20260913-905")
+        payload["builder"] = "Builder 1"
+        payload["builder_number"] = 2
+        with self.assertRaises(MemoryV2Error):
+            ingest_events(Path(tempfile.mkdtemp(prefix="sbmem-v2-builder-mismatch-")), [payload], validate_after=False)
+
+    def test_current_governance_uses_numbered_builders_and_approved_research(self):
+        render_all(ROOT)
+        report = validate(ROOT, "v1")
+        self.assertEqual((report.errors, report.warnings), (0, 0))
+        current = "\n".join((ROOT / name).read_text() for name in ("00_HOME.md", "CURRENT_STATE.md", "CURRENT_PRIORITIES.md", "CURRENT_BLOCKERS.md"))
+        self.assertIn("Builder 1", current)
+        self.assertIn("Builder 2", current)
+        self.assertIn("Builder 3", current)
+        self.assertNotRegex(current, r"\bBuilder [ABC]\b")
+        self.assertIn("6eaabbec7d0182103d815c72fae4976e261b40aa", current)
+        self.assertIn("EVT-20260913-010", current)
+        self.assertIn("NOT APPROVED", current)
 
     def test_seed_creates_recoverable_snapshot_and_conflict_blocks(self):
         td = Path(tempfile.mkdtemp(prefix="sbmem-v2-sync-"))

@@ -1,6 +1,7 @@
 {
   "affected_workstreams": ["TOP5-RESEARCH", "TOP5-PRODUCTION"],
   "builder": "CEO",
+  "builder_number": "CEO",
   "canonical": true,
   "ceo_gate_state": "approved",
   "domain": "roadmap",

@@ -70,7 +70,7 @@ or sealed-data read was performed.
   versus live separation, and Champions League ordering. Exact Signal-Time
   values remain a CEO gate.
 - **C — missing production/research lineage:** resolved for PR #54, PR #55,
-  the Top-5 baseline, Builder A/B/C ownership, and the latest PR #56 ref.
+  the Top-5 baseline, current Builder 1/2/3 ownership, and the latest PR #56 ref.
 - **D — missing operational stability state:** resolved as technically
   complete with the 72h stability soak explicitly deferred; no soak result is
   fabricated.
@@ -80,8 +80,8 @@ or sealed-data read was performed.
   `TASK-MEM-V2-001` and `FND-MEMORY-V2-001`; one active task is enforced.
 - **G — stale Claude builder assumptions:** resolved by retiring Claude
   runbooks and making CODEX the sole current builder platform.
-- **H — missing context packets:** resolved with bounded Builder A, Builder B,
-  Builder C, and CEO packets.
+- **H — missing context packets:** resolved with bounded Builder 1, Builder 2,
+  Builder 3, and CEO packets.
 - **I — unsafe live mirroring:** resolved with pre-seed backup, manifest-based
   conflict detection, fetch-first, fast-forward-only updates, and no-delete
   behavior.

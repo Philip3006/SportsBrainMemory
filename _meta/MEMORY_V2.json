@@ -9,14 +9,16 @@
   "source_latest_meaningful_at": "2026-09-13T23:14:02+02:00",
   "source_runtime_head_observed": "eaee1a53f846a45cd824e1ba549d3d832f83adee",
   "canonical_baseline_sha": "8edeb2a45434465fbb94b6882a0a677708103271",
-  "canonical_updated_at": "2026-09-13T23:25:00+02:00",
+  "canonical_updated_at": "2026-09-13T23:34:53+02:00",
   "canonical_status": "FRESH",
   "builder_platform": "CODEX",
   "builder_roles": {
-    "A": "Research",
-    "B": "Production",
-    "C": "Memory and Observability"
+    "1": "Top-5 Shadow Integration",
+    "2": "Top-5 Production / Activation Readiness",
+    "3": "Memory / Obsidian / Observability"
   },
+  "frozen_research_sha": "6eaabbec7d0182103d815c72fae4976e261b40aa",
+  "builder_handoff_rule": "Every builder completion handoff must begin with BUILDER: 1, BUILDER: 2, or BUILDER: 3.",
   "live_layer": "_live",
   "live_sync_interval_seconds": 90,
   "freshness_policy": {

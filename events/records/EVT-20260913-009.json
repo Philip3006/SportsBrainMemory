@@ -1,6 +1,7 @@
 {
   "affected_workstreams": ["STABILITY-ENGINEERING"],
   "builder": "CEO",
+  "builder_number": "CEO",
   "canonical": true,
   "ceo_gate_state": "deferred",
   "domain": "stability",

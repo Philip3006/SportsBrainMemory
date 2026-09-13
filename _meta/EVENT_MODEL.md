@@ -2,7 +2,7 @@
 type: meta-protocol
 tier: warm
 status: active
-last_updated: 2026-09-13T23:04:08+02:00
+last_updated: 2026-09-13T23:34:53+02:00
 freshness_class: stable
 ---
 # Memory V2 Event Model
@@ -15,9 +15,16 @@ event types are `CEO_DECISION`, `PR_MERGED`, `WORKSTREAM_STARTED`,
 `DEFERRED_DEPENDENCY`.
 
 Every event has a stable `event_id`, timezone-aware `timestamp`, `domain`,
-`summary`, source repository and optional source SHA/PR, builder, CEO gate
+`summary`, source repository and optional source SHA/PR, builder, required
+`builder_number`, CEO gate
 state, affected workstreams, findings, invariants, supersession, evidence,
 and an explicit `verification_state`.
+
+Builder events must use `builder: "Builder 1|2|3"` together with the matching
+integer `builder_number`. CEO and system events use `builder_number: "CEO"` or
+`"SYSTEM"`. Every builder completion handoff must begin with an explicit
+`BUILDER: 1`, `BUILDER: 2`, or `BUILDER: 3` line; an unnumbered handoff is
+formally incomplete.
 
 `ceo_approved`, `independently_verified`, and `merged_source` may be
 canonical. Builder reports are written to `events/pending/` and remain

@@ -1,6 +1,7 @@
 {
   "affected_workstreams": ["STABILITY-ENGINEERING", "ODDS-PROVIDERS"],
-  "builder": "Builder B",
+  "builder": "Builder 2",
+  "builder_number": 2,
   "canonical": true,
   "ceo_gate_state": "verified",
   "domain": "odds/providers",

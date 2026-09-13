@@ -1,6 +1,7 @@
 {
   "affected_workstreams": ["TOP5-SHADOW-READINESS"],
-  "builder": "Builder B",
+  "builder": "Builder 2",
+  "builder_number": 2,
   "canonical": true,
   "ceo_gate_state": "merged_disabled_no_live_activation",
   "domain": "production-shadow",

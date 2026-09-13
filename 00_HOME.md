@@ -17,16 +17,18 @@ generated: true
 
 ## CURRENT BUILDERS
 
-- **Builder A — Research:** Top-5 final audit remains active; 2425/2526 remain sealed.
-- **Builder B — Production:** PR #56 Shadow Readiness is merged but disabled-by-default; no live activation.
-- **Builder C — Memory/Observability:** Memory V2 and safe Obsidian sync are the current delivery.
+- **Builder 1 — Top-5 Shadow Integration:** consumes immutable CEO-approved Research SHA `6eaabbec7d0182103d815c72fae4976e261b40aa`; no research mutation or live activation.
+- **Builder 2 — Top-5 Production / Activation Readiness:** PR #56 is merged; preparation only, no live activation.
+- **Builder 3 — Memory / Obsidian / Observability:** Memory V2 and safe Obsidian sync are the current delivery.
 
 ## TOP-5 PROGRESS
 
-- Generic research framework is complete for five leagues; BL1 v7 parity is required and recorded.
+- Top-5 Development is complete; Research Gate is CEO approved at frozen SHA `6eaabbec7d0182103d815c72fae4976e261b40aa`.
+- 2425 and 2526 remain SEALED; Research completion does not approve a model or betting strategy for production.
 - Production architecture is complete, disabled by default, and has no active Top-5 registration.
 - Shadow Readiness hardening is merged and disabled-by-default; activation remains a CEO gate.
-- Champions League remains after Top-5 completion.
+- Top-5 live activation: **NOT APPROVED**.
+- Champions League: **not started; remains after Top-5**.
 
 ## STABILITY
 
@@ -46,7 +48,7 @@ generated: true
 
 ## LATEST DECISIONS
 
-- CODEX is the sole SportsBrain builder platform; logical Builder A/B/C roles remain separated.
+- CODEX is the sole SportsBrain builder platform; current ownership is Builder 1 / Builder 2 / Builder 3.
 - Canonical Memory and near-live operational status are separate layers.
 - Signal-Time uses an event-relative bounded window with explicit lead/age/idempotency constraints; exact values are not approved.
 

@@ -26,5 +26,5 @@ Then validate:
 
 `python tools/validate_memory.py`
 
-CODEX is the sole builder platform. Builder A/B/C are logical ownership
+CODEX is the sole builder platform. Builder 1/2/3 are numbered ownership
 roles, not permission to merge or bypass the CEO gate.

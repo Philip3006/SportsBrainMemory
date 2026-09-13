@@ -10,9 +10,9 @@ generated: true
 - Audited source main SHA: `eaee1a53f846a45cd824e1ba549d3d832f83adee`
 
 1. Complete CEO review of **TASK-MEM-V2-001** and the Memory V2 release branch.
-2. Builder A completes the Top-5 final audit under true A/B/A' contamination, BL1 parity, corrected statistics, and sealed-data rules.
-3. Builder B and CEO review whether any disabled Shadow Readiness activation is warranted; keep it disabled by default.
+2. Builder 1 consumes the immutable CEO-approved Research input for no-bet Shadow Integration only.
+3. Builder 2 continues Top-5 Production Activation Readiness preparation; keep live activation disabled.
 4. Resolve the external free-quota dependency before starting the formal 72h Stability Soak.
 5. Keep Champions League after Top-5 completion.
 
-Historical P0 order remains A → B → C → D; it is not a reason to reactivate completed workstreams.
+Historical P0 order remains unchanged as a phase sequence; it is not a reason to reactivate completed workstreams.

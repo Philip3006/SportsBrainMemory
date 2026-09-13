@@ -9,9 +9,9 @@ freshness_class: stable
 CODEX is the sole SportsBrain builder platform. Select the bounded packet for
 the logical role:
 
-- `builder/context/BUILDER_A_RESEARCH.md`
-- `builder/context/BUILDER_B_PRODUCTION.md`
-- `builder/context/BUILDER_C_MEMORY.md`
+- `builder/context/BUILDER_1_SHADOW_INTEGRATION.md`
+- `builder/context/BUILDER_2_ACTIVATION_READINESS.md`
+- `builder/context/BUILDER_3_MEMORY.md`
 - `builder/context/CEO_SUMMARY.md`
 
 Read `CURRENT_TASK.md`, verify the task ID, inspect only the listed source

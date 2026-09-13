@@ -9,7 +9,7 @@ freshness_class: release-bound
 ---
 # Top-5 Production Architecture
 
-PR #54 is retained as the safe historical baseline. PR #55 merged at
+Builder 2 retains PR #54 as the safe historical baseline. PR #55 merged at
 `b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad` and completed the generic Top-5
 production architecture reconciliation.
 

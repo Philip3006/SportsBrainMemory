@@ -1,6 +1,7 @@
 {
   "affected_workstreams": ["MEMORY-V2"],
   "builder": "CEO",
+  "builder_number": "CEO",
   "canonical": true,
   "ceo_gate_state": "approved",
   "domain": "memory-architecture",

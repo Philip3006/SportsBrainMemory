@@ -16,6 +16,7 @@ generated: true
 ## Active CEO gates
 
 - PR #56 Shadow Readiness is merged but remains disabled pending reviewed production timing, provider, shadow, and rollout gates.
+- Research is complete and CEO approved, but no model or betting strategy is thereby production-approved.
 - Exact production Signal-Time values are not approved.
 - No Top-5 deployable-edge claim is allowed without the full research, timing, provider, shadow, and rollout gates.
 

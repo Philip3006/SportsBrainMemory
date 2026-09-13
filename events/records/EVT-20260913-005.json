@@ -1,6 +1,7 @@
 {
   "affected_workstreams": ["TOP5-PRODUCTION"],
-  "builder": "Builder B",
+  "builder": "Builder 2",
+  "builder_number": 2,
   "canonical": true,
   "ceo_gate_state": "accepted_historical_baseline",
   "domain": "production-architecture",

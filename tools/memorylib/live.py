@@ -120,9 +120,9 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         "",
         "## CURRENT BUILDERS",
         "",
-        "- **Builder A — Research:** final Top-5 audit active; true A/B/A' contamination, BL1 parity, corrected statistics, no sealed-data access.",
-        "- **Builder B — Production:** PR #56 Shadow Readiness merged but disabled-by-default; no live activation.",
-        f"- **Builder C — Memory/Observability:** branch `{memory_branch}`; canonical/live separation and safe sync maintained.",
+        "- **Builder 1 — Top-5 Shadow Integration:** immutable Research SHA `6eaabbec7d0182103d815c72fae4976e261b40aa`; no research mutation or live activation.",
+        "- **Builder 2 — Top-5 Production / Activation Readiness:** PR #56 merged; preparation only, no live activation.",
+        f"- **Builder 3 — Memory / Obsidian / Observability:** branch `{memory_branch}`; canonical/live separation and safe sync maintained.",
         "",
         "## PR STATUS",
         "",
@@ -139,7 +139,7 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         "",
         "## TOP-5",
         "",
-        "- Research baseline: BL1 v7 frozen; DEV/CALIB/HOLDOUT semantics retained; 2425 and 2526 sealed.",
+        "- Research: **TOP-5 DEVELOPMENT COMPLETE / RESEARCH GATE CEO APPROVED** at frozen SHA `6eaabbec7d0182103d815c72fae4976e261b40aa`; 2425 and 2526 sealed.",
         "- Production architecture: complete, disabled by default, cumulative rollout gates, no active registration.",
         "- Shadow Readiness: merged hardening is disabled-by-default; exact production activation remains a CEO gate.",
         "",
@@ -156,13 +156,14 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         "## DEFERRED DEPENDENCIES / NEXT CEO GATE",
         "",
         "- Resolve the external free-quota dependency before the 72h soak.",
-        "- Review the merged PR #56 hardening and decide whether any disabled Shadow Readiness activation is warranted.",
+        "- Builder 2 continues Top-5 Production Activation Readiness; no live Top-5 activation is approved.",
+        "- Builder 1 may perform Research → NO-BET Shadow Integration only; research mutation, sealed-data unlock, live activation, real bets, and production model approval are prohibited.",
         "- Approve exact Signal-Time values only after schedule/quota evidence.",
         "- Champions League remains after Top-5 completion.",
         "",
     ])
     _write(vault / "_live" / "LIVE_STATUS.md", status_text)
-    _write(vault / "_live" / "BUILDERS.md", "\n".join([V2_GENERATED_MARKER, "# Builders", "", "- Builder A — Research", "- Builder B — Production", "- Builder C — Memory/Observability", "- CODEX is the sole builder platform."]))
+    _write(vault / "_live" / "BUILDERS.md", "\n".join([V2_GENERATED_MARKER, "# Builders", "", "- Builder 1 — Top-5 Shadow Integration", "- Builder 2 — Top-5 Production / Activation Readiness", "- Builder 3 — Memory / Obsidian / Observability", "- CODEX is the sole builder platform."]))
     _write(vault / "_live" / "PRS.md", "\n".join([V2_GENERATED_MARKER, "# SportsBrain PR Status", "", *prs]))
     _write(vault / "_live" / "CI_STATUS.md", "\n".join([V2_GENERATED_MARKER, "# CI and Runtime Status", "", *ci_lines]))
     _write(vault / "_live" / "SYNC_STATUS.md", "\n".join([V2_GENERATED_MARKER, "# Memory Sync Status", "", f"- Status: **{sync_state}**", f"- Last attempt: `{last_sync_at or now}`", f"- {sync_text}", "", "No hard reset or destructive merge is permitted."]))

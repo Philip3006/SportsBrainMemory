@@ -46,7 +46,8 @@ Inspect only the referenced context and required source files.
 Do not merge.
 ```
 
-Do not ask CODEX to recursively read the entire Memory. Use the role-bounded packet for Builder A, B, C, or CEO.
+Do not ask CODEX to recursively read the entire Memory. Use the numbered,
+role-bounded packet for Builder 1, 2, 3, or CEO.
 
 Before a Builder run, regenerate the packet:
 
@@ -76,6 +77,7 @@ CEO-approved events use this payload shape:
     "summary": "Decision text",
     "source_repository": "ChatGPT CEO brief",
     "builder": "CEO",
+    "builder_number": "CEO",
     "ceo_gate_state": "approved",
     "affected_workstreams": [], "findings": [], "invariants": [],
     "supersedes": [], "evidence": ["CEO approval reference"],

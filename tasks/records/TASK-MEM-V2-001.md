@@ -6,8 +6,10 @@ status: active
 canonical: true
 tier: warm
 workstream: MEMORY-V2
+builder: Builder 3
+builder_number: 3
 created_at: 2026-09-13T22:40:00+02:00
-updated_at: 2026-09-13T23:04:08+02:00
+updated_at: 2026-09-13T23:34:53+02:00
 freshness_class: stable
 budget_class: complex
 findings:
@@ -24,6 +26,8 @@ source_paths:
 # TASK-MEM-V2-001 — Memory V2 Live Obsidian System
 
 ## Mission
+
+BUILDER: 3
 
 Maintain reviewed canonical Memory while exposing a near-live operational
 view in Obsidian without runtime-noise commits or unsafe synchronization.

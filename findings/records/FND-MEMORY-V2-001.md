@@ -7,7 +7,7 @@ severity: P1
 domain: memory
 workstream: MEMORY-V2
 discovered_by: CEO
-last_updated: 2026-09-13T23:04:08+02:00
+last_updated: 2026-09-13T23:34:53+02:00
 freshness_class: stable
 ---
 # FND-MEMORY-V2-001 — Memory was stale and lacked a live operational layer
