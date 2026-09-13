@@ -11,7 +11,7 @@ generated: true
 
 1. Complete CEO review of **TASK-MEM-V2-001** and the Memory V2 release branch.
 2. Builder A completes the Top-5 final audit under true A/B/A' contamination, BL1 parity, corrected statistics, and sealed-data rules.
-3. Builder B resolves the PR #56 request/quota bulk-modeling review items; keep Shadow Readiness disabled.
+3. Builder B and CEO review whether any disabled Shadow Readiness activation is warranted; keep it disabled by default.
 4. Resolve the external free-quota dependency before starting the formal 72h Stability Soak.
 5. Keep Champions League after Top-5 completion.
 

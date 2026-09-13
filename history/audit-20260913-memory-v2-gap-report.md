@@ -55,12 +55,12 @@ or sealed-data read was performed.
 - Top-5 production baseline PR #54: `054c011ff29777bdc381363103ab24f3d52d49ce`.
 - Top-5 production architecture reconciliation PR #55:
   `b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad`.
-- Latest fetched PR #56 Shadow Readiness head:
-  `16be9cdb4d7fd84b1a18f708e210693f164268c3`, subject
-  `fix: model top5 bulk request readiness`; it remains unmerged and disabled.
+- PR #56 Shadow Readiness head `16be9cdb4d7fd84b1a18f708e210693f164268c3`,
+  subject `fix: model top5 bulk request readiness`, is merged into `origin/main`
+  at `8de9472644057656c50d900380a843909ff5a46b` and remains disabled-by-default.
 - Current fetched `origin/main` is `eaee1a53f846a45cd824e1ba549d3d832f83adee`,
-  an auto runtime-record commit. The latest meaningful release remains PR #55
-  until a newer non-runtime release is independently observed.
+  an auto runtime-record commit whose latest meaningful parent is the merged
+  PR #56 commit `8de9472644057656c50d900380a843909ff5a46b`.
 
 ## Gap classification
 
@@ -85,28 +85,28 @@ or sealed-data read was performed.
 - **I — unsafe live mirroring:** resolved with pre-seed backup, manifest-based
   conflict detection, fetch-first, fast-forward-only updates, and no-delete
   behavior.
-- **J — Top-5 activation ambiguity:** resolved as disabled by default; PR #56
-  remains open/not merged and no live, provider, publisher, scheduler,
-  Cloudflare, or ledger path is activated.
-- **K — external verification gap:** unresolved only where local evidence cannot
-  prove live GitHub state or network mutation. Push/PR creation and live CI
-  confirmation require a working external connection and CEO review.
+- **J — Top-5 activation ambiguity:** resolved as disabled by default; PR #56 is
+  merged but no live, provider, publisher, scheduler, Cloudflare, or ledger
+  path is activated.
+- **K — external verification gap:** live GitHub verification and Memory PR #1
+  creation are complete. Live CI and the deferred quota-dependent soak remain
+  external CEO gates.
 
 ## Open gates and explicit non-claims
 
 1. The 72h stability soak is deferred because the required external free-quota
    dependency was unavailable; the system records this as a deferred
    dependency, not as a pass.
-2. PR #56 is not merged. Its latest fetched branch head is recorded for review,
-   but no deployment or live activation is inferred.
+2. PR #56 is merged, but its implementation remains disabled-by-default. No
+   deployment, provider call, live signal, or activation is inferred.
 3. Signal-Time has an approved architecture shape only; exact lead windows,
    odds-age thresholds, quotas, and schedules remain unapproved.
 4. The checked-in source health snapshot currently renders as degraded/down.
    `_live/` reports that condition honestly and does not rewrite canonical
    source truth.
-5. GitHub push, PR creation, live CI, and remote merge confirmation were not
-   completed in this local audit because the external GitHub connection was
-   unavailable. The local branch and commit remain reviewable.
+5. GitHub push, Memory PR #1 creation, and PR #56 merge confirmation completed.
+   Live CI and the quota-dependent 72h soak remain unclaimed because they are
+   separate external gates.
 
 ## Artifacts produced
 

@@ -10,7 +10,7 @@ generated: true
 ## SPORTSBRAIN NOW
 
 - Source main SHA at audit: `eaee1a53f846a45cd824e1ba549d3d832f83adee`
-- Latest meaningful source merge: `b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad`
+- Latest meaningful source merge: `8de9472644057656c50d900380a843909ff5a46b`
 - Canonical Memory: **FRESH**
 - Current Builder task: **TASK-MEM-V2-001**
 - Near-live view: [[_live/LIVE_STATUS]]
@@ -18,14 +18,14 @@ generated: true
 ## CURRENT BUILDERS
 
 - **Builder A — Research:** Top-5 final audit remains active; 2425/2526 remain sealed.
-- **Builder B — Production:** PR #56 Shadow Readiness is not merged and has no live activation.
+- **Builder B — Production:** PR #56 Shadow Readiness is merged but disabled-by-default; no live activation.
 - **Builder C — Memory/Observability:** Memory V2 and safe Obsidian sync are the current delivery.
 
 ## TOP-5 PROGRESS
 
 - Generic research framework is complete for five leagues; BL1 v7 parity is required and recorded.
 - Production architecture is complete, disabled by default, and has no active Top-5 registration.
-- Shadow Readiness is pending CEO review of request/quota bulk-modeling corrections.
+- Shadow Readiness hardening is merged and disabled-by-default; activation remains a CEO gate.
 - Champions League remains after Top-5 completion.
 
 ## STABILITY
@@ -36,7 +36,7 @@ generated: true
 ## OPEN CEO GATES
 
 - [[decisions/records/DEC-0024]] — exact Signal-Time values remain unapproved.
-- [[workstreams/TOP5-SHADOW-READINESS]] — PR #56 review and request/quota corrections.
+- [[workstreams/TOP5-SHADOW-READINESS]] — decide whether any disabled Shadow Readiness activation is warranted.
 - [[workstreams/STABILITY-ENGINEERING]] — formal soak only after quota dependency is resolved.
 
 ## BLOCKERS

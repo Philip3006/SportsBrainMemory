@@ -27,7 +27,7 @@ generated: true
 ## SPORTSBRAIN NOW
 
 - Source main SHA at audit: `eaee1a53f846a45cd824e1ba549d3d832f83adee`
-- Latest meaningful source merge: `b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad`
+- Latest meaningful source merge: `8de9472644057656c50d900380a843909ff5a46b`
 - Canonical Memory: **FRESH**
 - Current Builder task: **TASK-MEM-V2-001**
 - Near-live view: [[_live/LIVE_STATUS]]
@@ -35,14 +35,14 @@ generated: true
 ## CURRENT BUILDERS
 
 - **Builder A — Research:** Top-5 final audit remains active; 2425/2526 remain sealed.
-- **Builder B — Production:** PR #56 Shadow Readiness is not merged and has no live activation.
+- **Builder B — Production:** PR #56 Shadow Readiness is merged but disabled-by-default; no live activation.
 - **Builder C — Memory/Observability:** Memory V2 and safe Obsidian sync are the current delivery.
 
 ## TOP-5 PROGRESS
 
 - Generic research framework is complete for five leagues; BL1 v7 parity is required and recorded.
 - Production architecture is complete, disabled by default, and has no active Top-5 registration.
-- Shadow Readiness is pending CEO review of request/quota bulk-modeling corrections.
+- Shadow Readiness hardening is merged and disabled-by-default; activation remains a CEO gate.
 - Champions League remains after Top-5 completion.
 
 ## STABILITY
@@ -53,7 +53,7 @@ generated: true
 ## OPEN CEO GATES
 
 - [[decisions/records/DEC-0024]] — exact Signal-Time values remain unapproved.
-- [[workstreams/TOP5-SHADOW-READINESS]] — PR #56 review and request/quota corrections.
+- [[workstreams/TOP5-SHADOW-READINESS]] — decide whether any disabled Shadow Readiness activation is warranted.
 - [[workstreams/STABILITY-ENGINEERING]] — formal soak only after quota dependency is resolved.
 
 ## BLOCKERS
@@ -92,7 +92,7 @@ generated: true
 ## Technical baseline
 
 - Source main SHA at last audit: `eaee1a53f846a45cd824e1ba549d3d832f83adee`
-- Latest meaningful source release/merge: `b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad`
+- Latest meaningful source release/merge: `8de9472644057656c50d900380a843909ff5a46b`
 - Canonical Memory freshness: **FRESH**
 - Current Builder task: **TASK-MEM-V2-001**
 - P0-A through P0-C historical production gates remain recorded; later runtime and research evidence is classified separately.
@@ -102,7 +102,7 @@ generated: true
 - **Stability Engineering** — technically complete; formal 72h soak deferred on external quota.
 - **Top-5 Research** — baseline complete; final audit active; no sealed-data access.
 - **Top-5 Production Architecture** — complete, disabled by default.
-- **Top-5 Shadow Readiness** — current Builder B workstream; PR #56 not merged.
+- **Top-5 Shadow Readiness** — merged hardening; disabled-by-default with no live activation.
 - **Memory V2** — current Builder C workstream; CEO review required for release.
 
 Operational source health and runtime-only events belong in [[_live/LIVE_STATUS]], not canonical Memory history.
@@ -127,7 +127,7 @@ generated: true
 
 ## Active CEO gates
 
-- PR #56 Shadow Readiness remains unmerged and disabled pending reviewed request/quota bulk-modeling corrections.
+- PR #56 Shadow Readiness is merged but remains disabled pending reviewed production timing, provider, shadow, and rollout gates.
 - Exact production Signal-Time values are not approved.
 - No Top-5 deployable-edge claim is allowed without the full research, timing, provider, shadow, and rollout gates.
 
@@ -151,7 +151,7 @@ generated: true
 
 1. Complete CEO review of **TASK-MEM-V2-001** and the Memory V2 release branch.
 2. Builder A completes the Top-5 final audit under true A/B/A' contamination, BL1 parity, corrected statistics, and sealed-data rules.
-3. Builder B resolves the PR #56 request/quota bulk-modeling review items; keep Shadow Readiness disabled.
+3. Builder B and CEO review whether any disabled Shadow Readiness activation is warranted; keep it disabled by default.
 4. Resolve the external free-quota dependency before starting the formal 72h Stability Soak.
 5. Keep Champions League after Top-5 completion.
 
@@ -228,18 +228,18 @@ active CEO gate even though the baseline framework is complete.
 id: WS-TOP5-SHADOW
 type: workstream
 tier: warm
-status: active_not_merged
+status: completed_disabled
 workstream: TOP5-SHADOW-READINESS
-last_updated: 2026-09-13T23:18:12+02:00
+last_updated: 2026-09-13T23:25:00+02:00
 freshness_class: release-bound
 ---
 # Top-5 Shadow Readiness
 
-Builder B owns PR #56 on `feat/top5-shadow-readiness`. The latest locally
-fetched head is `16be9cdb4d7fd84b1a18f708e210693f164268c3`, subject
-`fix: model top5 bulk request readiness`; it is not merged into main and no
-live activation is permitted. The earlier reviewed head `6a7cd78e67ee34d811c81206a49c4931f1a74fcb`
-is superseded by this fetched branch head.
+Builder B's PR #56 on `feat/top5-shadow-readiness` is merged into main at
+`8de9472644057656c50d900380a843909ff5a46b`, from head
+`16be9cdb4d7fd84b1a18f708e210693f164268c3`. The earlier reviewed head
+`6a7cd78e67ee34d811c81206a49c4931f1a74fcb` is superseded. The merged
+implementation remains disabled-by-default and no live activation is permitted.
 
 The current CEO review concerns request/quota bulk-modeling corrections. The
 shadow harness must remain no-bet, disabled, and separate from provider,

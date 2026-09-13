@@ -10,7 +10,7 @@ generated: true
 ## Technical baseline
 
 - Source main SHA at last audit: `eaee1a53f846a45cd824e1ba549d3d832f83adee`
-- Latest meaningful source release/merge: `b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad`
+- Latest meaningful source release/merge: `8de9472644057656c50d900380a843909ff5a46b`
 - Canonical Memory freshness: **FRESH**
 - Current Builder task: **TASK-MEM-V2-001**
 - P0-A through P0-C historical production gates remain recorded; later runtime and research evidence is classified separately.
@@ -20,7 +20,7 @@ generated: true
 - **Stability Engineering** — technically complete; formal 72h soak deferred on external quota.
 - **Top-5 Research** — baseline complete; final audit active; no sealed-data access.
 - **Top-5 Production Architecture** — complete, disabled by default.
-- **Top-5 Shadow Readiness** — current Builder B workstream; PR #56 not merged.
+- **Top-5 Shadow Readiness** — merged hardening; disabled-by-default with no live activation.
 - **Memory V2** — current Builder C workstream; CEO review required for release.
 
 Operational source health and runtime-only events belong in [[_live/LIVE_STATUS]], not canonical Memory history.

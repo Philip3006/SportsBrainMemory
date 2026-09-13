@@ -83,9 +83,21 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
     for line in refs.splitlines():
         if "top5-shadow-readiness" in line:
             ref, sha = line.split("\t", 1)
-            prs.append(f"- PR #56 / `{ref}` — `{sha}` — **open/not merged**")
+            main_log = _git_optional(source_repo, "log", source_ref, "--format=%H%x09%s", "-n", "120") or ""
+            merged_line = next((item for item in main_log.splitlines() if "#56" in item and "top-5" in item.lower()), None)
+            if merged_line:
+                merge_sha, merge_subject = merged_line.split("\t", 1)
+                prs.append(f"- PR #56 / `{ref}` — head `{sha}` — **merged into `{source_ref}` at `{merge_sha}`**; live activation remains disabled")
+            else:
+                prs.append(f"- PR #56 / `{ref}` — `{sha}` — **open/not merged**")
     if not prs:
-        prs.append("- PR #56 / `feat/top5-shadow-readiness` — remote ref not available in this checkout")
+        main_log = _git_optional(source_repo, "log", source_ref, "--format=%H%x09%s", "-n", "120") or ""
+        merged_line = next((item for item in main_log.splitlines() if "#56" in item and "top-5" in item.lower()), None)
+        if merged_line:
+            merge_sha, _ = merged_line.split("\t", 1)
+            prs.append(f"- PR #56 / `feat/top5-shadow-readiness` — **merged into `{source_ref}` at `{merge_sha}`**; live activation remains disabled")
+        else:
+            prs.append("- PR #56 / `feat/top5-shadow-readiness` — remote ref not available in this checkout")
     jobs = health.get("jobs", []) if isinstance(health.get("jobs"), list) else []
     relevant_jobs = [j for j in jobs if isinstance(j, dict) and j.get("job") in {"odds_refresh", "aggregate_health", "bundesliga2_live_push", "consume_pending_bets"}]
     ci_lines = [
@@ -109,7 +121,7 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         "## CURRENT BUILDERS",
         "",
         "- **Builder A — Research:** final Top-5 audit active; true A/B/A' contamination, BL1 parity, corrected statistics, no sealed-data access.",
-        "- **Builder B — Production:** PR #56 Shadow Readiness open/not merged; no live activation.",
+        "- **Builder B — Production:** PR #56 Shadow Readiness merged but disabled-by-default; no live activation.",
         f"- **Builder C — Memory/Observability:** branch `{memory_branch}`; canonical/live separation and safe sync maintained.",
         "",
         "## OPEN PRs",
@@ -129,7 +141,7 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         "",
         "- Research baseline: BL1 v7 frozen; DEV/CALIB/HOLDOUT semantics retained; 2425 and 2526 sealed.",
         "- Production architecture: complete, disabled by default, cumulative rollout gates, no active registration.",
-        "- Shadow Readiness: pending CEO review of request/quota bulk-modeling corrections.",
+        "- Shadow Readiness: merged hardening is disabled-by-default; exact production activation remains a CEO gate.",
         "",
         "## SIGNAL-TIME",
         "",
@@ -144,7 +156,7 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         "## DEFERRED DEPENDENCIES / NEXT CEO GATE",
         "",
         "- Resolve the external free-quota dependency before the 72h soak.",
-        "- Review PR #56 corrections and decide whether to merge Shadow Readiness.",
+        "- Review the merged PR #56 hardening and decide whether any disabled Shadow Readiness activation is warranted.",
         "- Approve exact Signal-Time values only after schedule/quota evidence.",
         "- Champions League remains after Top-5 completion.",
         "",
