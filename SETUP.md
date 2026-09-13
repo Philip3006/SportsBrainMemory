@@ -110,6 +110,10 @@ The recommended cadence is 90 seconds through a user-level macOS LaunchAgent
 (`gui/501`, no sudo). Each run fetches the configured branch, refuses dirty
 Memory worktrees, pulls only by fast-forward, checks the Vault manifest, and
 stops on local edits or divergence. It never hard-resets or discards files.
+When canonical packet names are intentionally replaced, sync may remove only
+the three unchanged retired generated packet paths explicitly listed in the
+sync manifest; every other missing or modified Vault file is preserved and
+causes a visible conflict.
 
 The initial seed creates a recoverable `.memory-backups/pre-v2-*` snapshot in
 the Vault. After seeding, edit conflicts are reported in

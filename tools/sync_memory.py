@@ -21,6 +21,11 @@ from memorylib.live import render_live_status
 from memorylib.v2 import file_sha256
 
 EXCLUDES = {".git", ".obsidian", ".claude", ".memory-build", ".memory-backups", "__pycache__", ".pytest_cache", "_live"}
+RETIRED_GENERATED_FILES = {
+    "builder/context/BUILDER_A_RESEARCH.md",
+    "builder/context/BUILDER_B_PRODUCTION.md",
+    "builder/context/BUILDER_C_MEMORY.md",
+}
 LOCK_PATH = Path("/tmp/sportsbrain-memory-v2-sync.lock")
 
 
@@ -92,6 +97,7 @@ def sync_vault(memory: Path, vault: Path) -> tuple[bool, str, dict[str, str]]:
     previous = vault_manifest(vault)
     if not previous:
         return False, "No sync manifest exists; initial seed is required and was not performed automatically.", previous
+    source_relpaths = {source.relative_to(memory).as_posix() for source in source_files(memory)}
     conflicts: list[str] = []
     for rel, expected in previous.items():
         path = vault / rel
@@ -99,6 +105,13 @@ def sync_vault(memory: Path, vault: Path) -> tuple[bool, str, dict[str, str]]:
             conflicts.append(rel)
     if conflicts:
         return False, "Vault local edits/conflicts detected; sync stopped: " + ", ".join(conflicts[:20]), previous
+    removed: list[str] = []
+    for rel, expected in previous.items():
+        if rel in RETIRED_GENERATED_FILES and rel not in source_relpaths:
+            path = vault / rel
+            if path.exists():
+                path.unlink()
+                removed.append(rel)
     current: dict[str, str] = {}
     for source in source_files(memory):
         rel = source.relative_to(memory).as_posix()
@@ -107,7 +120,10 @@ def sync_vault(memory: Path, vault: Path) -> tuple[bool, str, dict[str, str]]:
             copy_one(source, target)
         current[rel] = file_sha256(target)
     write_manifest(vault, current)
-    return True, "Vault canonical files synchronized without overwriting local edits.", current
+    detail = "Vault canonical files synchronized without overwriting local edits."
+    if removed:
+        detail += " Removed unchanged retired generated packets: " + ", ".join(sorted(removed)) + "."
+    return True, detail, current
 
 
 def sync_repo(memory: Path, branch: str) -> tuple[str, str]:

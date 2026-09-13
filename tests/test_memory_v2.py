@@ -125,6 +125,26 @@ class MemoryV2Tests(unittest.TestCase):
         finally:
             shutil.rmtree(td, ignore_errors=True)
 
+    def test_sync_removes_only_unchanged_retired_packet_files(self):
+        td = Path(tempfile.mkdtemp(prefix="sbmem-v2-retire-"))
+        try:
+            memory = td / "memory"
+            vault = td / "vault"
+            memory.mkdir()
+            vault.mkdir()
+            retired = memory / "builder/context/BUILDER_A_RESEARCH.md"
+            retired.parent.mkdir(parents=True)
+            retired.write_text("retired\n")
+            (memory / "current.md").write_text("current\n")
+            seed_vault(memory, vault)
+            retired.unlink()
+            ok, detail, _ = sync_vault(memory, vault)
+            self.assertTrue(ok)
+            self.assertIn("BUILDER_A_RESEARCH.md", detail)
+            self.assertFalse((vault / "builder/context/BUILDER_A_RESEARCH.md").exists())
+        finally:
+            shutil.rmtree(td, ignore_errors=True)
+
     def test_live_projection_writes_status_files_without_canonical_mutation(self):
         td = Path(tempfile.mkdtemp(prefix="sbmem-v2-live-"))
         try:
