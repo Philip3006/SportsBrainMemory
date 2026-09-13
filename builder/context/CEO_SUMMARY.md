@@ -248,7 +248,8 @@ Builder 2's PR #56 on `feat/top5-shadow-readiness` is merged into main at
 `6a7cd78e67ee34d811c81206a49c4931f1a74fcb` is superseded. The merged
 implementation remains disabled-by-default and no live activation is permitted.
 
-The merged Shadow Readiness baseline is complete. The current CEO review concerns request/quota bulk-modeling corrections. The
-shadow harness must remain no-bet, disabled, and separate from provider,
-publisher, scheduler, Cloudflare, and ledger mutation paths until the review
-gate is passed.
+The merged Shadow Readiness baseline is complete. The request/quota gate is
+closed and CEO-approved; PR #56 requires no further action.
+The shadow harness remains NO-BET, disabled-by-default, and separate from
+provider, publisher, scheduler, Cloudflare, and ledger mutation paths. No live
+activation is permitted.
