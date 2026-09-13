@@ -9,7 +9,7 @@ generated: true
 
 ## Deferred dependencies
 
-- Audited source main SHA: `eaee1a53f846a45cd824e1ba549d3d832f83adee`
+- Audited source main SHA: `6493f14093aa08e457e610c2961da1e77b80bc76`
 
 - External free-quota dependency blocks the formal 72h Stability Soak. The soak has not been started or fabricated.
 

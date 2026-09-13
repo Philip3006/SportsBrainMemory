@@ -9,7 +9,7 @@ generated: true
 
 ## SPORTSBRAIN NOW
 
-- Source main SHA at audit: `eaee1a53f846a45cd824e1ba549d3d832f83adee`
+- Source main SHA at audit: `6493f14093aa08e457e610c2961da1e77b80bc76`
 - Latest meaningful source merge: `8de9472644057656c50d900380a843909ff5a46b`
 - Canonical Memory: **FRESH**
 - Current Builder task: **TASK-MEM-V2-001**

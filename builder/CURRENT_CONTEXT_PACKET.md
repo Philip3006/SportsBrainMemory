@@ -22,12 +22,12 @@ This packet is generated and bounded. Read only the listed canonical records; do
   "schema_version": 2,
   "canonical_repository": "Philip3006/SportsBrainMemory",
   "source_repository": "Philip3006/sportsbrain",
-  "source_main_sha": "eaee1a53f846a45cd824e1ba549d3d832f83adee",
+  "source_main_sha": "6493f14093aa08e457e610c2961da1e77b80bc76",
   "source_latest_meaningful_sha": "8de9472644057656c50d900380a843909ff5a46b",
   "source_latest_meaningful_at": "2026-09-13T23:14:02+02:00",
-  "source_runtime_head_observed": "eaee1a53f846a45cd824e1ba549d3d832f83adee",
+  "source_runtime_head_observed": "6493f14093aa08e457e610c2961da1e77b80bc76",
   "canonical_baseline_sha": "8edeb2a45434465fbb94b6882a0a677708103271",
-  "canonical_updated_at": "2026-09-13T23:34:53+02:00",
+  "canonical_updated_at": "2026-09-13T23:48:38+02:00",
   "canonical_status": "FRESH",
   "builder_platform": "CODEX",
   "builder_roles": {
@@ -336,6 +336,10 @@ The recommended cadence is 90 seconds through a user-level macOS LaunchAgent
 (`gui/501`, no sudo). Each run fetches the configured branch, refuses dirty
 Memory worktrees, pulls only by fast-forward, checks the Vault manifest, and
 stops on local edits or divergence. It never hard-resets or discards files.
+When canonical packet names are intentionally replaced, sync may remove only
+the three unchanged retired generated packet paths explicitly listed in the
+sync manifest; every other missing or modified Vault file is preserved and
+causes a visible conflict.
 
 The initial seed creates a recoverable `.memory-backups/pre-v2-*` snapshot in
 the Vault. After seeding, edit conflicts are reported in
