@@ -124,7 +124,7 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         "- **Builder B — Production:** PR #56 Shadow Readiness merged but disabled-by-default; no live activation.",
         f"- **Builder C — Memory/Observability:** branch `{memory_branch}`; canonical/live separation and safe sync maintained.",
         "",
-        "## OPEN PRs",
+        "## PR STATUS",
         "",
         *prs,
         "",
@@ -163,7 +163,7 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
     ])
     _write(vault / "_live" / "LIVE_STATUS.md", status_text)
     _write(vault / "_live" / "BUILDERS.md", "\n".join([V2_GENERATED_MARKER, "# Builders", "", "- Builder A — Research", "- Builder B — Production", "- Builder C — Memory/Observability", "- CODEX is the sole builder platform."]))
-    _write(vault / "_live" / "PRS.md", "\n".join([V2_GENERATED_MARKER, "# Open SportsBrain PRs", "", *prs]))
+    _write(vault / "_live" / "PRS.md", "\n".join([V2_GENERATED_MARKER, "# SportsBrain PR Status", "", *prs]))
     _write(vault / "_live" / "CI_STATUS.md", "\n".join([V2_GENERATED_MARKER, "# CI and Runtime Status", "", *ci_lines]))
     _write(vault / "_live" / "SYNC_STATUS.md", "\n".join([V2_GENERATED_MARKER, "# Memory Sync Status", "", f"- Status: **{sync_state}**", f"- Last attempt: `{last_sync_at or now}`", f"- {sync_text}", "", "No hard reset or destructive merge is permitted."]))
     payload = {"generated_at": now, "status": overall, "sync_state": sync_state, "source_main_sha": source_head, "latest_meaningful_sha": meaningful_sha, "memory_sha": memory_head, "memory_branch": memory_branch, "memory_freshness": freshness}
