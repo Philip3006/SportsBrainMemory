@@ -5,15 +5,15 @@
   "ceo_gate_state": "review_required",
   "domain": "production-shadow",
   "event_id": "EVT-20260913-008",
-  "evidence": ["sportsbrain remote-tracking ref origin/feat/top5-shadow-readiness", "sportsbrain commit 6a7cd78e67ee34d811c81206a49c4931f1a74fcb"],
+  "evidence": ["sportsbrain remote-tracking ref origin/feat/top5-shadow-readiness", "sportsbrain commit 16be9cdb4d7fd84b1a18f708e210693f164268c3", "superseded fetched head 6a7cd78e67ee34d811c81206a49c4931f1a74fcb"],
   "findings": [],
   "invariants": ["NO-LIVE-ACTIVATION", "SHADOW-NO-BET"],
   "source_pr": 56,
   "source_repository": "Philip3006/sportsbrain",
-  "source_sha": "6a7cd78e67ee34d811c81206a49c4931f1a74fcb",
+  "source_sha": "16be9cdb4d7fd84b1a18f708e210693f164268c3",
   "supersedes": [],
   "summary": "PR #56 Shadow Readiness is the current Builder B workstream, not merged; CEO review identified request/quota bulk-modeling corrections and live activation remains disabled.",
-  "timestamp": "2026-09-13T22:31:52+02:00",
+  "timestamp": "2026-09-13T23:18:12+02:00",
   "type": "WORKSTREAM_STARTED",
-  "verification_state": "merged_source"
+  "verification_state": "independently_verified"
 }

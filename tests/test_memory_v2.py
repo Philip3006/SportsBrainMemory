@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 import sys
 sys.path.insert(0, str(ROOT / "tools"))
 from memorylib.dashboard import render_all
+from memorylib.live import render_live_status
 from memorylib.v2 import MemoryV2Error, build_context_packets, freshness_state, ingest_events
 from sync_memory import seed_vault, sync_repo, sync_vault
 
@@ -95,6 +96,35 @@ class MemoryV2Tests(unittest.TestCase):
             ok, detail, _ = sync_vault(memory, vault)
             self.assertFalse(ok)
             self.assertIn("local edits/conflicts", detail)
+        finally:
+            shutil.rmtree(td, ignore_errors=True)
+
+    def test_live_projection_writes_status_files_without_canonical_mutation(self):
+        td = Path(tempfile.mkdtemp(prefix="sbmem-v2-live-"))
+        try:
+            memory = td / "memory"
+            source = td / "source"
+            vault = td / "vault"
+            for repo in (memory, source):
+                subprocess.run(["git", "init", str(repo)], check=True, capture_output=True)
+                subprocess.run(["git", "-C", str(repo), "config", "user.email", "test@example.invalid"], check=True)
+                subprocess.run(["git", "-C", str(repo), "config", "user.name", "Memory Test"], check=True)
+            (memory / "canonical.md").write_text("canonical\n")
+            (memory / "_meta").mkdir()
+            (memory / "_meta/MEMORY_V2.json").write_text(
+                '{"memory_version":2,"canonical_updated_at":"2026-09-13T23:00:00+02:00"}\n'
+            )
+            (source / "docs/data").mkdir(parents=True)
+            (source / "docs/data/health.json").write_text('{"overall":"ok","generated_at":"2026-09-13T23:00:00Z","jobs":[]}\n')
+            subprocess.run(["git", "-C", str(memory), "add", "canonical.md", "_meta/MEMORY_V2.json"], check=True)
+            subprocess.run(["git", "-C", str(memory), "commit", "-m", "memory"], check=True, capture_output=True)
+            subprocess.run(["git", "-C", str(source), "add", "docs/data/health.json"], check=True)
+            subprocess.run(["git", "-C", str(source), "commit", "-m", "source"], check=True, capture_output=True)
+            payload = render_live_status(memory, vault, source, sync_state="ONLINE")
+            self.assertIn(payload["status"], {"ONLINE", "STALE"})
+            self.assertTrue((vault / "_live/LIVE_STATUS.md").exists())
+            self.assertTrue((vault / "_live/STATUS.json").exists())
+            self.assertEqual((memory / "canonical.md").read_text(), "canonical\n")
         finally:
             shutil.rmtree(td, ignore_errors=True)
 
