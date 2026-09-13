@@ -9,8 +9,14 @@ generated: true
 | Source path | Memory object |
 |---|---|
 | `.github/workflows/` | TASK-P0D-001 |
+| `.github/workflows/bundesliga2_settle.yml` | TASK-P0D-002 |
+| `.github/workflows/ci_gates.yml` | TASK-P0D-002 |
+| `.github/workflows/consume_pending_bets.yml` | TASK-P0D-002 |
+| `.github/workflows/tennis_closing_odds.yml` | TASK-P0D-002 |
 | `.github/workflows/tennis_lgbm_retrain.yml` | TASK-MODEL-002 |
+| `.github/workflows/tennis_settle.yml` | TASK-P0D-002 |
 | `SportsBrainMemory repository only` | TASK-MEM-V1-ACCEPT |
+| `_live/` | TASK-MEM-V2-001 |
 | `cloudflare/worker.js` | CMP-BETTING |
 | `cloudflare/worker.js` | CMP-PUBLICATION |
 | `cloudflare/worker.js` | TASK-P0C-001 |
@@ -27,6 +33,7 @@ generated: true
 | `scripts/` | TASK-P0B-004 |
 | `scripts/` | TASK-P0C-001 |
 | `scripts/` | TASK-P0C-002 |
+| `scripts/_bot_commit_push.sh` | TASK-P0D-001 |
 | `scripts/_git_safe_push.sh` | TASK-P0D-001 |
 | `scripts/_health.sh` | TASK-P0B-003 |
 | `scripts/auto_heal_ai.py` | TASK-P0B-003 |
@@ -38,6 +45,7 @@ generated: true
 | `scripts/tennis_lgbm_retrain.py` | TASK-MODEL-002 |
 | `src/betting/` | CMP-BETTING |
 | `src/betting/` | TASK-P0D-002 |
+| `src/config.py` | TASK-P0D-002 |
 | `src/measurement/` | TASK-MEAS-001 |
 | `src/monitoring/aggregate_health.py` | CMP-MONITORING |
 | `src/monitoring/aggregate_health.py` | TASK-P0B-001 |
@@ -54,8 +62,12 @@ generated: true
 | `src/tennis/` | TASK-MODEL-002 |
 | `tests/` | TASK-P0D-003 |
 | `tests/betting/` | TASK-P0D-002 |
+| `tests/monitoring/test_financial_writer_governance.py` | TASK-P0D-002 |
 | `tests/monitoring/test_health_truth.py` | TASK-P0B-001 |
 | `tests/monitoring/test_health_truth.py` | TASK-P0B-002 |
 | `tests/monitoring/test_recovery_truth.py` | TASK-P0B-003 |
+| `tests/monitoring/test_writer_governance.py` | TASK-P0D-001 |
 | `tests/scripts/test_consume_pending_bets.py` | TASK-P0D-002 |
 | `tests/tennis/` | TASK-MODEL-001 |
+| `tools/memorylib/v2.py` | TASK-MEM-V2-001 |
+| `tools/sync_memory.py` | TASK-MEM-V2-001 |

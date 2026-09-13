@@ -2,12 +2,12 @@
 id: TASK-P0D-002
 type: task
 title: Financial Writer Governance — Private Ledger Datastore
-status: approved
+status: completed
 canonical: true
 tier: warm
 workstream: P0-D
 created_at: 2026-08-16T13:04:00+02:00
-updated_at: 2026-08-18T22:50:00+02:00
+updated_at: 2026-09-13T23:04:08+02:00
 freshness_class: release-bound
 budget_class: standard
 findings:
@@ -36,6 +36,10 @@ source_paths:
   - .github/workflows/ci_gates.yml
 ---
 # TASK-P0D-002 — Financial Writer Governance — Private Ledger Datastore
+
+Historical task completed in the source repository during the backfill window;
+current financial mutation remains outside Memory V2 scope. See the canonical
+P0-D and runtime/provider events for later governance hardening.
 
 ## Mission
 

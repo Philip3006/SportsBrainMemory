@@ -1,0 +1,18 @@
+{
+  "affected_workstreams": ["STABILITY-ENGINEERING", "ODDS-PROVIDERS"],
+  "builder": "Builder B",
+  "canonical": true,
+  "ceo_gate_state": "verified",
+  "domain": "runtime/odds-refresh",
+  "event_id": "EVT-20260910-002",
+  "evidence": ["sportsbrain commit 976685c067701e02335b259b948eba55611134a1", "sportsbrain commits 0337749601ab9762bd9a659d93d34558a11646a2 and 46e8f06fb8dabf76627ccf53f42b3d1aa572215a"],
+  "findings": [],
+  "invariants": ["RUNTIME-STATE-OUTSIDE-CHECKOUT", "ODDS-REFRESH-ENVIRONMENT"],
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "976685c067701e02335b259b948eba55611134a1",
+  "supersedes": [],
+  "summary": "Odds-refresh performance/runtime-state work was completed with externalized provider budget state and hardened scan/refresh launch wrappers.",
+  "timestamp": "2026-09-10T16:48:57+02:00",
+  "type": "WORKSTREAM_COMPLETED",
+  "verification_state": "merged_source"
+}

@@ -3,7 +3,7 @@ type: "decision-index"
 tier: "warm"
 status: "active"
 last_updated: "2026-08-14T00:03:00+02:00"
-count: "22"
+count: "26"
 ---
 # Decision Index
 
@@ -29,3 +29,7 @@ count: "22"
 - [[decisions/records/DEC-0020]] — AI healer becomes diagnosis/recovery-only
 - [[decisions/records/DEC-0021]] — Shared Memory is private Markdown/Git; Obsidian is UI
 - [[decisions/records/DEC-0022]] — No MCP in Shared Memory V1
+- [[decisions/records/DEC-0023]] — CODEX is the sole SportsBrain builder platform
+- [[decisions/records/DEC-0024]] — Signal-Time architecture shape
+- [[decisions/records/DEC-0025]] — Champions League sequencing
+- [[decisions/records/DEC-0026]] — Canonical Memory and near-live status are separate

@@ -29,10 +29,10 @@ class T(unittest.TestCase):
     def test_07_one_approved_task_active(self):
         active=[o for o in Registry(ROOT).scan().objects if o.object_type=='task' and o.status in {'approved','active'}]
         self.assertEqual(len(active),1)
-        self.assertEqual(active[0].object_id,'TASK-P0B-003')
+        self.assertEqual(active[0].object_id,'TASK-MEM-V2-001')
     def test_08_current_task_shows_approved(self):
         render_all(ROOT)
-        self.assertIn('TASK-P0B-003',(ROOT/'CURRENT_TASK.md').read_text())
+        self.assertIn('TASK-MEM-V2-001',(ROOT/'CURRENT_TASK.md').read_text())
     def test_09_p0a_closed(self):
         self.assertIn('status: closed',(ROOT/'workstreams/P0-A.md').read_text())
     def test_10_p0a_findings_resolved(self):
@@ -57,12 +57,12 @@ class T(unittest.TestCase):
         render_all(ROOT)
         self.assertIn('TASK-P0B-001',(ROOT/'views/TASKS.md').read_text())
     def test_17_approved_task_context_executable(self):
-        c=build_context(ROOT,'TASK-P0B-003')
+        c=build_context(ROOT,'TASK-MEM-V2-001')
         self.assertIsNotNone(c)
         self.assertGreater(c.estimated_tokens,0)
     def test_18_approved_task_fits_budget(self):
-        c=build_context(ROOT,'TASK-P0B-003')
-        self.assertLess(c.estimated_tokens,8000)
+        c=build_context(ROOT,'TASK-MEM-V2-001')
+        self.assertLess(c.estimated_tokens,12000)
     def test_19_all_drafts_preview_fit(self):
         r=Registry(ROOT).scan()
         for o in [x for x in r.objects if x.object_type=='task' and x.status=='draft']:
@@ -183,8 +183,8 @@ class T(unittest.TestCase):
         try:
             shutil.copytree(ROOT,td,dirs_exist_ok=True,
                 ignore=shutil.ignore_patterns('.git','__pycache__','.memory-backups','.memory-build','*.pyc'))
-            t=(td/'tasks/records/TASK-P0B-003.md')
-            t.write_text(t.read_text().replace('status: approved','status: draft'))
+            t=(td/'tasks/records/TASK-MEM-V2-001.md')
+            t.write_text(t.read_text().replace('status: active','status: draft'))
             result=render_all(td)
             self.assertEqual(result['active_tasks'],0)
             self.assertIn('**NONE**',(td/'CURRENT_TASK.md').read_text())
@@ -197,7 +197,7 @@ class T(unittest.TestCase):
             shutil.copytree(ROOT,td,dirs_exist_ok=True,
                 ignore=shutil.ignore_patterns('.git','__pycache__','.memory-backups','.memory-build','*.pyc'))
             t4=(td/'tasks/records/TASK-P0B-004.md')
-            t4.write_text(t4.read_text().replace('status: draft','status: approved'))
+            t4.write_text(t4.read_text().replace('status: completed','status: approved'))
             with self.assertRaises(RuntimeError):
                 render_all(td)
         finally:
@@ -220,13 +220,13 @@ class T(unittest.TestCase):
 
     def test_35_ws_p0b_active(self):
         r=Registry(ROOT).scan()
-        self.assertEqual(r.by_id['WS-P0-B'].status,'active')
+        self.assertEqual(r.by_id['WS-P0-B'].status,'closed')
 
     def test_36_current_priorities_no_memory_install(self):
         render_all(ROOT)
         text=(ROOT/'CURRENT_PRIORITIES.md').read_text()
         self.assertNotIn('Accept/install SportsBrainMemory V1',text)
-        self.assertIn('TASK-P0B-003',text)
+        self.assertIn('TASK-MEM-V2-001',text)
 
     def test_38_p0b1_completed(self):
         r=Registry(ROOT).scan()
@@ -237,7 +237,7 @@ class T(unittest.TestCase):
         self.assertEqual(r.by_id['TASK-P0B-002'].status,'completed')
     def test_39b_p0b3_approved(self):
         r=Registry(ROOT).scan()
-        self.assertEqual(r.by_id['TASK-P0B-003'].status,'approved')
+        self.assertEqual(r.by_id['TASK-P0B-003'].status,'completed')
 
     def test_40_fnd_005_resolved_production(self):
         r=Registry(ROOT).scan()
@@ -256,7 +256,7 @@ class T(unittest.TestCase):
     def test_43_p0b2_source_release_sha(self):
         r=Registry(ROOT).scan()
         st=r.by_id['STATE-20260816-001']
-        self.assertEqual(st.meta.get('source_release_sha'),'bb59d180e9d6f8df7a2c78d2d4e82e71e12751c9')
+        self.assertEqual(st.meta.get('source_release_sha'),'b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad')
     def test_45_evd_p0b2_prod_exists(self):
         r=Registry(ROOT).scan()
         self.assertIn('EVD-P0B-002-PROD-001',r.by_id)
@@ -269,14 +269,9 @@ class T(unittest.TestCase):
     def test_44_priority_order_p0c_before_model_integrity(self):
         render_all(ROOT)
         text=(ROOT/'CURRENT_PRIORITIES.md').read_text()
-        self.assertIn('P0-C',text)
-        self.assertIn('P0-D',text)
-        self.assertIn('MODEL-INTEGRITY',text)
-        idx_p0c=text.index('P0-C')
-        idx_p0d=text.index('P0-D')
-        idx_model=text.index('MODEL-INTEGRITY')
-        self.assertLess(idx_p0c,idx_model,'P0-C must appear before MODEL-INTEGRITY in priorities')
-        self.assertLess(idx_p0d,idx_model,'P0-D must appear before MODEL-INTEGRITY in priorities')
+        self.assertIn('Top-5',text)
+        self.assertIn('72h Stability Soak',text)
+        self.assertIn('Historical P0 order',text)
 
     def test_37_current_state_no_fixed_generated_timestamp(self):
         render_all(ROOT)

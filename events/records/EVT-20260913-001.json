@@ -1,0 +1,17 @@
+{
+  "affected_workstreams": ["MEMORY-V2", "GOVERNANCE"],
+  "builder": "CEO",
+  "canonical": true,
+  "ceo_gate_state": "approved",
+  "domain": "governance",
+  "event_id": "EVT-20260913-001",
+  "evidence": ["CEO Memory V2 builder brief 2026-09-13"],
+  "findings": ["FND-MEMORY-V2-001"],
+  "invariants": ["CODEX-SOLE-BUILDER", "ISOLATED-BUILDER-ROLES"],
+  "source_repository": "ChatGPT CEO brief",
+  "supersedes": ["DEC-0002"],
+  "summary": "CODEX is the sole SportsBrain builder platform; Builder A remains Research, Builder B Production, and Builder C Memory/Observability.",
+  "timestamp": "2026-09-13T22:40:00+02:00",
+  "type": "CEO_DECISION",
+  "verification_state": "ceo_approved"
+}

@@ -1,0 +1,18 @@
+{
+  "affected_workstreams": ["TOP5-RESEARCH"],
+  "builder": "Builder A",
+  "canonical": true,
+  "ceo_gate_state": "review_required",
+  "domain": "research/top5",
+  "event_id": "EVT-20260913-003",
+  "evidence": ["research/top5/TOP5_CEO_HANDOFF.md", "research/top5/leagues/bl1/results/PARITY_REPORT.md"],
+  "findings": [],
+  "invariants": ["NO-SEALED-DATA-ACCESS", "NO-FISHING", "NO-TUNING", "BL1-PARITY"],
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "8f3ed13fe4ed56d3ac618aa5ec29dd6ecb03bdfb",
+  "supersedes": [],
+  "summary": "Top-5 final audit remains active; no deployable-edge claim is promoted from the research baseline without all required downstream gates.",
+  "timestamp": "2026-09-13T22:50:00+02:00",
+  "type": "RESEARCH_GATE",
+  "verification_state": "independently_verified"
+}

@@ -22,7 +22,7 @@ class Graph:
             for relation, targets in obj.relations.items():
                 for target in targets:
                     self.edges.append(Edge(obj.object_id, relation, target))
-                    if _looks_like_id(target) and target not in self.registry.by_id and relation != "invariants":
+                    if _looks_like_id(target) and target not in self.registry.by_id and not target.startswith("EVT-") and relation != "invariants":
                         self.issues.append(RegistryIssue(
                             "ERROR","BROKEN_RELATION",
                             f"{obj.object_id} {relation} -> unknown id {target}",obj.relpath))

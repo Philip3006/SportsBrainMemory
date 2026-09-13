@@ -1,0 +1,18 @@
+{
+  "affected_workstreams": ["TOP5-RESEARCH"],
+  "builder": "Builder A",
+  "canonical": true,
+  "ceo_gate_state": "review_required",
+  "domain": "research/top5",
+  "event_id": "EVT-20260910-001",
+  "evidence": ["research/top5/TOP5_CEO_HANDOFF.md", "research/top5/leagues/bl1/results/PARITY_REPORT.md", "sportsbrain commit 422b6c7925775a308afbfc4fd3c548da8581edd1"],
+  "findings": [],
+  "invariants": ["TRUE-A-B-A-PRIME-CONTAMINATION", "BL1-PARITY", "SEALED-2425-2526"],
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "8f3ed13fe4ed56d3ac618aa5ec29dd6ecb03bdfb",
+  "supersedes": [],
+  "summary": "Generic Top-5 research framework reached the consolidated five-league baseline with BL1 v7 parity, structural invariants, true A/B/A' contamination, corrected statistical language, and sealed 2425/2526 outcomes.",
+  "timestamp": "2026-09-11T00:17:54+02:00",
+  "type": "RESEARCH_GATE",
+  "verification_state": "independently_verified"
+}

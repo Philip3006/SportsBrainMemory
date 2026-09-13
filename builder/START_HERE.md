@@ -4,11 +4,11 @@ tier: "hot"
 status: "active"
 freshness_class: "stable"
 ---
-# Claude Builder — Start Here
+# CODEX Builder — Start Here
 
 For a normal SportsBrain Builder session:
 
-1. Read `builder/CURRENT_CONTEXT_PACKET.md`.
+1. Read the role packet under `builder/context/` and then `builder/CURRENT_CONTEXT_PACKET.md`.
 2. Verify its Task ID matches `CURRENT_TASK.md`.
 3. Inspect only the SportsBrain source files/direct callers/tests required by that task.
 4. Execute the task.
@@ -25,3 +25,6 @@ If the packet is stale or task ID differs, regenerate it with:
 Then validate:
 
 `python tools/validate_memory.py`
+
+CODEX is the sole builder platform. Builder A/B/C are logical ownership
+roles, not permission to merge or bypass the CEO gate.

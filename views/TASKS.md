@@ -10,6 +10,7 @@ generated: true
 |---|---|---|---|
 | TASK-MEAS-001 | draft | MODEL_INTEGRITY | complex |
 | TASK-MEM-V1-ACCEPT | completed | MEMORY_V1 | standard |
+| TASK-MEM-V2-001 | active | MEMORY-V2 | complex |
 | TASK-MODEL-001 | draft | MODEL_INTEGRITY | complex |
 | TASK-MODEL-002 | draft | MODEL_INTEGRITY | complex |
 | TASK-P0B-001 | completed | P0-B | standard |
@@ -19,5 +20,5 @@ generated: true
 | TASK-P0C-001 | completed | P0-C | complex |
 | TASK-P0C-002 | completed | P0-C | complex |
 | TASK-P0D-001 | completed | P0-D | standard |
-| TASK-P0D-002 | approved | P0-D | standard | arch-approved 2026-08-18; v2 branch task/TASK-P0D-002-v2 pending CI+merge |
+| TASK-P0D-002 | completed | P0-D | standard |
 | TASK-P0D-003 | draft | P0-D | standard |

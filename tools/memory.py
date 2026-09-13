@@ -10,6 +10,8 @@ from memorylib.render import compile_shadow
 from memorylib.dashboard import render_all
 from memorylib.context import build_context
 from memorylib.acceptance import run as acceptance_run, tree_fingerprint
+from memorylib.v2 import build_context_packets, ingest_events
+from memorylib.live import render_live_status
 
 def main():
     p=argparse.ArgumentParser()
@@ -21,6 +23,14 @@ def main():
     sp.add_parser('health')
     sp.add_parser('acceptance')
     sp.add_parser('fingerprint')
+    sp.add_parser('packets')
+    u=sp.add_parser('update')
+    u.add_argument('payload')
+    u.add_argument('--commit',action='store_true')
+    u.add_argument('--commit-message',default='memory: apply canonical V2 update')
+    l=sp.add_parser('live')
+    l.add_argument('--source-repo',required=True)
+    l.add_argument('--vault',required=True)
     c=sp.add_parser('context')
     c.add_argument('task_id')
     c.add_argument('--allow-draft',action='store_true')
@@ -54,6 +64,26 @@ def main():
         return 0
     if a.cmd=='fingerprint':
         print(tree_fingerprint(ROOT))
+        return 0
+    if a.cmd=='packets':
+        print(json.dumps(build_context_packets(ROOT),indent=2,sort_keys=True))
+        return 0
+    if a.cmd=='update':
+        import subprocess
+        data=json.loads(Path(a.payload).read_text(encoding='utf-8'))
+        result=ingest_events(ROOT,data.get('events',[]),canonical_records=data.get('canonical_records',[]),validate_after=False)
+        render_all(ROOT)
+        report=validate(ROOT,'v1')
+        if report.errors:
+            print(json.dumps(report.to_dict(),indent=2,sort_keys=True)); return 1
+        if a.commit:
+            paths=['00_HOME.md','CURRENT_STATE.md','CURRENT_PRIORITIES.md','CURRENT_BLOCKERS.md','CURRENT_TASK.md','findings/OPEN.md','findings/RESOLVED.md','views','mocs','builder/CURRENT_CONTEXT_PACKET.md','builder/context','events','decisions/records','workstreams','tasks/records','findings/records','state/records','architecture','_meta']
+            subprocess.run(['git','-C',str(ROOT),'add','--',*paths],check=True)
+            subprocess.run(['git','-C',str(ROOT),'commit','-m',a.commit_message],check=True)
+        print(json.dumps({'results':[r.__dict__ for r in result],'committed':a.commit,'errors':report.errors,'warnings':report.warnings},indent=2))
+        return 0
+    if a.cmd=='live':
+        print(json.dumps(render_live_status(ROOT,Path(a.vault),Path(a.source_repo)),indent=2,sort_keys=True))
         return 0
     if a.cmd=='acceptance':
         r=acceptance_run(ROOT)

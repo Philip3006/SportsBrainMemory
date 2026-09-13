@@ -1,0 +1,17 @@
+{
+  "affected_workstreams": ["TOP5-RESEARCH", "TOP5-PRODUCTION", "MEMORY-V2"],
+  "builder": "CEO",
+  "canonical": true,
+  "ceo_gate_state": "approved_target",
+  "domain": "signal-time",
+  "event_id": "EVT-20260913-002",
+  "evidence": ["CEO Memory V2 builder brief 2026-09-13", "research/top5/TOP5_CEO_HANDOFF.md", "docs/top5_production_architecture.md"],
+  "findings": [],
+  "invariants": ["BOUNDED-SIGNAL-WINDOW", "MAX-ODDS-AGE", "SEPARATE-CLOSING-CAPTURE", "IDEMPOTENT-DISPATCH", "BULK-MARKET-REUSE"],
+  "source_repository": "ChatGPT CEO brief",
+  "supersedes": [],
+  "summary": "The only approved Signal-Time form is an event-relative bounded window with explicit lead/age, separate closing capture, idempotency, and bulk market reuse; exact production values remain unapproved.",
+  "timestamp": "2026-09-13T22:45:00+02:00",
+  "type": "CEO_DECISION",
+  "verification_state": "ceo_approved"
+}

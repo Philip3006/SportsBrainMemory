@@ -1,0 +1,28 @@
+{
+  "memory_name": "SportsBrain Shared Memory",
+  "memory_version": 2,
+  "schema_version": 2,
+  "canonical_repository": "Philip3006/SportsBrainMemory",
+  "source_repository": "Philip3006/sportsbrain",
+  "source_main_sha": "010ee71559fef2a25d0e77c2ef82413c99ce127f",
+  "source_latest_meaningful_sha": "b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad",
+  "source_latest_meaningful_at": "2026-09-13T21:56:44+02:00",
+  "source_runtime_head_observed": "010ee71559fef2a25d0e77c2ef82413c99ce127f",
+  "canonical_baseline_sha": "8edeb2a45434465fbb94b6882a0a677708103271",
+  "canonical_updated_at": "2026-09-13T23:04:08+02:00",
+  "canonical_status": "FRESH",
+  "builder_platform": "CODEX",
+  "builder_roles": {
+    "A": "Research",
+    "B": "Production",
+    "C": "Memory and Observability"
+  },
+  "live_layer": "_live",
+  "live_sync_interval_seconds": 90,
+  "freshness_policy": {
+    "aging_after_hours": 6,
+    "stale_after_hours": 24,
+    "runtime_status_is_not_canonical": true
+  },
+  "status": "ready_for_ceo_review"
+}
