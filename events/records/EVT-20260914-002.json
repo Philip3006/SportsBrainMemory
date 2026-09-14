@@ -1,0 +1,34 @@
+{
+  "affected_workstreams": [
+    "TOP5-ACTIVATION-READINESS"
+  ],
+  "builder": "Builder 2",
+  "builder_number": 2,
+  "canonical": true,
+  "ceo_gate_state": "merged_disabled_no_live_activation",
+  "domain": "production-activation-readiness",
+  "event_id": "EVT-20260914-002",
+  "evidence": [
+    "GitHub PR #58 state MERGED",
+    "sportsbrain PR #58 head 58c4261d8b3cea3ef021a0a2ba3734151a4c411d",
+    "sportsbrain PR #58 merge commit 8d401ff7a8c9b7f23f354f09b5563caa804332e2",
+    "PR #58 records merged PR #56 baseline 8de9472644057656c50d900380a843909ff5a46b and frozen Research reference 6eaabbec7d0182103d815c72fae4976e261b40aa",
+    "PR #58 safety contract: no deployment, Top-5 activation, model binding, real bet, provider call/spending, scheduler/launchd, Cloudflare, publication, ledger, sealed-data, or Research mutation"
+  ],
+  "findings": [],
+  "invariants": [
+    "DISABLED-BY-DEFAULT",
+    "NO-BET",
+    "NO-LIVE-ACTIVATION",
+    "SEALED-2425-2526",
+    "NO-PRODUCTION-MUTATION"
+  ],
+  "source_pr": 58,
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "58c4261d8b3cea3ef021a0a2ba3734151a4c411d",
+  "summary": "PR #58 Activation Readiness is merged into SportsBrain main at 8d401ff7; the readiness contracts are recorded as new post-V2 evidence while Top-5 remains disabled, NO-BET, unpublished, unregistered, and not approved for live activation.",
+  "supersedes": [],
+  "timestamp": "2026-09-14T18:11:36+00:00",
+  "type": "PR_MERGED",
+  "verification_state": "merged_source"
+}
