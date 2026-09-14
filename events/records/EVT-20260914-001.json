@@ -1,0 +1,33 @@
+{
+  "affected_workstreams": [
+    "TOP5-SHADOW-INTEGRATION"
+  ],
+  "builder": "Builder 1",
+  "builder_number": 1,
+  "canonical": true,
+  "ceo_gate_state": "merged_disabled_no_live_activation",
+  "domain": "production-shadow",
+  "event_id": "EVT-20260914-001",
+  "evidence": [
+    "GitHub PR #57 state MERGED",
+    "sportsbrain PR #57 head 6275725fde873535569b217f7dc7ce53a6efb745",
+    "sportsbrain PR #57 merge commit 2b285424daf1a6315f33020c282e522589c8a917",
+    "PR #57 safety contract: production registration and activation remain disabled with no live provider, scheduler, launchd, publisher, Worker, Cloudflare, or ledger path",
+    "PR #57 safety contract: 2425 calibration outcomes and 2526 holdout outcomes remain sealed"
+  ],
+  "findings": [],
+  "invariants": [
+    "SHADOW-NO-BET",
+    "NO-LIVE-ACTIVATION",
+    "SEALED-2425-2526",
+    "NO-PRODUCTION-MUTATION"
+  ],
+  "source_pr": 57,
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "6275725fde873535569b217f7dc7ce53a6efb745",
+  "summary": "PR #57 Shadow Integration is merged into SportsBrain main at 2b285424; the five-league integration remains offline/simulated, disabled-by-default, NO-BET, and outside live activation.",
+  "supersedes": [],
+  "timestamp": "2026-09-13T22:54:52+00:00",
+  "type": "PR_MERGED",
+  "verification_state": "merged_source"
+}
