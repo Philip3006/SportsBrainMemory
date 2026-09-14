@@ -5,7 +5,7 @@ from collections import defaultdict
 from .frontmatter import load_document
 from .objects import MemoryObject
 
-SKIP_DIRS = {".git", ".memory-build", ".memory-backups", "__pycache__", ".obsidian"}
+SKIP_DIRS = {".git", ".memory-build", ".memory-backups", "__pycache__", ".obsidian", "_live"}
 
 @dataclass
 class RegistryIssue:

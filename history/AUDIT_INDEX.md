@@ -7,6 +7,20 @@ freshness_class: "historical"
 ---
 # Audit Index
 
+## AUD-20260913-MEMORY-V2
+
+Memory V2 audit and live Obsidian implementation covering the stale period
+2026-08-18 through 2026-09-13. The canonical gap report records the source
+refs inspected, meaningful release/runtime events, suppressed runtime-only
+noise, and unresolved CEO/external gates:
+
+- [Memory V2 gap report](audit-20260913-memory-v2-gap-report.md)
+- [Memory V2 architecture](../architecture/MEMORY_V2.md)
+- [Event model](../_meta/EVENT_MODEL.md)
+
+No SportsBrain production source, Cloudflare deployment, financial ledger,
+sealed research data, or existing launchd job was mutated by this audit.
+
 ## AUD-20260813-DEEP
 
 Comprehensive CEO read-only architecture/production audit.

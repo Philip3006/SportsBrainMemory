@@ -1,0 +1,19 @@
+{
+  "affected_workstreams": ["TOP5-RESEARCH"],
+  "builder": "CEO",
+  "builder_number": "CEO",
+  "canonical": true,
+  "ceo_gate_state": "approved_complete_immutable_input",
+  "domain": "research/top5",
+  "event_id": "EVT-20260913-010",
+  "evidence": ["CEO Builder 3 alignment brief 2026-09-13", "sportsbrain commit 6eaabbec7d0182103d815c72fae4976e261b40aa", "research/top5/TOP5_CEO_HANDOFF.md"],
+  "findings": [],
+  "invariants": ["TOP5-DEVELOPMENT-COMPLETE", "RESEARCH-GATE-CEO-APPROVED", "SEALED-2425-2526", "NO-PRODUCTION-MODEL-APPROVAL"],
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "6eaabbec7d0182103d815c72fae4976e261b40aa",
+  "supersedes": ["EVT-20260913-003"],
+  "summary": "Top-5 development is complete and the Research Gate is CEO approved at frozen SHA 6eaabbec7d0182103d815c72fae4976e261b40aa; 2425 and 2526 remain sealed and no model or betting strategy is production-approved.",
+  "timestamp": "2026-09-13T23:34:53+02:00",
+  "type": "RESEARCH_GATE",
+  "verification_state": "ceo_approved"
+}

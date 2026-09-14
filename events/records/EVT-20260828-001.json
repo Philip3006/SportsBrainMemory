@@ -1,0 +1,19 @@
+{
+  "affected_workstreams": ["MODEL-INTEGRITY", "TENNIS"],
+  "builder": "Builder 1",
+  "builder_number": 1,
+  "canonical": true,
+  "ceo_gate_state": "verified",
+  "domain": "model-integrity",
+  "event_id": "EVT-20260828-001",
+  "evidence": ["sportsbrain commit 2e63e61ba99221f8c8ce000557458482c0b6dd7b", "sportsbrain commit d1eca535fc2ee451c85e2a9a2cad36e6f4d661e6"],
+  "findings": ["FND-20260814-021"],
+  "invariants": ["MODEL-TRAIN-LIVE-PARITY"],
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "d1eca535fc2ee451c85e2a9a2cad36e6f4d661e6",
+  "supersedes": [],
+  "summary": "Tennis RollingState train/live and TennisExplorer prediction-path parity hardening was merged and test-gated.",
+  "timestamp": "2026-08-28T13:03:49+02:00",
+  "type": "PRODUCTION_VERIFIED",
+  "verification_state": "merged_source"
+}

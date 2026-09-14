@@ -1,0 +1,18 @@
+{
+  "affected_workstreams": ["TOP5-SHADOW-INTEGRATION", "TOP5-ACTIVATION-READINESS", "MEMORY-V2"],
+  "builder": "CEO",
+  "builder_number": "CEO",
+  "canonical": true,
+  "ceo_gate_state": "approved_current_ownership",
+  "domain": "governance/builder-handoff",
+  "event_id": "EVT-20260913-011",
+  "evidence": ["CEO Builder 3 alignment brief 2026-09-13", "events/records/EVT-20260913-008.json", "events/records/EVT-20260913-010.json"],
+  "findings": [],
+  "invariants": ["NUMBERED-BUILDER-HANDOFF", "NO-LIVE-ACTIVATION", "CANONICAL-LIVE-SEPARATION"],
+  "source_repository": "ChatGPT CEO brief",
+  "supersedes": ["EVT-20260913-001"],
+  "summary": "Current ownership is Builder 1 Top-5 Shadow Integration, Builder 2 Top-5 Production / Activation Readiness, and Builder 3 Memory / Obsidian / Observability; every builder completion handoff must begin with its explicit builder number.",
+  "timestamp": "2026-09-13T23:34:53+02:00",
+  "type": "CEO_DECISION",
+  "verification_state": "ceo_approved"
+}

@@ -2,6 +2,12 @@
   "additional_properties": false,
   "object_type": "workstream",
   "properties": {
+    "builder": {
+      "type": "string"
+    },
+    "builder_number": {
+      "type": "integer"
+    },
     "belongs_to": {
       "type": [
         "array",
@@ -83,6 +89,9 @@
         "string"
       ]
     },
+    "frozen_research_sha": {
+      "type": "string"
+    },
     "freshness_class": {
       "enum": [
         "runtime-sensitive",
@@ -102,6 +111,9 @@
     },
     "id": {
       "pattern": "[A-Za-z0-9][A-Za-z0-9_-]*",
+      "type": "string"
+    },
+    "input_owner": {
       "type": "string"
     },
     "implements": {

@@ -1,9 +1,13 @@
 ---
 type: builder-contract
 tier: hot
-status: active
+status: retired
 ---
-# Claude Builder Runbook
+# Historical Claude Builder Runbook — RETIRED
+
+This document preserves the V1 workflow for historical audit only. It is not
+an active instruction set. Current builder work is executed through CODEX and
+the role-bounded packets under `builder/context/`.
 
 ## Session contract
 

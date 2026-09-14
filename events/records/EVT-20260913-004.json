@@ -1,0 +1,20 @@
+{
+  "affected_workstreams": ["TOP5-PRODUCTION"],
+  "builder": "Builder 2",
+  "builder_number": 2,
+  "canonical": true,
+  "ceo_gate_state": "accepted_historical_baseline",
+  "domain": "production-architecture",
+  "event_id": "EVT-20260913-004",
+  "evidence": ["sportsbrain commit 054c011ff29777bdc381363103ab24f3d52d49ce"],
+  "findings": [],
+  "invariants": ["FAIL-CLOSED-CONTRACTS", "DISABLED-BY-DEFAULT"],
+  "source_pr": 54,
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "054c011ff29777bdc381363103ab24f3d52d49ce",
+  "supersedes": [],
+  "summary": "PR #54 is accepted as the safe historical Top-5 production-contract baseline.",
+  "timestamp": "2026-09-13T18:51:26+02:00",
+  "type": "PR_MERGED",
+  "verification_state": "merged_source"
+}

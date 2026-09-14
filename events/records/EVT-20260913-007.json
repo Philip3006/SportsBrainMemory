@@ -1,0 +1,18 @@
+{
+  "affected_workstreams": ["MEMORY-V2"],
+  "builder": "CEO",
+  "builder_number": "CEO",
+  "canonical": true,
+  "ceo_gate_state": "approved",
+  "domain": "memory-architecture",
+  "event_id": "EVT-20260913-007",
+  "evidence": ["CEO Memory V2 builder brief 2026-09-13", "architecture/MEMORY_V2.md"],
+  "findings": ["FND-MEMORY-V2-001"],
+  "invariants": ["CANONICAL-VS-RUNTIME-SEPARATION", "NO-RUNTIME-NOISE-COMMITS"],
+  "source_repository": "ChatGPT CEO brief",
+  "supersedes": ["DEC-0021", "DEC-0022"],
+  "summary": "Canonical reviewed Memory and near-live operational status are separate layers; runtime-only commits do not automatically become Memory history.",
+  "timestamp": "2026-09-13T23:00:00+02:00",
+  "type": "ARCHITECTURE_CHANGED",
+  "verification_state": "ceo_approved"
+}

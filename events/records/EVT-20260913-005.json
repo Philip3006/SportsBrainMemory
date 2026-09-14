@@ -1,0 +1,20 @@
+{
+  "affected_workstreams": ["TOP5-PRODUCTION"],
+  "builder": "Builder 2",
+  "builder_number": 2,
+  "canonical": true,
+  "ceo_gate_state": "accepted_historical_baseline",
+  "domain": "production-architecture",
+  "event_id": "EVT-20260913-005",
+  "evidence": ["sportsbrain commit b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad", "docs/top5_production_architecture.md"],
+  "findings": [],
+  "invariants": ["CUMULATIVE-ROLLOUT-GATES", "NO-ACTIVE-TOP5-REGISTRATION", "NO-LIVE-ACTIVATION"],
+  "source_pr": 55,
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "b4d6765f79b20ca2f2c3d3b323ee2f666a1449ad",
+  "supersedes": [],
+  "summary": "PR #55 merged the generic Top-5 production architecture reconciliation; it remains disabled by default with no active registration or live mutation path.",
+  "timestamp": "2026-09-13T21:56:44+02:00",
+  "type": "PR_MERGED",
+  "verification_state": "merged_source"
+}

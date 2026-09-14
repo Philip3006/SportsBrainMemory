@@ -1,0 +1,30 @@
+{
+  "memory_name": "SportsBrain Shared Memory",
+  "memory_version": 2,
+  "schema_version": 2,
+  "canonical_repository": "Philip3006/SportsBrainMemory",
+  "source_repository": "Philip3006/sportsbrain",
+  "source_main_sha": "6493f14093aa08e457e610c2961da1e77b80bc76",
+  "source_latest_meaningful_sha": "8de9472644057656c50d900380a843909ff5a46b",
+  "source_latest_meaningful_at": "2026-09-13T23:14:02+02:00",
+  "source_runtime_head_observed": "6493f14093aa08e457e610c2961da1e77b80bc76",
+  "canonical_baseline_sha": "8edeb2a45434465fbb94b6882a0a677708103271",
+  "canonical_updated_at": "2026-09-13T23:48:38+02:00",
+  "canonical_status": "FRESH",
+  "builder_platform": "CODEX",
+  "builder_roles": {
+    "1": "Top-5 Shadow Integration",
+    "2": "Top-5 Production / Activation Readiness",
+    "3": "Memory / Obsidian / Observability"
+  },
+  "frozen_research_sha": "6eaabbec7d0182103d815c72fae4976e261b40aa",
+  "builder_handoff_rule": "Every builder completion handoff must begin with BUILDER: 1, BUILDER: 2, or BUILDER: 3.",
+  "live_layer": "_live",
+  "live_sync_interval_seconds": 90,
+  "freshness_policy": {
+    "aging_after_hours": 6,
+    "stale_after_hours": 24,
+    "runtime_status_is_not_canonical": true
+  },
+  "status": "ready_for_ceo_review"
+}

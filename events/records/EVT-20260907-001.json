@@ -1,0 +1,19 @@
+{
+  "affected_workstreams": ["STABILITY-ENGINEERING", "ODDS-PROVIDERS"],
+  "builder": "Builder 2",
+  "builder_number": 2,
+  "canonical": true,
+  "ceo_gate_state": "verified",
+  "domain": "odds/providers",
+  "event_id": "EVT-20260907-001",
+  "evidence": ["sportsbrain commit 624a10ca7ecd030e8eb0937ca48e9358922caafe", "tests/tennis/odds/test_provider_diagnostics.py"],
+  "findings": [],
+  "invariants": ["PROVIDER-DIAGNOSTICS", "EXACT-MARKET-PROPOSITION"],
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "624a10ca7ecd030e8eb0937ca48e9358922caafe",
+  "supersedes": [],
+  "summary": "Provider diagnostics distinguish timeout, exception, no_match, 403, and 429 outcomes; Tennis provider refresh and merger behavior was hardened.",
+  "timestamp": "2026-09-07T00:46:53+02:00",
+  "type": "PRODUCTION_VERIFIED",
+  "verification_state": "merged_source"
+}

@@ -5,7 +5,12 @@ status: "active"
 last_updated: "2026-08-14T00:03:00+02:00"
 freshness_class: "stable"
 ---
-# SportsBrain Builder Memory Rules
+# Historical Claude Builder Memory Rules — RETIRED
+
+This file is retained for provenance only. It is not an active builder
+instruction. CODEX is now the sole SportsBrain builder platform; see
+`builder/CODEX_START_HERE.md` and the role-bounded packets under
+`builder/context/`.
 
 This directory is the SportsBrain shared memory.
 
@@ -19,10 +24,10 @@ Always start with:
 
 Then inspect only the source files and adjacent callers/tests required by the task.
 
-## Governance
+## Historical Governance
 
 - ChatGPT/CEO is read-only and independently audits your work.
-- Claude is the normal Builder/source mutator.
+- The former Claude builder workflow ended when CODEX became the sole builder platform.
 - Do not merge without explicit later approval.
 - No force push, destructive reset, or history rewrite.
 - Preserve the user's original dirty worktree; use an isolated clean worktree.
