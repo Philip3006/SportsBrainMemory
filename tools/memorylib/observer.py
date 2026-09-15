@@ -428,6 +428,23 @@ def observe_sources(
     if not snapshots and previous.get("repositories"):
         snapshots = previous["repositories"]
         status = "DEGRADED"
+    handoffs = previous.get("builder_handoffs", []) if isinstance(previous.get("builder_handoffs"), list) else []
+    blockers = [
+        {
+            "blocker_id": "BLK-TOP5-PROVIDER-QUOTA",
+            "classification": "EXTERNAL",
+            "status": "REPORTED_OPEN",
+            "summary": "The Odds API quota is exhausted; real provider evidence is blocked.",
+            "resolution_requires": "external quota restoration and explicit verification",
+            "auto_resolve": False,
+        }
+    ]
+    seen_blockers = {blocker["blocker_id"] for blocker in blockers}
+    for handoff in handoffs:
+        for blocker in handoff.get("blockers", []) if isinstance(handoff, dict) else []:
+            if isinstance(blocker, dict) and blocker.get("blocker_id") not in seen_blockers:
+                blockers.append(blocker)
+                seen_blockers.add(blocker.get("blocker_id"))
     return {
         "schema": 1,
         "observed_at": observed_at,
@@ -445,17 +462,8 @@ def observe_sources(
             "state": pr59[0].get("source_state") if pr59 else None,
             "promotion_required": bool(pr59),
         },
-        "blockers": [
-            {
-                "blocker_id": "BLK-TOP5-PROVIDER-QUOTA",
-                "classification": "EXTERNAL",
-                "status": "REPORTED_OPEN",
-                "summary": "The Odds API quota is exhausted; real provider evidence is blocked.",
-                "resolution_requires": "external quota restoration and explicit verification",
-                "auto_resolve": False,
-            }
-        ],
-        "builder_handoffs": previous.get("builder_handoffs", []),
+        "blockers": blockers,
+        "builder_handoffs": handoffs,
     }
 
 
@@ -613,12 +621,17 @@ def render_control_plane(payload: dict[str, Any]) -> str:
     lines += ["", "## Blockers", ""]
     for blocker in payload.get("blockers", []):
         lines.append(f"- `{blocker['classification']}` `{blocker['status']}` — {blocker['summary']} (auto-resolve: no)")
+    lines += ["", "## Unresolved CEO Decisions", "", "- Promotion of any source candidate into canonical history requires explicit CEO approval.", "- Exact Top-5 activation values remain a CEO decision; no live activation is approved.", "- Persistent observer scheduling requires separate CEO approval."]
     lines += ["", "## Source Conflicts / Mismatches", ""]
     if payload.get("conflicts"):
         for conflict in payload["conflicts"]:
             lines.append(f"- **{conflict.get('severity', 'ERROR')}** `{conflict.get('type')}` — {json.dumps(conflict, sort_keys=True)}")
     else:
         lines.append("- None detected in the observed source set.")
+    if payload.get("errors"):
+        lines += ["", "## Observer Errors", ""]
+        for error in payload["errors"]:
+            lines.append(f"- `{error.get('type', 'SOURCE_ERROR')}` `{error.get('repository', 'unknown')}` — {error.get('detail', '')}")
     lines += ["", "## PR #59", "", f"- Detected independently: **{payload.get('pr_59', {}).get('detected', False)}**; candidate promotion required: **{payload.get('pr_59', {}).get('promotion_required', False)}**.", "", "## Failure Behavior", "", "- GitHub/source failures preserve last-known snapshots and candidates; they never rewrite canonical Memory or replace it with empty data.", "- This file is runtime-only and is not canonical history.", ""]
     return "\n".join(lines)
 
@@ -638,6 +651,9 @@ def write_runtime_outputs(vault: Path, payload: dict[str, Any]) -> None:
 def observe_and_write(memory_repo: Path, vault: Path, client: Any | None = None, repositories: list[str] | None = None) -> dict[str, Any]:
     client = client or GitHubClient()
     previous = _read_json(vault / "_live" / "SOURCE_OBSERVER.json", {})
+    handoff_store = _read_json(vault / "_live" / "BUILDER_HANDOFFS.json", {})
+    if isinstance(handoff_store, dict) and isinstance(handoff_store.get("candidates"), list):
+        previous["builder_handoffs"] = handoff_store["candidates"]
     payload = observe_sources(memory_repo, client, repositories=repositories, previous=previous)
     write_runtime_outputs(vault, payload)
     return payload

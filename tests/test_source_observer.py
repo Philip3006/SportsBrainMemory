@@ -174,6 +174,9 @@ Safety: no production mutation and no live activation
         write_runtime_outputs(self.vault, payload)
         self.assertTrue((self.vault / "_live/SOURCE_OBSERVER.json").exists())
         self.assertTrue((self.vault / "_live/CEO_CONTROL_PLANE.md").exists())
+        control_plane = (self.vault / "_live/CEO_CONTROL_PLANE.md").read_text(encoding="utf-8")
+        self.assertIn("Unresolved CEO Decisions", control_plane)
+        self.assertIn("PR #59", control_plane)
         self.assertEqual(list((self.memory / "events/records").glob("*.json")), [])
         self.assertEqual(validate_candidate_store(json.loads((self.vault / "_live/SOURCE_CANDIDATES.json").read_text())), [])
 
