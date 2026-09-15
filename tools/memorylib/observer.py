@@ -329,6 +329,69 @@ def _merge_candidates(previous: list[dict[str, Any]], fresh: list[dict[str, Any]
     return [merged[key] for key in sorted(merged)]
 
 
+def _valid_handoffs(items: Any) -> list[dict[str, Any]]:
+    """Return only well-formed, explicitly identified Builder evidence."""
+    if not isinstance(items, list):
+        return []
+    valid: list[dict[str, Any]] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        try:
+            validate_handoff_evidence(item)
+            _parse_time(item["observed_at"])
+        except (CandidateValidationError, TypeError, ValueError, KeyError):
+            continue
+        valid.append(item)
+    return valid
+
+
+def _latest_builder_evidence(items: Any) -> dict[int, dict[str, Any]]:
+    """Select one valid handoff per builder using observed_at and candidate_id."""
+    latest: dict[int, dict[str, Any]] = {}
+    for item in _valid_handoffs(items):
+        builder_number = int(item["builder_number"])
+        key = (_parse_time(item["observed_at"]), str(item.get("candidate_id", "")))
+        current = latest.get(builder_number)
+        current_key = (
+            (_parse_time(current["observed_at"]), str(current.get("candidate_id", "")))
+            if current else None
+        )
+        if current is None or key > current_key:
+            latest[builder_number] = item
+    return latest
+
+
+def _handoff_state_conflicts(handoffs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Surface a newer handoff that changes blocker state for CEO review."""
+    conflicts: list[dict[str, Any]] = []
+    by_builder: dict[int, list[dict[str, Any]]] = {}
+    for handoff in _valid_handoffs(handoffs):
+        by_builder.setdefault(int(handoff["builder_number"]), []).append(handoff)
+    for builder_number, items in by_builder.items():
+        ordered = sorted(items, key=lambda item: (_parse_time(item["observed_at"]), str(item.get("candidate_id", ""))))
+        if len(ordered) < 2:
+            continue
+        previous = ordered[-2]
+        latest = ordered[-1]
+        previous_blockers = {item.get("blocker_id") for item in previous.get("blockers", []) if isinstance(item, dict)}
+        latest_blockers = {item.get("blocker_id") for item in latest.get("blockers", []) if isinstance(item, dict)}
+        changed = previous_blockers != latest_blockers
+        previous_status = {item.get("blocker_id"): item.get("status") for item in previous.get("blockers", []) if isinstance(item, dict)}
+        latest_status = {item.get("blocker_id"): item.get("status") for item in latest.get("blockers", []) if isinstance(item, dict)}
+        changed = changed or any(previous_status.get(key) != latest_status.get(key) for key in previous_blockers & latest_blockers)
+        if changed:
+            conflicts.append({
+                "type": "BLOCKER_STATE_CHANGE_REQUIRES_CEO_REVIEW",
+                "severity": "CEO_DECISION_REQUIRED",
+                "builder_number": builder_number,
+                "previous_observed_at": previous["observed_at"],
+                "latest_observed_at": latest["observed_at"],
+                "detail": "A newer Builder handoff changed blocker evidence; no blocker history was auto-resolved.",
+            })
+    return conflicts
+
+
 def _source_conflicts(memory_repo: Path, snapshots: dict[str, dict[str, Any]], errors: list[dict[str, Any]], previous: dict[str, Any]) -> list[dict[str, Any]]:
     conflicts: list[dict[str, Any]] = []
     source_repo = "Philip3006/sportsbrain"
@@ -368,7 +431,7 @@ def _source_conflicts(memory_repo: Path, snapshots: dict[str, dict[str, Any]], e
         conflicts.append({"type": "NO_BET_STATE_CONFLICT", "severity": "SAFETY_CRITICAL", "detail": "NO-BET marker is absent from current operational truth"})
     if "not approved" not in safety.lower() and "no live activation" not in safety.lower():
         conflicts.append({"type": "LIVE_ACTIVATION_STATE_CONFLICT", "severity": "SAFETY_CRITICAL", "detail": "no-live-activation restriction is absent"})
-    for handoff in previous.get("builder_handoffs", []) if isinstance(previous.get("builder_handoffs"), list) else []:
+    for handoff in _latest_builder_evidence(previous.get("builder_handoffs")).values():
         observed_at = handoff.get("observed_at") if isinstance(handoff, dict) else None
         if observed_at:
             try:
@@ -428,23 +491,34 @@ def observe_sources(
     if not snapshots and previous.get("repositories"):
         snapshots = previous["repositories"]
         status = "DEGRADED"
-    handoffs = previous.get("builder_handoffs", []) if isinstance(previous.get("builder_handoffs"), list) else []
-    blockers = [
-        {
-            "blocker_id": "BLK-TOP5-PROVIDER-QUOTA",
-            "classification": "EXTERNAL",
-            "status": "REPORTED_OPEN",
-            "summary": "The Odds API quota is exhausted; real provider evidence is blocked.",
-            "resolution_requires": "external quota restoration and explicit verification",
-            "auto_resolve": False,
-        }
-    ]
-    seen_blockers = {blocker["blocker_id"] for blocker in blockers}
-    for handoff in handoffs:
-        for blocker in handoff.get("blockers", []) if isinstance(handoff, dict) else []:
-            if isinstance(blocker, dict) and blocker.get("blocker_id") not in seen_blockers:
-                blockers.append(blocker)
-                seen_blockers.add(blocker.get("blocker_id"))
+    handoffs = _valid_handoffs(previous.get("builder_handoffs"))
+    conflicts.extend(_handoff_state_conflicts(handoffs))
+    latest_handoffs = _latest_builder_evidence(handoffs)
+    blockers: list[dict[str, Any]] = []
+    seen_blockers: set[str] = set()
+    for handoff in latest_handoffs.values():
+        for blocker in handoff.get("blockers", []):
+            if not isinstance(blocker, dict) or not blocker.get("blocker_id") or blocker["blocker_id"] in seen_blockers:
+                continue
+            item = dict(blocker)
+            item["provenance"] = "CANDIDATE_OPERATIONAL_EVIDENCE"
+            item["source_candidate_id"] = handoff.get("candidate_id")
+            blockers.append(item)
+            seen_blockers.add(item["blocker_id"])
+    for blocker in previous.get("blockers", []) if isinstance(previous.get("blockers"), list) else []:
+        if not isinstance(blocker, dict) or not blocker.get("blocker_id") or blocker["blocker_id"] in seen_blockers:
+            continue
+        try:
+            validate_blocker(blocker)
+        except CandidateValidationError:
+            continue
+        item = dict(blocker)
+        item["provenance"] = "PRESERVED_LAST_KNOWN"
+        item["status"] = "PRESERVED_UNVERIFIED"
+        item["needs_ceo_review"] = True
+        item["last_observed_at"] = previous.get("observed_at")
+        blockers.append(item)
+        seen_blockers.add(item["blocker_id"])
     return {
         "schema": 1,
         "observed_at": observed_at,
@@ -490,33 +564,63 @@ def parse_builder_handoff(text: str, observed_at: str | None = None) -> dict[str
     if not match:
         raise CandidateValidationError("handoff must begin with exactly BUILDER: 1, BUILDER: 2, or BUILDER: 3")
     builder_number = int(match.group(1))
-    normalized = "\n".join(line.strip() for line in lines if line.strip())
+    normalized_lines = []
+    for line in lines:
+        value = line.strip()
+        value = re.sub(r"^(?:#+\s*|[-*•]\s+)", "", value)
+        if value:
+            normalized_lines.append(value)
+    normalized = "\n".join(normalized_lines)
     role = _extract_first(r"^ROLE:\s*(.+)$", normalized)
     branch = _extract_first(r"(?:local\s+)?branch:\s*([^\n]+)", normalized)
     head = _extract_first(r"(?:exact\s+)?head(?:\s+sha)?\s*:\s*([0-9a-f]{40})", normalized)
     if head is None:
         head = _extract_first(r"\bcommit\s*:\s*([0-9a-f]{40})", normalized)
     pr_match = PR_RE.search(normalized)
-    status = _extract_first(r"^status:\s*(.+)$", normalized)
-    tests = _extract_first(r"(?:tests?|test suite):\s*([^\n]+)", normalized)
+    status = (
+        _extract_first(r"^final status:\s*(.+)$", normalized)
+        or _extract_first(r"^status:\s*(.+)$", normalized)
+        or _extract_first(r"^final recommendation:\s*(.+)$", normalized)
+    )
+    tests = _extract_first(r"(?:tests?|test suite)(?:\s+remain)?\s*:\s*([^\n]+)", normalized)
+    if tests is None:
+        tests = _extract_first(r"^(?:tests?|test suite)\s+([^\n]+)$", normalized)
     tests_passed_match = re.search(r"(\d+)\s+passed", normalized, re.IGNORECASE)
-    ci = _extract_first(r"^CI:\s*(.+)$", normalized)
-    blockers_text = _extract_first(r"^blockers?:\s*(.+)$", normalized)
+    ci = _extract_first(r"^CI(?:\s+status)?:\s*(.+)$", normalized)
+    blocker_texts: list[str] = []
+    for index, line in enumerate(normalized_lines):
+        blocker_match = re.match(r"^(?:hard\s+)?blockers?\s*:?\s*(.*)$", line, re.IGNORECASE)
+        if not blocker_match:
+            continue
+        value = blocker_match.group(1).strip()
+        if value:
+            blocker_texts.append(value)
+            continue
+        for following in normalized_lines[index + 1:]:
+            if re.match(r"^[A-Za-z][A-Za-z /_-]{0,40}\s*:\s*", following):
+                break
+            if following:
+                blocker_texts.append(following)
     safety = [line for line in lines if re.search(r"safety|no production|no runtime|no mutation|no live", line, re.IGNORECASE)]
-    blocker_items: list[dict[str, Any]] = []
-    if blockers_text and blockers_text.lower() not in {"none", "n/a", "-"}:
-        lowered = blockers_text.lower()
-        classification = "EXTERNAL" if any(token in lowered for token in ("quota", "provider", "credential", "outage")) else "CEO_DECISION_REQUIRED"
-        blocker_items.append({
-            "blocker_id": "BLK-HANDOFF-" + hashlib.sha256(blockers_text.encode("utf-8")).hexdigest()[:16],
-            "classification": classification,
-            "status": "REPORTED_OPEN",
-            "summary": blockers_text,
-            "auto_resolve": False,
-        })
     observed_at = observed_at or now_utc()
     identity = "|".join((str(builder_number), branch or "", head or "", str(pr_match.group(1) if pr_match else ""), status or ""))
     evidence_id = "HANDOFF-CAND-" + hashlib.sha256(identity.encode("utf-8")).hexdigest()[:24]
+    blocker_items: list[dict[str, Any]] = []
+    for blocker_text in blocker_texts:
+        if blocker_text.lower() in {"none", "n/a", "-", "no blockers", "no current blockers"}:
+            continue
+        lowered = blocker_text.lower()
+        classification = "EXTERNAL" if any(token in lowered for token in ("quota", "provider", "credential", "outage")) else "CEO_DECISION_REQUIRED"
+        reported_status = "REPORTED_CHANGED" if any(token in lowered for token in ("resolved", "cleared", "no longer blocked", "unblocked")) else "REPORTED_OPEN"
+        blocker_items.append({
+            "blocker_id": "BLK-HANDOFF-" + hashlib.sha256(blocker_text.encode("utf-8")).hexdigest()[:16],
+            "classification": classification,
+            "status": reported_status,
+            "summary": blocker_text,
+            "provenance": "CANDIDATE_OPERATIONAL_EVIDENCE",
+            "source_candidate_id": evidence_id,
+            "auto_resolve": False,
+        })
     result = {
         "candidate_id": evidence_id,
         "candidate_type": "CANDIDATE_OPERATIONAL_EVIDENCE",
@@ -543,6 +647,10 @@ def parse_builder_handoff(text: str, observed_at: str | None = None) -> dict[str
 
 
 def validate_handoff_evidence(evidence: dict[str, Any]) -> None:
+    required = {"candidate_id", "candidate_type", "canonical", "promotion_required", "observed_at", "builder", "builder_number", "blockers"}
+    missing = sorted(required - set(evidence))
+    if missing:
+        raise CandidateValidationError("handoff evidence missing field(s): " + ", ".join(missing))
     if evidence.get("candidate_type") != "CANDIDATE_OPERATIONAL_EVIDENCE" or evidence.get("canonical") is not False or evidence.get("promotion_required") is not True:
         raise CandidateValidationError("builder handoff evidence must remain non-canonical and require promotion")
     builder_number = evidence.get("builder_number")
@@ -550,6 +658,14 @@ def validate_handoff_evidence(evidence: dict[str, Any]) -> None:
         raise CandidateValidationError("handoff builder identity must be an explicit matching Builder 1/2/3")
     if evidence.get("head_sha") is not None and not SHA_RE.fullmatch(str(evidence["head_sha"])):
         raise CandidateValidationError("handoff head_sha must be a full lowercase SHA when present")
+    try:
+        _parse_time(evidence["observed_at"])
+    except (TypeError, ValueError) as exc:
+        raise CandidateValidationError("handoff observed_at must be timezone-aware ISO-8601") from exc
+    if not isinstance(evidence.get("candidate_id"), str) or not evidence["candidate_id"].startswith("HANDOFF-CAND-"):
+        raise CandidateValidationError("handoff candidate_id must identify operational evidence")
+    if not isinstance(evidence.get("blockers"), list):
+        raise CandidateValidationError("handoff blockers must be a list")
     for blocker in evidence.get("blockers", []):
         validate_blocker(blocker)
 
@@ -576,6 +692,8 @@ def render_control_plane(payload: dict[str, Any]) -> str:
     repositories = payload.get("repositories", {})
     sports = repositories.get("Philip3006/sportsbrain", {})
     memory = repositories.get("Philip3006/SportsBrainMemory", {})
+    latest_handoffs = _latest_builder_evidence(payload.get("builder_handoffs"))
+    as_of = payload.get("observed_at") or now_utc()
     lines = [
         "<!-- GENERATED BY SportsBrainMemory Source Observer: RUNTIME ONLY -->",
         "# SportsBrain CEO Control Plane",
@@ -587,9 +705,41 @@ def render_control_plane(payload: dict[str, Any]) -> str:
         "",
         "## Builder State",
         "",
-        "- Builder 1 — Real NO-BET Shadow Execution active; real provider evidence blocked by the reported external Odds API quota exhaustion.",
-        "- Builder 2 — Independent Shadow Validation Gate merged; New Provider Redundancy workstream active.",
-        "- Builder 3 — Memory Source Observer / CEO Control Plane active; canonical history remains append-only.",
+    ]
+    for builder_number in (1, 2, 3):
+        evidence = latest_handoffs.get(builder_number)
+        if evidence is None:
+            lines.append(f"- Builder {builder_number} — **UNKNOWN / NO CURRENT HANDOFF EVIDENCE**")
+            continue
+        try:
+            freshness = _age_state(evidence["observed_at"], as_of)
+        except (TypeError, ValueError):
+            freshness = "STALE"
+        blocker_items = evidence.get("blockers", [])
+        blocker_state = "NONE REPORTED"
+        if blocker_items:
+            blocker_state = "; ".join(
+                f"{item.get('classification', 'UNKNOWN')}/{item.get('status', 'UNKNOWN')}: {item.get('summary', '')}"
+                for item in blocker_items
+            )
+        tests = evidence.get("tests") or (
+            f"{evidence['tests_passed']} passed" if evidence.get("tests_passed") is not None else "UNKNOWN"
+        )
+        ci = evidence.get("ci") or "UNKNOWN"
+        lines.extend([
+            f"- Builder {builder_number}",
+            f"  - role: {evidence.get('role') or 'UNKNOWN'}",
+            f"  - branch: {evidence.get('branch') or 'UNKNOWN'}",
+            f"  - head SHA: `{evidence.get('head_sha') or 'UNKNOWN'}`",
+            f"  - PR: {('PR #' + str(evidence['source_pr'])) if evidence.get('source_pr') else 'UNKNOWN'}",
+            f"  - reported status: {evidence.get('status') or 'UNKNOWN'}",
+            f"  - blocker state: {blocker_state}",
+            f"  - tests: {tests}",
+            f"  - CI: {ci}",
+            f"  - observed_at: `{evidence.get('observed_at', 'UNKNOWN')}`",
+            f"  - freshness: **{freshness}**" + (" — not unquestionably current; CEO review required." if freshness == "STALE" else ""),
+        ])
+    lines.extend([
         "",
         "## Top-5 Safety State",
         "",
@@ -607,7 +757,7 @@ def render_control_plane(payload: dict[str, Any]) -> str:
         "",
         "## Latest Merged PRs",
         "",
-    ]
+    ])
     for repo, snapshot in repositories.items():
         for pr in snapshot.get("latest_merged_prs", [])[:10]:
             lines.append(f"- `{repo}` PR #{pr['number']} — **MERGED** — head `{pr.get('head_sha') or 'UNAVAILABLE'}` — merge `{pr.get('merge_sha') or 'UNAVAILABLE'}` — {pr.get('title', '')}")

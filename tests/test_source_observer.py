@@ -180,6 +180,111 @@ Safety: no production mutation and no live activation
         self.assertEqual(list((self.memory / "events/records").glob("*.json")), [])
         self.assertEqual(validate_candidate_store(json.loads((self.vault / "_live/SOURCE_CANDIDATES.json").read_text())), [])
 
+    def _handoff(self, builder_number: int, observed_at: str, status: str, branch: str, head: str, blocker: str | None = None) -> dict:
+        blocker_line = f"Hard Blocker: {blocker}\n" if blocker else ""
+        text = f"""BUILDER: {builder_number}
+ROLE: Builder {builder_number} evidence
+Local branch: {branch}
+Exact head: {head}
+PR #{builder_number + 50}
+Final status: {status}
+Tests: 58 passed
+CI: green
+{blocker_line}Safety: no production mutation and no live activation
+"""
+        return parse_builder_handoff(text, observed_at=observed_at)
+
+    def test_newer_builder_one_handoff_replaces_older_rendered_state(self):
+        older = self._handoff(1, "2026-09-15T08:00:00+00:00", "OLD STATUS", "feat/old", "1" * 40)
+        newer = self._handoff(1, "2026-09-15T09:00:00+00:00", "NEW STATUS", "feat/new", "2" * 40)
+        payload = observe_sources(
+            self.memory,
+            FixtureGitHubClient({SPORTS: snapshot("1" * 40, []), MEMORY: snapshot("2" * 40, [])}),
+            previous={"builder_handoffs": [older, newer]},
+            observed_at="2026-09-15T10:00:00+00:00",
+        )
+        control_plane = write_and_render(payload)
+        self.assertIn("NEW STATUS", control_plane)
+        self.assertIn("feat/new", control_plane)
+        self.assertNotIn("OLD STATUS", control_plane)
+        self.assertNotIn("feat/old", control_plane)
+
+    def test_builder_two_and_three_are_selected_independently(self):
+        handoffs = [
+            self._handoff(2, "2026-09-15T09:00:00+00:00", "BUILDER TWO", "feat/two", "2" * 40),
+            self._handoff(3, "2026-09-15T09:00:00+00:00", "BUILDER THREE", "feat/three", "3" * 40),
+        ]
+        control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": handoffs})
+        self.assertIn("BUILDER TWO", control_plane)
+        self.assertIn("feat/two", control_plane)
+        self.assertIn("BUILDER THREE", control_plane)
+        self.assertIn("feat/three", control_plane)
+
+    def test_absent_builder_evidence_is_unknown(self):
+        control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": []})
+        for builder_number in (1, 2, 3):
+            self.assertIn(f"Builder {builder_number} — **UNKNOWN / NO CURRENT HANDOFF EVIDENCE**", control_plane)
+
+    def test_stale_builder_handoff_is_visibly_stale(self):
+        stale = self._handoff(1, "2026-09-13T08:00:00+00:00", "OLD", "feat/stale", "1" * 40)
+        control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": [stale]})
+        self.assertIn("freshness: **STALE**", control_plane)
+        self.assertIn("not unquestionably current", control_plane)
+
+    def test_final_status_and_final_recommendation_are_parsed(self):
+        final_status = self._handoff(1, "2026-09-15T09:00:00+00:00", "FINAL STATUS COMPLETE", "feat/status", "1" * 40)
+        recommendation = parse_builder_handoff(
+            """BUILDER: 2
+ROLE: readiness
+Local branch: feat/recommendation
+Exact head: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+Final recommendation: READY FOR CEO REVIEW
+""",
+            observed_at="2026-09-15T09:00:00+00:00",
+        )
+        self.assertEqual(final_status["status"], "FINAL STATUS COMPLETE")
+        self.assertEqual(recommendation["status"], "READY FOR CEO REVIEW")
+
+    def test_hard_blocker_section_is_parsed(self):
+        evidence = self._handoff(1, "2026-09-15T09:00:00+00:00", "BLOCKED", "feat/blocker", "1" * 40, "provider authentication is unavailable")
+        self.assertEqual(len(evidence["blockers"]), 1)
+        self.assertEqual(evidence["blockers"][0]["classification"], "EXTERNAL")
+        self.assertEqual(evidence["blockers"][0]["status"], "REPORTED_OPEN")
+
+    def test_quota_blocker_is_not_fabricated_without_evidence(self):
+        payload = observe_sources(
+            self.memory,
+            FixtureGitHubClient({SPORTS: snapshot("1" * 40, []), MEMORY: snapshot("2" * 40, [])}),
+            observed_at="2026-09-15T10:00:00+00:00",
+        )
+        self.assertFalse(any("QUOTA" in item["blocker_id"] for item in payload["blockers"]))
+
+    def test_old_blocker_is_preserved_unverified_and_not_auto_resolved(self):
+        older = self._handoff(1, "2026-09-15T08:00:00+00:00", "BLOCKED", "feat/old", "1" * 40, "quota is exhausted")
+        newer = self._handoff(1, "2026-09-15T09:00:00+00:00", "CONDITION CHANGED", "feat/new", "2" * 40)
+        payload = observe_sources(
+            self.memory,
+            FixtureGitHubClient({SPORTS: snapshot("1" * 40, []), MEMORY: snapshot("2" * 40, [])}),
+            previous={"observed_at": "2026-09-15T09:00:00+00:00", "builder_handoffs": [older, newer], "blockers": older["blockers"]},
+            observed_at="2026-09-15T10:00:00+00:00",
+        )
+        preserved = next(item for item in payload["blockers"] if item["blocker_id"] == older["blockers"][0]["blocker_id"])
+        self.assertEqual(preserved["status"], "PRESERVED_UNVERIFIED")
+        self.assertTrue(preserved["needs_ceo_review"])
+        self.assertIn("BLOCKER_STATE_CHANGE_REQUIRES_CEO_REVIEW", {item["type"] for item in payload["conflicts"]})
+
+    def test_control_plane_has_no_static_builder_workstream_truth(self):
+        control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": []})
+        self.assertNotIn("Real NO-BET Shadow Execution active", control_plane)
+        self.assertNotIn("Independent Shadow Validation Gate merged", control_plane)
+        self.assertNotIn("Memory Source Observer / CEO Control Plane active", control_plane)
+
+
+def write_and_render(payload: dict) -> str:
+    from memorylib.observer import render_control_plane
+
+    return render_control_plane(payload)
+
 
 if __name__ == "__main__":
     unittest.main()
