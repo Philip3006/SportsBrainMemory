@@ -9,6 +9,7 @@ from .graph import Graph
 from .schema import SchemaStore, validate_meta
 from .v2 import FROZEN_RESEARCH_SHA, V1_GENERATED_MARKER, V2_GENERATED_MARKER, freshness_state, parse_timestamp, read_manifest, validate_event
 from .frontmatter import parse_frontmatter
+from .observer import validate_blocker, validate_candidate, validate_handoff_evidence
 
 @dataclass
 class ValidationReport:
@@ -29,6 +30,45 @@ class ValidationReport:
             'object_count':self.object_count,'id_count':self.id_count,
             'status_counts':self.status_counts,'issues':[asdict(i) for i in self.issues]
         }
+
+
+def validate_runtime_payload(path: Path) -> list[str]:
+    """Validate non-canonical observer, candidate, blocker, or handoff JSON."""
+    try:
+        payload = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        return [f'{path}: invalid JSON: {exc}']
+    if not isinstance(payload, dict) or payload.get('schema') != 1:
+        return [f'{path}: runtime payload schema must be 1']
+    errors: list[str] = []
+    candidates = payload.get('candidates', [])
+    if not isinstance(candidates, list):
+        errors.append(f'{path}: candidates must be a list')
+    else:
+        ids: set[str] = set()
+        for index, candidate in enumerate(candidates):
+            try:
+                if candidate.get('candidate_type') == 'CANDIDATE_OPERATIONAL_EVIDENCE':
+                    validate_handoff_evidence(candidate)
+                else:
+                    validate_candidate(candidate)
+                candidate_id = candidate.get('candidate_id')
+                if candidate_id in ids:
+                    errors.append(f'{path}: duplicate candidate_id {candidate_id}')
+                ids.add(candidate_id)
+            except Exception as exc:
+                errors.append(f'{path}: candidates[{index}]: {exc}')
+    blockers = payload.get('blockers', [])
+    if blockers is not None:
+        if not isinstance(blockers, list):
+            errors.append(f'{path}: blockers must be a list')
+        else:
+            for index, blocker in enumerate(blockers):
+                try:
+                    validate_blocker(blocker)
+                except Exception as exc:
+                    errors.append(f'{path}: blockers[{index}]: {exc}')
+    return errors
 
 def _structured(path:str)->bool:
     return path.startswith((
