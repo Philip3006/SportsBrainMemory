@@ -55,7 +55,16 @@ def _write(path: Path, text: str) -> None:
     temporary.replace(path)
 
 
-def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, sync_state: str = "ONLINE", sync_detail: str = "", last_sync_at: str | None = None) -> dict[str, Any]:
+def render_live_status(
+    memory_repo: Path,
+    vault: Path,
+    source_repo: Path,
+    *,
+    sync_state: str = "ONLINE",
+    sync_detail: str = "",
+    last_sync_at: str | None = None,
+    semantic_graph: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     manifest = read_manifest(memory_repo)
     now = _iso_now()
     memory_head = _git_optional(memory_repo, "rev-parse", "HEAD") or "UNRESOLVED"
@@ -105,6 +114,21 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         f"- Relevant job records: `{len(relevant_jobs)}`",
         "- Live GitHub CI: not queried by this local-only renderer; source refs and checked-in health are shown instead.",
     ]
+    if semantic_graph is None:
+        graph_status_path = vault / "_live" / "SEMANTIC_GRAPH_STATUS.json"
+        try:
+            candidate = json.loads(graph_status_path.read_text(encoding="utf-8"))
+            semantic_graph = candidate if isinstance(candidate, dict) else None
+        except (OSError, json.JSONDecodeError):
+            semantic_graph = None
+    graph_lines = [
+        f"- Status: **{(semantic_graph or {}).get('status', 'UNKNOWN')}**",
+        f"- Location: `{(semantic_graph or {}).get('graph_root', '_live/graph')}`",
+        f"- Graph digest: `{(semantic_graph or {}).get('graph_digest', 'UNAVAILABLE')}`",
+        f"- Validation: errors={((semantic_graph or {}).get('validation') or {}).get('errors', 'UNAVAILABLE')} warnings={((semantic_graph or {}).get('validation') or {}).get('warnings', 'UNAVAILABLE')}",
+    ]
+    if semantic_graph and semantic_graph.get("failure"):
+        graph_lines.append(f"- Failure behavior: {semantic_graph['failure']}")
     sync_text = sync_detail or "No sync warning."
     status_text = "\n".join([
         V2_GENERATED_MARKER,
@@ -153,6 +177,10 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
         f"- `{sync_state}` — {sync_text}",
         "- Safety: fetch first; fast-forward only; no hard reset; no local-edit discard; conflicts block sync.",
         "",
+        "## SEMANTIC GRAPH V2",
+        "",
+        *graph_lines,
+        "",
         "## DEFERRED DEPENDENCIES / NEXT CEO GATE",
         "",
         "- Resolve the external free-quota dependency before the 72h soak.",
@@ -167,6 +195,6 @@ def render_live_status(memory_repo: Path, vault: Path, source_repo: Path, *, syn
     _write(vault / "_live" / "PRS.md", "\n".join([V2_GENERATED_MARKER, "# SportsBrain PR Status", "", *prs]))
     _write(vault / "_live" / "CI_STATUS.md", "\n".join([V2_GENERATED_MARKER, "# CI and Runtime Status", "", *ci_lines]))
     _write(vault / "_live" / "SYNC_STATUS.md", "\n".join([V2_GENERATED_MARKER, "# Memory Sync Status", "", f"- Status: **{sync_state}**", f"- Last attempt: `{last_sync_at or now}`", f"- {sync_text}", "", "No hard reset or destructive merge is permitted."]))
-    payload = {"generated_at": now, "status": overall, "sync_state": sync_state, "source_main_sha": source_head, "latest_meaningful_sha": meaningful_sha, "memory_sha": memory_head, "memory_branch": memory_branch, "memory_freshness": freshness}
+    payload = {"generated_at": now, "status": overall, "sync_state": sync_state, "source_main_sha": source_head, "latest_meaningful_sha": meaningful_sha, "memory_sha": memory_head, "memory_branch": memory_branch, "memory_freshness": freshness, "semantic_graph": semantic_graph or {"status": "UNKNOWN", "graph_root": "_live/graph"}}
     _write(vault / "_live" / "STATUS.json", json.dumps(payload, indent=2, sort_keys=True) + "\n")
     return payload
