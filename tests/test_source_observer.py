@@ -16,7 +16,9 @@ from memorylib.observer import (  # noqa: E402
     FixtureGitHubClient,
     ObserverError,
     candidate_id,
+    handoff_evidence_id,
     ingest_handoff,
+    observe_and_write,
     observe_sources,
     parse_builder_handoff,
     validate_blocker,
@@ -149,14 +151,20 @@ Blocker: The Odds API quota is exhausted
 Safety: no production mutation and no live activation
 """
         evidence = parse_builder_handoff(handoff, observed_at="2026-09-15T08:00:00+00:00")
+        repeated = parse_builder_handoff(handoff, observed_at="2026-09-15T09:00:00+00:00")
         self.assertEqual(evidence["builder_number"], 1)
         self.assertEqual(evidence["tests_passed"], 58)
         self.assertFalse(evidence["canonical"])
+        self.assertEqual(evidence["candidate_id"], repeated["candidate_id"])
+        self.assertEqual(evidence["candidate_id"], handoff_evidence_id(evidence))
         store = self.vault / "_live/BUILDER_HANDOFFS.json"
         ingest_handoff(store, evidence)
-        ingest_handoff(store, evidence)
+        ingest_handoff(store, repeated)
         stored = json.loads(store.read_text(encoding="utf-8"))
         self.assertEqual(len(stored["candidates"]), 1)
+        self.assertEqual(stored["candidates"][0]["observation_count"], 2)
+        self.assertEqual(stored["candidates"][0]["first_observed_at"], "2026-09-15T08:00:00+00:00")
+        self.assertEqual(stored["candidates"][0]["last_observed_at"], "2026-09-15T09:00:00+00:00")
         self.assertEqual(validate_runtime_payload(store), [])
         with self.assertRaises(CandidateValidationError):
             parse_builder_handoff("BUILDER: 1/2\nROLE: ambiguous")
@@ -180,8 +188,10 @@ Safety: no production mutation and no live activation
         self.assertEqual(list((self.memory / "events/records").glob("*.json")), [])
         self.assertEqual(validate_candidate_store(json.loads((self.vault / "_live/SOURCE_CANDIDATES.json").read_text())), [])
 
-    def _handoff(self, builder_number: int, observed_at: str, status: str, branch: str, head: str, blocker: str | None = None) -> dict:
+    def _handoff(self, builder_number: int, observed_at: str, status: str, branch: str, head: str, blocker: str | None = None, blocker_classification: str | None = None, blocker_status: str | None = None) -> dict:
         blocker_line = f"Hard Blocker: {blocker}\n" if blocker else ""
+        classification_line = f"Blocker classification: {blocker_classification}\n" if blocker_classification else ""
+        status_line = f"Blocker status: {blocker_status}\n" if blocker_status else ""
         text = f"""BUILDER: {builder_number}
 ROLE: Builder {builder_number} evidence
 Local branch: {branch}
@@ -190,7 +200,7 @@ PR #{builder_number + 50}
 Final status: {status}
 Tests: 58 passed
 CI: green
-{blocker_line}Safety: no production mutation and no live activation
+{blocker_line}{classification_line}{status_line}Safety: no production mutation and no live activation
 """
         return parse_builder_handoff(text, observed_at=observed_at)
 
@@ -278,6 +288,48 @@ Final recommendation: READY FOR CEO REVIEW
         self.assertNotIn("Real NO-BET Shadow Execution active", control_plane)
         self.assertNotIn("Independent Shadow Validation Gate merged", control_plane)
         self.assertNotIn("Memory Source Observer / CEO Control Plane active", control_plane)
+
+    def test_handoff_identity_separates_blocker_state_transitions(self):
+        common = (1, "2026-09-15T09:00:00+00:00", "SAME OVERALL STATUS", "feat/same", "1" * 40)
+        quota = self._handoff(*common, blocker="quota exhausted")
+        credential = self._handoff(*common, blocker="credential invalid")
+        no_blocker = self._handoff(*common)
+        classification_changed = self._handoff(*common, blocker="quota exhausted", blocker_classification="CEO_DECISION_REQUIRED")
+        status_changed = self._handoff(*common, blocker="quota exhausted", blocker_status="REPORTED_CHANGED")
+        evidence = [quota, credential, no_blocker, classification_changed, status_changed]
+        self.assertEqual(len({item["candidate_id"] for item in evidence}), 5)
+        self.assertEqual(len({handoff_evidence_id(item) for item in evidence}), 5)
+
+        store = self.vault / "_live/BUILDER_HANDOFFS.json"
+        for item in evidence:
+            ingest_handoff(store, item)
+        stored = json.loads(store.read_text(encoding="utf-8"))["candidates"]
+        self.assertEqual(len(stored), 5)
+        self.assertIn(quota["candidate_id"], {item["candidate_id"] for item in stored})
+        self.assertIn(credential["candidate_id"], {item["candidate_id"] for item in stored})
+
+        for previous, latest in ((quota, credential), (quota, no_blocker), (quota, classification_changed), (quota, status_changed)):
+            transition = observe_sources(
+                self.memory,
+                FixtureGitHubClient({SPORTS: snapshot("1" * 40, []), MEMORY: snapshot("2" * 40, [])}),
+                previous={"builder_handoffs": [previous, latest]},
+                observed_at="2026-09-15T10:00:00+00:00",
+            )
+            self.assertIn("BLOCKER_STATE_CHANGE_REQUIRES_CEO_REVIEW", {item["type"] for item in transition["conflicts"]})
+            self.assertEqual(transition["builder_handoffs"], [previous, latest])
+
+    def test_observer_loads_persisted_handoff_evidence_for_live_rendering(self):
+        evidence = self._handoff(2, "2026-09-15T09:00:00+00:00", "INGESTED STATUS", "feat/ingested", "2" * 40)
+        ingest_handoff(self.vault / "_live/BUILDER_HANDOFFS.json", evidence)
+        payload = observe_and_write(
+            self.memory,
+            self.vault,
+            client=FixtureGitHubClient({SPORTS: snapshot("1" * 40, []), MEMORY: snapshot("2" * 40, [])}),
+        )
+        self.assertEqual(payload["builder_handoffs"][0]["candidate_id"], evidence["candidate_id"])
+        control_plane = (self.vault / "_live/CEO_CONTROL_PLANE.md").read_text(encoding="utf-8")
+        self.assertIn("INGESTED STATUS", control_plane)
+        self.assertIn("UNKNOWN / NO CURRENT HANDOFF EVIDENCE", control_plane)
 
 
 def write_and_render(payload: dict) -> str:

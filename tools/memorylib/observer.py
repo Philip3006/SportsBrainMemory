@@ -377,9 +377,15 @@ def _handoff_state_conflicts(handoffs: list[dict[str, Any]]) -> list[dict[str, A
         previous_blockers = {item.get("blocker_id") for item in previous.get("blockers", []) if isinstance(item, dict)}
         latest_blockers = {item.get("blocker_id") for item in latest.get("blockers", []) if isinstance(item, dict)}
         changed = previous_blockers != latest_blockers
-        previous_status = {item.get("blocker_id"): item.get("status") for item in previous.get("blockers", []) if isinstance(item, dict)}
-        latest_status = {item.get("blocker_id"): item.get("status") for item in latest.get("blockers", []) if isinstance(item, dict)}
-        changed = changed or any(previous_status.get(key) != latest_status.get(key) for key in previous_blockers & latest_blockers)
+        previous_state = {
+            item.get("blocker_id"): (item.get("classification"), item.get("status"))
+            for item in previous.get("blockers", []) if isinstance(item, dict)
+        }
+        latest_state = {
+            item.get("blocker_id"): (item.get("classification"), item.get("status"))
+            for item in latest.get("blockers", []) if isinstance(item, dict)
+        }
+        changed = changed or any(previous_state.get(key) != latest_state.get(key) for key in previous_blockers & latest_blockers)
         if changed:
             conflicts.append({
                 "type": "BLOCKER_STATE_CHANGE_REQUIRES_CEO_REVIEW",
@@ -552,6 +558,44 @@ def validate_blocker(blocker: dict[str, Any]) -> None:
         raise CandidateValidationError("blockers may not be automatically resolved")
 
 
+def _normalize_identity_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    return " ".join(str(value).split()).casefold()
+
+
+def _handoff_identity_payload(evidence: dict[str, Any]) -> dict[str, Any]:
+    """Build the stable operational state used for handoff candidate identity."""
+    blockers = []
+    for blocker in evidence.get("blockers", []) if isinstance(evidence.get("blockers"), list) else []:
+        if not isinstance(blocker, dict):
+            continue
+        blockers.append({
+            "summary": _normalize_identity_text(blocker.get("summary")),
+            "classification": _normalize_identity_text(blocker.get("classification")),
+            "status": _normalize_identity_text(blocker.get("status")),
+        })
+    blockers.sort(key=lambda item: json.dumps(item, sort_keys=True, separators=(",", ":")))
+    return {
+        "builder_number": evidence.get("builder_number"),
+        "role": _normalize_identity_text(evidence.get("role")),
+        "branch": " ".join(str(evidence.get("branch") or "").split()) or None,
+        "head_sha": str(evidence.get("head_sha")).lower() if evidence.get("head_sha") else None,
+        "source_pr": evidence.get("source_pr"),
+        "status": _normalize_identity_text(evidence.get("status")),
+        "blockers": blockers,
+        "ci": _normalize_identity_text(evidence.get("ci")),
+        "tests": _normalize_identity_text(evidence.get("tests")),
+        "tests_passed": evidence.get("tests_passed"),
+    }
+
+
+def handoff_evidence_id(evidence: dict[str, Any]) -> str:
+    identity = _handoff_identity_payload(evidence)
+    encoded = json.dumps(identity, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return "HANDOFF-CAND-" + hashlib.sha256(encoded.encode("utf-8")).hexdigest()[:24]
+
+
 def _extract_first(pattern: str, text: str) -> str | None:
     match = re.search(pattern, text, re.IGNORECASE | re.MULTILINE)
     return match.group(1).strip().strip("`") if match else None
@@ -588,8 +632,10 @@ def parse_builder_handoff(text: str, observed_at: str | None = None) -> dict[str
     tests_passed_match = re.search(r"(\d+)\s+passed", normalized, re.IGNORECASE)
     ci = _extract_first(r"^CI(?:\s+status)?:\s*(.+)$", normalized)
     blocker_texts: list[str] = []
+    blocker_statuses = [value.upper() for value in re.findall(r"^(?:hard\s+)?blockers?\s+status:\s*(.+)$", normalized, re.IGNORECASE | re.MULTILINE)]
+    blocker_classifications = [value.upper() for value in re.findall(r"^(?:hard\s+)?blockers?\s+classification:\s*(.+)$", normalized, re.IGNORECASE | re.MULTILINE)]
     for index, line in enumerate(normalized_lines):
-        blocker_match = re.match(r"^(?:hard\s+)?blockers?\s*:?\s*(.*)$", line, re.IGNORECASE)
+        blocker_match = re.match(r"^(?:hard\s+)?blockers?(?:\s*:\s*(.*))?$", line, re.IGNORECASE)
         if not blocker_match:
             continue
         value = blocker_match.group(1).strip()
@@ -603,26 +649,27 @@ def parse_builder_handoff(text: str, observed_at: str | None = None) -> dict[str
                 blocker_texts.append(following)
     safety = [line for line in lines if re.search(r"safety|no production|no runtime|no mutation|no live", line, re.IGNORECASE)]
     observed_at = observed_at or now_utc()
-    identity = "|".join((str(builder_number), branch or "", head or "", str(pr_match.group(1) if pr_match else ""), status or ""))
-    evidence_id = "HANDOFF-CAND-" + hashlib.sha256(identity.encode("utf-8")).hexdigest()[:24]
     blocker_items: list[dict[str, Any]] = []
-    for blocker_text in blocker_texts:
+    for index, blocker_text in enumerate(blocker_texts):
         if blocker_text.lower() in {"none", "n/a", "-", "no blockers", "no current blockers"}:
             continue
         lowered = blocker_text.lower()
         classification = "EXTERNAL" if any(token in lowered for token in ("quota", "provider", "credential", "outage")) else "CEO_DECISION_REQUIRED"
         reported_status = "REPORTED_CHANGED" if any(token in lowered for token in ("resolved", "cleared", "no longer blocked", "unblocked")) else "REPORTED_OPEN"
+        if index < len(blocker_classifications) and blocker_classifications[index] in BLOCKER_CLASSES:
+            classification = blocker_classifications[index]
+        if index < len(blocker_statuses):
+            reported_status = blocker_statuses[index]
         blocker_items.append({
             "blocker_id": "BLK-HANDOFF-" + hashlib.sha256(blocker_text.encode("utf-8")).hexdigest()[:16],
             "classification": classification,
             "status": reported_status,
             "summary": blocker_text,
             "provenance": "CANDIDATE_OPERATIONAL_EVIDENCE",
-            "source_candidate_id": evidence_id,
             "auto_resolve": False,
         })
     result = {
-        "candidate_id": evidence_id,
+        "candidate_id": "",
         "candidate_type": "CANDIDATE_OPERATIONAL_EVIDENCE",
         "canonical": False,
         "promotion_required": True,
@@ -641,6 +688,11 @@ def parse_builder_handoff(text: str, observed_at: str | None = None) -> dict[str
         "safety_confirmation": safety,
         "raw_header": first,
     }
+    evidence_id = handoff_evidence_id(result)
+    result["candidate_id"] = evidence_id
+    result["evidence_identity"] = _handoff_identity_payload(result)
+    for blocker in result["blockers"]:
+        blocker["source_candidate_id"] = evidence_id
     if any(SECRET_RE.search(str(value)) for value in result.values()):
         raise CandidateValidationError("secret-like material detected in handoff")
     return result
@@ -668,6 +720,11 @@ def validate_handoff_evidence(evidence: dict[str, Any]) -> None:
         raise CandidateValidationError("handoff blockers must be a list")
     for blocker in evidence.get("blockers", []):
         validate_blocker(blocker)
+    expected_id = handoff_evidence_id(evidence)
+    if evidence["candidate_id"] != expected_id:
+        raise CandidateValidationError("handoff candidate_id does not match normalized operational evidence")
+    if "evidence_identity" in evidence and evidence["evidence_identity"] != _handoff_identity_payload(evidence):
+        raise CandidateValidationError("handoff evidence_identity does not match normalized operational evidence")
 
 
 def ingest_handoff(store_path: Path, evidence: dict[str, Any]) -> dict[str, Any]:
@@ -678,7 +735,11 @@ def ingest_handoff(store_path: Path, evidence: dict[str, Any]) -> dict[str, Any]
     candidates = payload.setdefault("candidates", [])
     existing = next((item for item in candidates if item.get("candidate_id") == evidence["candidate_id"]), None)
     if existing is None:
-        candidates.append(evidence)
+        stored = dict(evidence)
+        stored["first_observed_at"] = evidence["observed_at"]
+        stored["last_observed_at"] = evidence["observed_at"]
+        stored["observation_count"] = 1
+        candidates.append(stored)
     else:
         existing["last_observed_at"] = evidence["observed_at"]
         existing["observation_count"] = int(existing.get("observation_count", 1)) + 1

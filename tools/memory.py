@@ -114,6 +114,14 @@ def main():
         if previous_path.exists():
             try: previous=json.loads(previous_path.read_text(encoding='utf-8'))
             except json.JSONDecodeError: previous={}
+        handoff_path=vault/'_live'/'BUILDER_HANDOFFS.json'
+        if handoff_path.exists():
+            try:
+                handoff_store=json.loads(handoff_path.read_text(encoding='utf-8'))
+                if isinstance(handoff_store,dict) and isinstance(handoff_store.get('candidates'),list):
+                    previous['builder_handoffs']=handoff_store['candidates']
+            except json.JSONDecodeError:
+                pass
         payload=observe_sources(ROOT,client,repositories=a.repositories,previous=previous)
         if not a.dry_run:
             write_runtime_outputs(vault,payload)
