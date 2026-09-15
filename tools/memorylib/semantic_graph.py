@@ -11,8 +11,11 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import shutil
+import tempfile
 import time
 from typing import Any, Iterable
 
@@ -110,6 +113,7 @@ class Entity:
     canonical: bool = True
     source_type: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+    target_root: str = GRAPH_RELATIVE_ROOT
 
     @property
     def key(self) -> str:
@@ -117,7 +121,7 @@ class Entity:
 
     @property
     def target(self) -> str:
-        return f"{GRAPH_RELATIVE_ROOT}/entities/{self.namespace}/{_safe_slug(self.stable_id)}"
+        return f"{self.target_root}/entities/{self.namespace}/{_safe_slug(self.stable_id)}"
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -191,6 +195,15 @@ def _normal_text(value: Any) -> str:
     return " ".join(str(value).split()).strip()
 
 
+def _normal_link_root(value: Any) -> str:
+    normalized = str(value or "").replace("\\", "/").strip().strip("/")
+    if not normalized or normalized == ".":
+        raise ValueError("graph link_root must be a non-empty relative path")
+    if any(part in {"", ".", ".."} for part in normalized.split("/")):
+        raise ValueError("graph link_root must not contain empty, dot, or parent path components")
+    return normalized
+
+
 def _parse_time(value: Any) -> datetime | None:
     if not isinstance(value, str) or not value.strip():
         return None
@@ -198,6 +211,18 @@ def _parse_time(value: Any) -> datetime | None:
         return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
     except ValueError:
         return None
+
+
+def _freshness_state(updated_at: Any, current: datetime) -> str:
+    updated = _parse_time(updated_at)
+    if updated is None:
+        return "STALE"
+    hours = max(0.0, (current - updated).total_seconds() / 3600.0)
+    if hours <= 6:
+        return "FRESH"
+    if hours <= 24:
+        return "AGING"
+    return "STALE"
 
 
 def _json_file(path: Path) -> Any:
@@ -290,10 +315,22 @@ def _label_from_document(path: Path, meta: dict[str, Any], body: str, stable_id:
 class SemanticGraph:
     """In-memory graph registry and deterministic projection builder."""
 
-    def __init__(self, root: Path, *, vault: Path | None = None, include_runtime: bool = False) -> None:
+    def __init__(
+        self,
+        root: Path,
+        *,
+        vault: Path | None = None,
+        include_runtime: bool = False,
+        output_root: Path | None = None,
+        link_root: str | None = None,
+        reference_time: str | None = None,
+    ) -> None:
         self.root = root.resolve()
         self.vault = vault.resolve() if vault else None
         self.include_runtime = include_runtime and self.vault is not None
+        self.output_root = self._default_output_root(output_root)
+        self.link_root = _normal_link_root(link_root or self._default_link_root(self.output_root))
+        self.reference_time = _parse_time(reference_time) or datetime.now(timezone.utc)
         self.entities: dict[str, Entity] = {}
         self.aliases: dict[tuple[str | None, str], str] = {}
         self.path_entities: dict[str, str] = {}
@@ -302,6 +339,31 @@ class SemanticGraph:
         self.issues: list[GraphIssue] = []
         self.records: list[tuple[str, dict[str, Any], str, bool, str, str]] = []
         self.generated_at = ""
+
+    def _default_output_root(self, output_root: Path | None) -> Path:
+        if output_root is not None:
+            return output_root.resolve()
+        if self.include_runtime and self.vault is not None:
+            return (self.vault / "_live" / "graph").resolve()
+        return (self.root / GRAPH_RELATIVE_ROOT).resolve()
+
+    def _default_link_root(self, output_root: Path) -> str:
+        if self.vault is not None:
+            try:
+                return output_root.relative_to(self.vault).as_posix()
+            except ValueError:
+                pass
+        try:
+            return output_root.relative_to(self.root).as_posix()
+        except ValueError:
+            return GRAPH_RELATIVE_ROOT
+
+    def configure_output(self, output_root: Path, link_root: str | None = None) -> None:
+        """Configure where this projection is materialized and linked."""
+        self.output_root = output_root.resolve()
+        self.link_root = _normal_link_root(link_root or self._default_link_root(self.output_root))
+        for entity in self.entities.values():
+            entity.target_root = self.link_root
 
     def build(self) -> "SemanticGraph":
         started = time.perf_counter()
@@ -325,7 +387,10 @@ class SemanticGraph:
             timestamps.append(manifest.get("canonical_updated_at"))
         timestamps.extend(payload.get("timestamp") for _, payload, _, _, _, _ in self.records)
         if self.include_runtime and self.vault:
+            runtime_inputs = {"SOURCE_OBSERVER.json", "SOURCE_CANDIDATES.json", "BUILDER_HANDOFFS.json", "BLOCKERS.json"}
             for path in sorted((self.vault / "_live").glob("*.json")):
+                if path.name not in runtime_inputs:
+                    continue
                 payload = _json_file(path)
                 if isinstance(payload, dict):
                     timestamps.append(payload.get("generated_at"))
@@ -408,7 +473,17 @@ class SemanticGraph:
         key = f"{namespace}:{stable_id}"
         existing = self.entities.get(key)
         if existing is None:
-            existing = Entity(namespace, stable_id, _normal_text(label) or stable_id, set(), provenance, canonical, source_type, {})
+            existing = Entity(
+                namespace,
+                stable_id,
+                _normal_text(label) or stable_id,
+                set(),
+                provenance,
+                canonical,
+                source_type,
+                {},
+                self.link_root,
+            )
             self.entities[key] = existing
         elif existing.label == existing.stable_id and label:
             existing.label = _normal_text(label)
@@ -440,6 +515,13 @@ class SemanticGraph:
             return
         self.aliases[alias_key] = key
 
+    def _runtime_metadata(self, payload: dict[str, Any]) -> dict[str, Any]:
+        metadata = dict(payload)
+        observed_at = payload.get("observed_at") or payload.get("generated_at")
+        if observed_at:
+            metadata["freshness"] = _freshness_state(observed_at, self.reference_time)
+        return metadata
+
     def _index_runtime_sources(self) -> None:
         assert self.vault is not None
         live = self.vault / "_live"
@@ -451,6 +533,22 @@ class SemanticGraph:
             (live / "BUILDER_HANDOFFS.json", "handoff"),
             (live / "BLOCKERS.json", "blocker"),
         )
+        handoff_payload = _json_file(live / "BUILDER_HANDOFFS.json")
+        handoff_items = handoff_payload.get("candidates", []) if isinstance(handoff_payload, dict) else []
+        try:
+            from .observer import _latest_builder_evidence, _valid_handoffs
+
+            valid_handoffs = _valid_handoffs(handoff_items)
+            latest_handoffs = _latest_builder_evidence(valid_handoffs)
+        except (ImportError, TypeError, ValueError):
+            valid_handoffs = []
+            latest_handoffs = {}
+        latest_ids = {
+            int(number): str(item.get("candidate_id"))
+            for number, item in latest_handoffs.items()
+            if item.get("candidate_id")
+        }
+        valid_handoff_ids = {str(item.get("candidate_id")) for item in valid_handoffs if item.get("candidate_id")}
         seen_candidates: set[str] = set()
         for path, kind in source_files:
             payload = _json_file(path)
@@ -468,7 +566,7 @@ class SemanticGraph:
                     if cid in seen_candidates:
                         continue
                     seen_candidates.add(cid)
-                    entity_key = self._add_entity("EVIDENCE", cid, candidate.get("summary") or cid, rel, "RUNTIME_DERIVED", False, candidate.get("candidate_type"), candidate)
+                    entity_key = self._add_entity("EVIDENCE", cid, candidate.get("summary") or cid, rel, "RUNTIME_DERIVED", False, candidate.get("candidate_type"), self._runtime_metadata(candidate))
                     self._register_structured_relations(entity_key, candidate, rel, False, "RUNTIME_DERIVED")
                     self._register_runtime_nested(entity_key, candidate, rel)
             elif kind == "handoff":
@@ -478,7 +576,15 @@ class SemanticGraph:
                 for handoff in candidates:
                     if not isinstance(handoff, dict) or not handoff.get("candidate_id"):
                         continue
-                    entity_key = self._add_entity("EVIDENCE", str(handoff["candidate_id"]), f"Builder handoff {handoff.get('builder_number', 'UNKNOWN')}", rel, "RUNTIME_DERIVED", False, handoff.get("candidate_type"), handoff)
+                    if str(handoff.get("candidate_id")) not in valid_handoff_ids:
+                        continue
+                    handoff = dict(handoff)
+                    try:
+                        builder_number = int(handoff.get("builder_number"))
+                    except (TypeError, ValueError):
+                        builder_number = None
+                    handoff["latest_for_builder"] = bool(builder_number and latest_ids.get(builder_number) == handoff.get("candidate_id"))
+                    entity_key = self._add_entity("EVIDENCE", str(handoff["candidate_id"]), f"Builder handoff {handoff.get('builder_number', 'UNKNOWN')}", rel, "RUNTIME_DERIVED", False, handoff.get("candidate_type"), self._runtime_metadata(handoff))
                     self._register_structured_relations(entity_key, handoff, rel, False, "RUNTIME_DERIVED")
                     self._register_runtime_nested(entity_key, handoff, rel)
             else:
@@ -488,8 +594,26 @@ class SemanticGraph:
                 for blocker in blockers:
                     if not isinstance(blocker, dict) or not blocker.get("blocker_id"):
                         continue
-                    entity_key = self._add_entity("BLOCKER", str(blocker["blocker_id"]), blocker.get("summary") or blocker["blocker_id"], rel, "RUNTIME_DERIVED", False, "blocker", blocker)
+                    entity_key = self._add_entity("BLOCKER", str(blocker["blocker_id"]), blocker.get("summary") or blocker["blocker_id"], rel, "RUNTIME_DERIVED", False, "blocker", self._runtime_metadata(blocker))
                     self._register_structured_relations(entity_key, blocker, rel, False, "RUNTIME_DERIVED")
+
+        for builder_number, handoff in latest_handoffs.items():
+            builder = self.entities.get(self._builder_key(builder_number))
+            if builder is None:
+                continue
+            builder.metadata["current_evidence"] = {
+                "candidate_id": handoff.get("candidate_id"),
+                "role": handoff.get("role"),
+                "branch": handoff.get("branch"),
+                "head_sha": handoff.get("head_sha"),
+                "source_pr": handoff.get("source_pr"),
+                "status": handoff.get("status"),
+                "blocker_count": len(handoff.get("blockers", [])) if isinstance(handoff.get("blockers"), list) else 0,
+                "tests": handoff.get("tests") or handoff.get("tests_passed"),
+                "ci": handoff.get("ci"),
+                "observed_at": handoff.get("observed_at"),
+                "freshness": _freshness_state(handoff.get("observed_at"), self.reference_time),
+            }
 
     def _register_runtime_nested(self, source_key: str, payload: dict[str, Any], source_path: str) -> None:
         blockers = payload.get("blockers")
@@ -497,7 +621,7 @@ class SemanticGraph:
             for blocker in blockers:
                 if not isinstance(blocker, dict) or not blocker.get("blocker_id"):
                     continue
-                target = self._add_entity("BLOCKER", str(blocker["blocker_id"]), blocker.get("summary") or blocker["blocker_id"], source_path, "RUNTIME_DERIVED", False, "blocker", blocker)
+                target = self._add_entity("BLOCKER", str(blocker["blocker_id"]), blocker.get("summary") or blocker["blocker_id"], source_path, "RUNTIME_DERIVED", False, "blocker", self._runtime_metadata(blocker))
                 self._add_edge(source_key, "blocker", target, source_path, "blockers", str(blocker.get("summary") or blocker["blocker_id"]), "RUNTIME_DERIVED")
 
     def _register_structured_relations(self, source_key: str, payload: dict[str, Any], source_path: str, canonical: bool, provenance: str) -> None:
@@ -810,8 +934,43 @@ def _render_moc(title: str, description: str, entities: Iterable[Entity]) -> str
     return "\n".join(lines).rstrip() + "\n"
 
 
+def _render_builder_moc(entities: Iterable[Entity]) -> str:
+    selected = sorted(entities, key=lambda entity: entity.key)
+    lines = [
+        GRAPH_MARKER,
+        "# Builders Graph MOC",
+        "",
+        "Builder identities are governed as 1–4; role and status remain evidence-derived.",
+        "",
+        f"- Entity count: **{len(selected)}**",
+        "",
+    ]
+    for entity in selected:
+        lines.append(f"- {_link(entity)} — `{entity.namespace}`")
+        current = entity.metadata.get("current_evidence")
+        if not isinstance(current, dict):
+            lines.append("  - current evidence: **UNKNOWN / NO CURRENT HANDOFF EVIDENCE**")
+            continue
+        freshness = current.get("freshness") or "STALE"
+        lines.extend([
+            f"  - current evidence: `{current.get('candidate_id') or 'UNKNOWN'}`",
+            f"  - current role: {current.get('role') or 'UNKNOWN'}",
+            f"  - current branch: {current.get('branch') or 'UNKNOWN'}",
+            f"  - current head SHA: `{current.get('head_sha') or 'UNKNOWN'}`",
+            f"  - current PR: {('PR #' + str(current['source_pr'])) if current.get('source_pr') else 'UNKNOWN'}",
+            f"  - current status: {current.get('status') or 'UNKNOWN'}",
+            f"  - current blocker count: {current.get('blocker_count', 0)}",
+            f"  - current tests/CI: {current.get('tests') or 'UNKNOWN'} / {current.get('ci') or 'UNKNOWN'}",
+            f"  - observed_at: `{current.get('observed_at') or 'UNKNOWN'}`",
+            f"  - freshness: **{freshness}**" + (" — not unquestionably current; CEO review required." if freshness == "STALE" else ""),
+        ])
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def render_semantic_graph(graph: SemanticGraph, output_root: Path | None = None) -> dict[str, Any]:
-    output = (output_root or (graph.root / GRAPH_RELATIVE_ROOT)).resolve()
+    if output_root is not None:
+        graph.configure_output(output_root)
+    output = graph.output_root
     entities_root = output / "entities"
     output.mkdir(parents=True, exist_ok=True)
     entities_root.mkdir(parents=True, exist_ok=True)
@@ -824,7 +983,7 @@ def render_semantic_graph(graph: SemanticGraph, output_root: Path | None = None)
     for edge in graph.edges.values():
         incoming[edge.target].append(edge)
     for entity in sorted(graph.entities.values(), key=lambda item: item.key):
-        path = graph.root / f"{entity.target}.md"
+        path = output / "entities" / entity.namespace / f"{_safe_slug(entity.stable_id)}.md"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(_render_entity_page(graph, entity, incoming), encoding="utf-8")
 
@@ -849,7 +1008,8 @@ def render_semantic_graph(graph: SemanticGraph, output_root: Path | None = None)
         "MOC-BLOCKERS.md": ("Blockers Graph MOC", "Blockers are runtime-derived only when present in observer evidence; no blocker is fabricated by the graph.", by_namespace["BLOCKER"]),
     }
     for filename, (title, description, items) in moc_specs.items():
-        (output / filename).write_text(_render_moc(title, description, items), encoding="utf-8")
+        rendered = _render_builder_moc(items) if filename == "MOC-BUILDERS.md" else _render_moc(title, description, items)
+        (output / filename).write_text(rendered, encoding="utf-8")
 
     activity = []
     for entity in graph.entities.values():
@@ -898,7 +1058,7 @@ def render_semantic_graph(graph: SemanticGraph, output_root: Path | None = None)
         "graph_digest": graph.digest(),
         "canonical_input_digest": manifest_payload["canonical_input_digest"],
         "canonical_event_digest": manifest_payload["canonical_event_digest"],
-        "generated_location": GRAPH_RELATIVE_ROOT,
+        "generated_location": graph.link_root,
         "noncanonical_view": True,
         "runtime_included": graph.include_runtime,
         "namespaces": list(NAMESPACES),
@@ -921,19 +1081,156 @@ def render_semantic_graph(graph: SemanticGraph, output_root: Path | None = None)
             GRAPH_MARKER, "# Memory Semantic Link Graph V2", "",
             "Generated noncanonical view layer. Build with `python3 tools/memory.py graph build`; validate with `python3 tools/memory.py graph validate`.",
             "", "Canonical records are read-only inputs. Runtime `_live` records are included only when an explicit vault is supplied and remain `canonical: false`.",
+            f"", f"Projection location: `{graph.link_root}`.",
             "", "The semantic digest excludes generated timestamps and performance measurements.", "",
         ]), encoding="utf-8"
     )
-    home_lines = [GRAPH_MARKER, "# Memory Semantic Link Graph V2", "", "This is a deterministic, noncanonical derived view over canonical Memory records and, when explicitly requested, a read-only `_live` observer snapshot.", "", "## Safety boundary", "", "- Canonical events/history are read-only inputs.", "- Runtime candidates, operational handoffs, and blockers remain noncanonical and promotion-gated.", "- NO-BET, no live activation, and SEALED 2425/2526 remain source invariants; this graph cannot promote or resolve them.", "- Remove `views/graph/` to roll back the projection without rewriting canonical Memory.", "", "## Health", "", f"- Graph digest: `{graph.digest()}`", f"- Entities: **{health['after']['entity_count']}**", f"- Typed edges: **{health['after']['edge_count']}**", f"- Isolated nodes: **{health['after']['isolated_node_count']}** ({health['after']['isolated_node_percent']}%)", f"- Connected components: **{health['after']['connected_components']}**; largest: **{health['after']['largest_component']}**", f"- Unresolved references: **{health['after']['unresolved_reference_count']}**", "", "## Hubs", ""]
-    home_lines.extend(f"- [[{GRAPH_RELATIVE_ROOT}/{filename.removesuffix('.md')}|{title}]]" for filename, (title, _, _) in moc_specs.items())
-    home_lines.append(f"- [[{GRAPH_RELATIVE_ROOT}/MOC-RECENT-ACTIVITY|Recent Activity Graph MOC]]")
+    home_lines = [GRAPH_MARKER, "# Memory Semantic Link Graph V2", "", "This is a deterministic, noncanonical derived view over canonical Memory records and, when explicitly requested, a read-only `_live` observer snapshot.", "", "## Safety boundary", "", "- Canonical events/history are read-only inputs.", "- Runtime candidates, operational handoffs, and blockers remain noncanonical and promotion-gated.", "- NO-BET, no live activation, and SEALED 2425/2526 remain source invariants; this graph cannot promote or resolve them.", "- Remove the selected projection root to roll back the view without rewriting canonical Memory.", "", "## Health", "", f"- Graph digest: `{graph.digest()}`", f"- Entities: **{health['after']['entity_count']}**", f"- Typed edges: **{health['after']['edge_count']}**", f"- Isolated nodes: **{health['after']['isolated_node_count']}** ({health['after']['isolated_node_percent']}%)", f"- Connected components: **{health['after']['connected_components']}**; largest: **{health['after']['largest_component']}**", f"- Unresolved references: **{health['after']['unresolved_reference_count']}**", "", "## Hubs", ""]
+    home_lines.extend(f"- [[{graph.link_root}/{filename.removesuffix('.md')}|{title}]]" for filename, (title, _, _) in moc_specs.items())
+    home_lines.append(f"- [[{graph.link_root}/MOC-RECENT-ACTIVITY|Recent Activity Graph MOC]]")
     (output / "00_GRAPH_HOME.md").write_text("\n".join(home_lines).rstrip() + "\n", encoding="utf-8")
     return {"output": str(output), "graph_digest": graph.digest(), "build_seconds": graph.build_seconds, "health": health, "entity_count": len(graph.entities), "edge_count": len(graph.edges), "unresolved_count": len(graph.unresolved)}
 
 
-def build_semantic_graph(root: Path, *, vault: Path | None = None, include_runtime: bool = False, output_root: Path | None = None) -> dict[str, Any]:
-    graph = SemanticGraph(root, vault=vault, include_runtime=include_runtime).build()
-    return render_semantic_graph(graph, output_root)
+def build_semantic_graph(
+    root: Path,
+    *,
+    vault: Path | None = None,
+    include_runtime: bool = False,
+    output_root: Path | None = None,
+    link_root: str | None = None,
+    reference_time: str | None = None,
+) -> dict[str, Any]:
+    if include_runtime and vault is not None and output_root is None:
+        return build_semantic_graph_atomic(root, vault, reference_time=reference_time)
+    graph = SemanticGraph(
+        root,
+        vault=vault,
+        include_runtime=include_runtime,
+        output_root=output_root,
+        link_root=link_root,
+        reference_time=reference_time,
+    ).build()
+    return render_semantic_graph(graph)
+
+
+def _write_json_atomic(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, delete=False) as handle:
+        json.dump(payload, handle, indent=2, sort_keys=True, ensure_ascii=False)
+        handle.write("\n")
+        temporary = Path(handle.name)
+    temporary.replace(path)
+
+
+def _runtime_graph_status(vault: Path, payload: dict[str, Any]) -> None:
+    _write_json_atomic(vault / "_live" / "SEMANTIC_GRAPH_STATUS.json", payload)
+
+
+class SemanticGraphRuntimeError(RuntimeError):
+    """A runtime graph could not be validated and promoted safely."""
+
+
+def _remove_runtime_path(path: Path) -> None:
+    if path.is_dir() and not path.is_symlink():
+        shutil.rmtree(path)
+    elif path.exists() or path.is_symlink():
+        path.unlink()
+
+
+def build_semantic_graph_atomic(
+    root: Path,
+    vault: Path,
+    *,
+    reference_time: str | None = None,
+) -> dict[str, Any]:
+    """Build, validate, and atomically promote the current Vault graph.
+
+    The temporary directory is a sibling of the live graph so promotion is a
+    same-filesystem rename.  The previous graph is retained until the new
+    graph has passed validation, and is restored if the final rename fails.
+    """
+    root = root.resolve()
+    vault = vault.resolve()
+    live = vault / "_live"
+    live.mkdir(parents=True, exist_ok=True)
+    current = live / "graph"
+    temporary: Path | None = Path(tempfile.mkdtemp(prefix=".graph-build-", dir=live))
+    previous: Path | None = None
+    try:
+        graph = SemanticGraph(
+            root,
+            vault=vault,
+            include_runtime=True,
+            output_root=temporary,
+            link_root="_live/graph",
+            reference_time=reference_time,
+        ).build()
+        result = render_semantic_graph(graph)
+        validation = validate_semantic_graph(root, temporary, vault=vault, link_base=vault)
+        result["validation"] = validation.to_dict()
+        if validation.errors or validation.warnings:
+            raise SemanticGraphRuntimeError(
+                f"GRAPH VALIDATION FAILED: errors={validation.errors} warnings={validation.warnings}"
+            )
+
+        if current.exists():
+            previous = Path(tempfile.mkdtemp(prefix=".graph-previous-", dir=live))
+            previous.rmdir()
+            os.replace(current, previous)
+        try:
+            os.replace(temporary, current)
+            temporary = None
+        except Exception:
+            if previous is not None and not current.exists():
+                os.replace(previous, current)
+                previous = None
+            raise
+        result["output"] = str(current)
+        if previous is not None:
+            _remove_runtime_path(previous)
+            previous = None
+        _runtime_graph_status(vault, {
+            "schema": 1,
+            "status": "ONLINE",
+            "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "graph_root": "_live/graph",
+            "graph_digest": result["graph_digest"],
+            "canonical_input_digest": graph.semantic_payload()["canonical_input_digest"],
+            "runtime_included": True,
+            "last_good_graph": True,
+            "validation": {"errors": 0, "warnings": 0},
+        })
+        return result
+    except Exception as exc:
+        if previous is not None and not current.exists():
+            os.replace(previous, current)
+            previous = None
+        if temporary is not None and temporary.exists():
+            shutil.rmtree(temporary, ignore_errors=True)
+        try:
+            _runtime_graph_status(vault, {
+                "schema": 1,
+                "status": "DEGRADED",
+                "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+                "graph_root": "_live/graph",
+                "last_good_graph": current.exists(),
+                "error": str(exc),
+                "failure": "new graph was not promoted; previous valid graph was preserved",
+            })
+        except OSError:
+            pass
+        if isinstance(exc, SemanticGraphRuntimeError):
+            raise
+        raise SemanticGraphRuntimeError(f"GRAPH GENERATION FAILED: {exc}") from exc
+    finally:
+        if previous is not None and previous.exists():
+            try:
+                _remove_runtime_path(previous)
+            except OSError:
+                pass
+        if temporary is not None and temporary.exists():
+            shutil.rmtree(temporary, ignore_errors=True)
 
 
 def _read_manifest(graph_root: Path) -> dict[str, Any] | None:
@@ -945,9 +1242,33 @@ def _read_manifest(graph_root: Path) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
-def validate_semantic_graph(root: Path, graph_root: Path | None = None) -> GraphValidation:
+def _display_path(path: Path, root: Path) -> str:
+    try:
+        return path.relative_to(root).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def _link_target_path(target: str, link_base: Path, graph_root: Path | None = None, graph_location: str | None = None) -> Path:
+    normalized = target.strip().strip("/")
+    location = (graph_location or "").strip().strip("/")
+    if graph_root is not None and location and (normalized == location or normalized.startswith(location + "/")):
+        relative = normalized[len(location):].lstrip("/")
+        return (graph_root / (relative if relative.endswith(".md") else f"{relative}.md")).resolve()
+    return (link_base / (normalized if normalized.endswith(".md") else f"{normalized}.md")).resolve()
+
+
+def validate_semantic_graph(
+    root: Path,
+    graph_root: Path | None = None,
+    *,
+    vault: Path | None = None,
+    link_base: Path | None = None,
+) -> GraphValidation:
     root = root.resolve()
-    graph_root = (graph_root or (root / GRAPH_RELATIVE_ROOT)).resolve()
+    vault = vault.resolve() if vault else None
+    graph_root = (graph_root or ((vault / "_live" / "graph") if vault else (root / GRAPH_RELATIVE_ROOT))).resolve()
+    link_base = (link_base or vault or root).resolve()
     issues: list[GraphIssue] = []
     manifest = _read_manifest(graph_root)
     if manifest is None:
@@ -956,12 +1277,15 @@ def validate_semantic_graph(root: Path, graph_root: Path | None = None) -> Graph
         issues.append(GraphIssue("ERROR", "GRAPH_SCHEMA", f"expected graph schema {GRAPH_SCHEMA}", "GRAPH_MANIFEST.json"))
     if manifest.get("noncanonical_view") is not True:
         issues.append(GraphIssue("ERROR", "GRAPH_CANONICAL_FLAG", "graph projection must be explicitly noncanonical", "GRAPH_MANIFEST.json"))
+    if manifest.get("runtime_included") and vault is None:
+        issues.append(GraphIssue("ERROR", "RUNTIME_LINK_BASE_MISSING", "runtime graph validation requires the Vault as link base", "GRAPH_MANIFEST.json"))
+    graph_location = manifest.get("generated_location") if isinstance(manifest.get("generated_location"), str) else GRAPH_RELATIVE_ROOT
     expected_input = canonical_input_digest(root)
     if manifest.get("canonical_input_digest") != expected_input:
-        issues.append(GraphIssue("ERROR", "CANONICAL_INPUT_MUTATED", "canonical input digest differs from graph manifest", "GRAPH_MANIFEST.json"))
+        issues.append(GraphIssue("ERROR", "CANONICAL_INPUT_MUTATED", "canonical input digest differs from graph manifest; rebuild the current graph before validation", "GRAPH_MANIFEST.json"))
     expected_events = canonical_event_digest(root)
     if manifest.get("canonical_event_digest") != expected_events:
-        issues.append(GraphIssue("ERROR", "CANONICAL_EVENTS_MUTATED", "canonical events digest differs from graph manifest", "GRAPH_MANIFEST.json"))
+        issues.append(GraphIssue("ERROR", "CANONICAL_EVENTS_MUTATED", "canonical event digest differs from graph manifest; rebuild the current graph before validation", "GRAPH_MANIFEST.json"))
     entities = manifest.get("entities")
     edges = manifest.get("edges")
     if not isinstance(entities, list) or not isinstance(edges, list):
@@ -974,7 +1298,6 @@ def validate_semantic_graph(root: Path, graph_root: Path | None = None) -> Graph
     if len(edge_keys) != len(set(edge_keys)):
         issues.append(GraphIssue("ERROR", "DUPLICATE_EDGES", "duplicate typed edges in manifest", "GRAPH_MANIFEST.json"))
     entity_set = set(entity_keys)
-    target_to_path: dict[str, Path] = {}
     for entity in entities:
         if not isinstance(entity, dict):
             issues.append(GraphIssue("ERROR", "ENTITY_SHAPE", "entity is not an object", "GRAPH_MANIFEST.json"))
@@ -984,11 +1307,14 @@ def validate_semantic_graph(root: Path, graph_root: Path | None = None) -> Graph
         if key not in entity_set or not isinstance(target, str):
             issues.append(GraphIssue("ERROR", "ENTITY_TARGET", "entity target is missing", "GRAPH_MANIFEST.json"))
             continue
-        path = root / f"{target}.md"
-        target_to_path[target] = path
+        path = _link_target_path(target, link_base, graph_root, graph_location)
         if not path.exists():
             issues.append(GraphIssue("ERROR", "MISSING_ENTITY_PAGE", f"generated entity page missing for {key}", target))
-        if key.split(":", 1)[0] not in NAMESPACES:
+        try:
+            path.relative_to(graph_root)
+        except ValueError:
+            issues.append(GraphIssue("ERROR", "ENTITY_TARGET_OUTSIDE_GRAPH", f"entity target for {key} is outside selected graph root", target))
+        if not isinstance(key, str) or ":" not in key or key.split(":", 1)[0] not in NAMESPACES:
             issues.append(GraphIssue("ERROR", "UNKNOWN_NAMESPACE", f"entity uses unsupported namespace: {key}", "GRAPH_MANIFEST.json"))
     for edge in edges:
         if not isinstance(edge, dict):
@@ -1003,15 +1329,15 @@ def validate_semantic_graph(root: Path, graph_root: Path | None = None) -> Graph
         try:
             text = path.read_text(encoding="utf-8")
         except OSError as exc:
-            issues.append(GraphIssue("ERROR", "GRAPH_READ", str(exc), str(path.relative_to(root))))
+            issues.append(GraphIssue("ERROR", "GRAPH_READ", str(exc), _display_path(path, root)))
             continue
         for target in link_pattern.findall(text):
             target = target.strip()
             if target.startswith(("http://", "https://")):
                 continue
-            target_path = root / f"{target}.md" if not target.endswith(".md") else root / target
+            target_path = _link_target_path(target, link_base, graph_root, graph_location)
             if not target_path.exists():
-                issues.append(GraphIssue("ERROR", "DANGLING_WIKILINK", f"generated wikilink target does not exist: {target}", str(path.relative_to(root))))
+                issues.append(GraphIssue("ERROR", "DANGLING_WIKILINK", f"generated wikilink target does not exist: {target}", _display_path(path, root)))
     semantic = {
         "schema": manifest.get("schema"),
         "canonical_input_digest": manifest.get("canonical_input_digest"),
@@ -1028,11 +1354,13 @@ def validate_semantic_graph(root: Path, graph_root: Path | None = None) -> Graph
         issues.append(GraphIssue("ERROR", "UNRESOLVED_SHAPE", "unresolved_references must be a list", "GRAPH_MANIFEST.json"))
         unresolved = []
     report_health = manifest.get("health", {}).get("after", {}) if isinstance(manifest.get("health"), dict) else {}
-    graph = SemanticGraph(root)
+    graph = SemanticGraph(root, vault=vault, include_runtime=bool(manifest.get("runtime_included")), output_root=graph_root, link_root=manifest.get("generated_location") or GRAPH_RELATIVE_ROOT)
     for entity in entities:
-        if isinstance(entity, dict) and entity.get("entity_key"):
-            namespace, stable_id = str(entity["entity_key"]).split(":", 1)
-            graph.entities[entity["entity_key"]] = Entity(namespace, stable_id, entity.get("label", stable_id), set(entity.get("source_paths", [])), entity.get("provenance", "UNKNOWN"), bool(entity.get("canonical")), entity.get("source_type"), entity.get("metadata", {}))
+        if isinstance(entity, dict) and isinstance(entity.get("entity_key"), str) and ":" in entity["entity_key"]:
+            namespace, stable_id = entity["entity_key"].split(":", 1)
+            target = str(entity.get("target") or GRAPH_RELATIVE_ROOT)
+            target_root = target.split("/entities/", 1)[0] if "/entities/" in target else graph.link_root
+            graph.entities[entity["entity_key"]] = Entity(namespace, stable_id, entity.get("label", stable_id), set(entity.get("source_paths", [])), entity.get("provenance", "UNKNOWN"), bool(entity.get("canonical")), entity.get("source_type"), entity.get("metadata", {}), target_root)
     for edge in edges:
         if isinstance(edge, dict) and all(edge.get(key) for key in ("source", "relation", "target")):
             graph.edges[(edge["source"], edge["relation"], edge["target"])] = GraphEdge(edge["source"], edge["relation"], edge["target"], edge.get("source_path", ""), edge.get("field", ""), edge.get("raw_target", ""), edge.get("provenance", ""), edge.get("evidence", []))
@@ -1046,6 +1374,6 @@ def validate_semantic_graph(root: Path, graph_root: Path | None = None) -> Graph
     return GraphValidation(error_count, warning_count, issues, {"baseline": manifest.get("health", {}).get("baseline", {}), "after": computed, "unresolved_references": unresolved})
 
 
-def semantic_graph_health(root: Path, graph_root: Path | None = None) -> dict[str, Any]:
-    validation = validate_semantic_graph(root, graph_root)
+def semantic_graph_health(root: Path, graph_root: Path | None = None, *, vault: Path | None = None) -> dict[str, Any]:
+    validation = validate_semantic_graph(root, graph_root, vault=vault)
     return {"errors": validation.errors, "warnings": validation.warnings, "health": validation.health}

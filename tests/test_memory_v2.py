@@ -14,7 +14,7 @@ from memorylib.dashboard import render_all
 from memorylib.live import render_live_status
 from memorylib.validate import validate
 from memorylib.v2 import MemoryV2Error, build_context_packets, freshness_state, ingest_events
-from sync_memory import seed_vault, sync_repo, sync_vault
+from sync_memory import refresh_runtime_graph, seed_vault, sync_repo, sync_vault
 
 
 def event(event_id: str, *, canonical: bool = True, state: str = "ceo_approved"):
@@ -171,6 +171,38 @@ class MemoryV2Tests(unittest.TestCase):
             self.assertTrue((vault / "_live/LIVE_STATUS.md").exists())
             self.assertTrue((vault / "_live/STATUS.json").exists())
             self.assertEqual((memory / "canonical.md").read_text(), "canonical\n")
+        finally:
+            shutil.rmtree(td, ignore_errors=True)
+
+    def test_runtime_graph_refresh_stays_out_of_memory_checkout_and_sync_manifest(self):
+        td = Path(tempfile.mkdtemp(prefix="sbmem-v2-runtime-graph-"))
+        try:
+            memory = td / "memory"
+            vault = td / "vault"
+            memory.mkdir()
+            vault.mkdir()
+            subprocess.run(["git", "init", str(memory)], check=True, capture_output=True)
+            for args in (("user.email", "test@example.invalid"), ("user.name", "Memory Test")):
+                subprocess.run(["git", "-C", str(memory), "config", *args], check=True)
+            (memory / "_meta").mkdir()
+            (memory / "_meta/MEMORY_V2.json").write_text('{"memory_version":2,"canonical_updated_at":"2026-09-16T00:00:00Z"}\n')
+            (memory / "canonical.md").write_text("canonical\n")
+            subprocess.run(["git", "-C", str(memory), "add", "."], check=True)
+            subprocess.run(["git", "-C", str(memory), "commit", "-m", "memory"], check=True, capture_output=True)
+            seed_vault(memory, vault)
+            before = subprocess.run(["git", "-C", str(memory), "status", "--porcelain"], check=True, capture_output=True, text=True).stdout
+
+            status, detail = refresh_runtime_graph(memory, vault)
+
+            after = subprocess.run(["git", "-C", str(memory), "status", "--porcelain"], check=True, capture_output=True, text=True).stdout
+            self.assertEqual(before, after)
+            self.assertEqual(status["status"], "ONLINE")
+            self.assertIn("refreshed and validated", detail)
+            self.assertTrue((vault / "_live/graph/GRAPH_MANIFEST.json").exists())
+            self.assertFalse((memory / "views/graph").exists())
+            sync_manifest = vault / "_live/.memory_sync_manifest.json"
+            self.assertTrue(sync_manifest.exists())
+            self.assertNotIn("_live/graph", sync_manifest.read_text(encoding="utf-8"))
         finally:
             shutil.rmtree(td, ignore_errors=True)
 

@@ -158,6 +158,32 @@ def sync_repo(memory: Path, branch: str) -> tuple[str, str]:
     return "ONLINE", f"Fast-forwarded Memory branch to {remote_ref}."
 
 
+def refresh_runtime_graph(memory: Path, vault: Path) -> tuple[dict, str]:
+    """Refresh the Vault graph after canonical/runtime inputs are current."""
+    from memorylib.semantic_graph import build_semantic_graph_atomic
+
+    try:
+        result = build_semantic_graph_atomic(memory, vault)
+        return {
+            "status": "ONLINE",
+            "graph_root": "_live/graph",
+            "graph_digest": result["graph_digest"],
+            "runtime_included": True,
+            "validation": result.get("validation", {"errors": 0, "warnings": 0}),
+            "health": result.get("health", {}),
+        }, "Semantic Graph V2 runtime projection refreshed and validated."
+    except Exception as exc:
+        status_path = vault / "_live" / "SEMANTIC_GRAPH_STATUS.json"
+        try:
+            status = json.loads(status_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            status = {"status": "DEGRADED", "graph_root": "_live/graph", "last_good_graph": False}
+        status.setdefault("status", "DEGRADED")
+        status.setdefault("graph_root", "_live/graph")
+        status["error"] = str(exc)
+        return status, f"Semantic Graph V2 refresh failed safely; last valid graph was preserved: {exc}"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--memory-repo", required=True, type=Path)
@@ -173,17 +199,27 @@ def main() -> int:
         return 0
     timestamp = now()
     try:
+        graph_status = None
         if args.seed:
             _, detail = seed_vault(args.memory_repo, args.vault)
             sync_state = "ONLINE"
+            graph_status, graph_detail = refresh_runtime_graph(args.memory_repo, args.vault)
+            if graph_status.get("status") != "ONLINE":
+                sync_state = "DEGRADED"
+            detail += " " + graph_detail
         else:
             sync_state, detail = sync_repo(args.memory_repo, args.branch)
             if sync_state in {"ONLINE", "DEGRADED"}:
                 copied, vault_detail, _ = sync_vault(args.memory_repo, args.vault)
                 if not copied:
                     sync_state = "SYNC BLOCKED"
+                else:
+                    graph_status, graph_detail = refresh_runtime_graph(args.memory_repo, args.vault)
+                    if graph_status.get("status") != "ONLINE":
+                        sync_state = "DEGRADED"
+                    vault_detail += " " + graph_detail
                 detail = detail + " " + vault_detail
-        render_live_status(args.memory_repo, args.vault, args.source_repo, sync_state=sync_state, sync_detail=detail, last_sync_at=timestamp)
+        render_live_status(args.memory_repo, args.vault, args.source_repo, sync_state=sync_state, sync_detail=detail, last_sync_at=timestamp, semantic_graph=graph_status)
         return 0
     except Exception as exc:
         try:

@@ -64,10 +64,13 @@ def main():
     graph_build = graph_sp.add_parser('build')
     graph_build.add_argument('--vault')
     graph_build.add_argument('--include-runtime', action='store_true')
+    graph_build.add_argument('--output-root')
     graph_validate = graph_sp.add_parser('validate')
     graph_validate.add_argument('--graph-root')
+    graph_validate.add_argument('--vault')
     graph_health = graph_sp.add_parser('health')
     graph_health.add_argument('--graph-root')
+    graph_health.add_argument('--vault')
     a=p.parse_args()
 
     if a.cmd=='validate':
@@ -162,16 +165,19 @@ def main():
                 ROOT,
                 vault=vault,
                 include_runtime=bool(a.include_runtime or vault),
+                output_root=Path(a.output_root) if a.output_root else None,
             )
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0
         graph_root = Path(a.graph_root) if a.graph_root else None
         if a.graph_cmd=='validate':
-            result = validate_semantic_graph(ROOT, graph_root)
+            vault = Path(a.vault) if a.vault else None
+            result = validate_semantic_graph(ROOT, graph_root, vault=vault)
             print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
             return 1 if result.errors or result.warnings else 0
         if a.graph_cmd=='health':
-            print(json.dumps(semantic_graph_health(ROOT, graph_root), indent=2, sort_keys=True))
+            vault = Path(a.vault) if a.vault else None
+            print(json.dumps(semantic_graph_health(ROOT, graph_root, vault=vault), indent=2, sort_keys=True))
             return 0
 
 if __name__=='__main__':
