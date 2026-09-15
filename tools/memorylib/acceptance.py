@@ -32,6 +32,12 @@ def run(root:Path):
     r=validate(root,'v1')
     gates.append(('strict_validator',r.errors==0 and r.warnings==0,f'errors={r.errors} warnings={r.warnings}'))
 
+    graph_manifest = root / 'views' / 'graph' / 'GRAPH_MANIFEST.json'
+    if graph_manifest.exists():
+        from .semantic_graph import validate_semantic_graph
+        graph_report = validate_semantic_graph(root)
+        gates.append(('semantic_graph_integrity', graph_report.errors == 0 and graph_report.warnings == 0, f'errors={graph_report.errors} warnings={graph_report.warnings}'))
+
     reg=Registry(root).scan()
     drafts=[o for o in reg.objects if o.object_type=='task' and o.status=='draft']
     ctx_ok=True

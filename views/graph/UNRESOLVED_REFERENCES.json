@@ -1,0 +1,68 @@
+{
+  "references": [
+    {
+      "field_relation": "body_link",
+      "raw_target": "CURRENT_STATE",
+      "reason": "authored wikilink target is not indexed",
+      "source_entity": "ARCHITECTURE:SYSTEM_MAP",
+      "source_file": "architecture/SYSTEM_MAP.md"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/TOP5_CEO_HANDOFF.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260910-001",
+      "source_file": "events/records/EVT-20260910-001.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/leagues/bl1/results/PARITY_REPORT.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260910-001",
+      "source_file": "events/records/EVT-20260910-001.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "docs/top5_production_architecture.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-002",
+      "source_file": "events/records/EVT-20260913-002.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/TOP5_CEO_HANDOFF.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-002",
+      "source_file": "events/records/EVT-20260913-002.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/TOP5_CEO_HANDOFF.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-003",
+      "source_file": "events/records/EVT-20260913-003.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/leagues/bl1/results/PARITY_REPORT.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-003",
+      "source_file": "events/records/EVT-20260913-003.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "docs/top5_production_architecture.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-005",
+      "source_file": "events/records/EVT-20260913-005.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/TOP5_CEO_HANDOFF.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-010",
+      "source_file": "events/records/EVT-20260913-010.json"
+    }
+  ],
+  "schema": 2
+}

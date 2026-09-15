@@ -1,0 +1,240 @@
+{
+  "after": {
+    "connected_components": 85,
+    "dangling_wikilink_count": 0,
+    "edge_count": 1178,
+    "edges_by_relation": {
+      "affected_workstream": 97,
+      "builder": 15,
+      "depends_on": 11,
+      "domain": 51,
+      "evidence_commit": 159,
+      "evidence_pr": 72,
+      "evidence_reference": 37,
+      "explicit_link": 34,
+      "finding": 51,
+      "invariant": 231,
+      "merge_commit": 68,
+      "resolved_by": 16,
+      "source_commit": 92,
+      "source_pr": 74,
+      "source_repository": 88,
+      "superseded_by": 1,
+      "supersedes": 5,
+      "verification": 15,
+      "workstream": 61
+    },
+    "entity_count": 615,
+    "graph_nodes": 615,
+    "isolated_node_count": 82,
+    "isolated_node_percent": 13.33,
+    "largest_component": 524,
+    "node_types": {
+      "ARCHITECTURE": 7,
+      "BLOCKER": 1,
+      "BUILDER": 4,
+      "COMMIT": 139,
+      "COMPONENT": 4,
+      "DATASET": 1,
+      "DECISION": 26,
+      "DOMAIN": 33,
+      "EVENT": 18,
+      "EVIDENCE": 77,
+      "FINDING": 33,
+      "INVARIANT": 115,
+      "JOB": 12,
+      "META": 27,
+      "MODEL": 1,
+      "PR": 64,
+      "PROVIDER": 1,
+      "REPOSITORY": 3,
+      "STATE": 1,
+      "TASK": 14,
+      "VERIFICATION": 8,
+      "WORKSTREAM": 21,
+      "WRITER": 5
+    },
+    "top_hubs": [
+      {
+        "degree": 77,
+        "entity_key": "REPOSITORY:Philip3006/sportsbrain",
+        "label": "Philip3006/sportsbrain"
+      },
+      {
+        "degree": 69,
+        "entity_key": "INVARIANT:NO-AUTOMATIC-CANONICAL-PROMOTION",
+        "label": "NO-AUTOMATIC-CANONICAL-PROMOTION"
+      },
+      {
+        "degree": 69,
+        "entity_key": "WORKSTREAM:SOURCE-OBSERVER",
+        "label": "SOURCE-OBSERVER"
+      },
+      {
+        "degree": 20,
+        "entity_key": "WORKSTREAM:WS-P0-B",
+        "label": "P0-B — Monitoring Truth"
+      },
+      {
+        "degree": 19,
+        "entity_key": "EVIDENCE:EVD-P0B-002-PROD-001",
+        "label": "P0-B2 Schedule & Window Truth production closure evidence"
+      },
+      {
+        "degree": 16,
+        "entity_key": "EVENT:EVT-20260914-002",
+        "label": "PR #58 Activation Readiness is merged into SportsBrain main at 8d401ff7; the readiness contracts are recorded as new post-V2 evidence while Top-5 remains disabled, NO-BET, unpublished, unregistered, and not approved for live activation."
+      },
+      {
+        "degree": 16,
+        "entity_key": "TASK:TASK-P0C-001",
+        "label": "Public / Private Serialization Boundary"
+      },
+      {
+        "degree": 16,
+        "entity_key": "TASK:TASK-P0C-002",
+        "label": "Authenticated Private State & Dual Fetch"
+      },
+      {
+        "degree": 15,
+        "entity_key": "TASK:TASK-P0B-002",
+        "label": "Schedule & Window Truth"
+      },
+      {
+        "degree": 14,
+        "entity_key": "VERIFICATION:VER-P0A-PROD-001",
+        "label": "P0-A production verification"
+      },
+      {
+        "degree": 13,
+        "entity_key": "EVENT:EVT-20260913-008",
+        "label": "PR #56 Shadow Readiness is merged into main at 8de9472 with head 16be9c3; the implementation remains disabled-by-default and no live activation is permitted."
+      },
+      {
+        "degree": 13,
+        "entity_key": "EVENT:EVT-20260914-001",
+        "label": "PR #57 Shadow Integration is merged into SportsBrain main at 2b285424; the five-league integration remains offline/simulated, disabled-by-default, NO-BET, and outside live activation."
+      },
+      {
+        "degree": 13,
+        "entity_key": "FINDING:FND-20260814-018",
+        "label": "FND-20260814-018 — Runtime-data commits continuously obscure source-release provenance"
+      },
+      {
+        "degree": 12,
+        "entity_key": "TASK:TASK-P0D-001",
+        "label": "Standard Runtime Writer Governance"
+      },
+      {
+        "degree": 11,
+        "entity_key": "EVENT:EVT-20260830-001",
+        "label": "Runtime artifact publishing, scheduler authority, local health truth, and health authority boundaries were hardened."
+      },
+      {
+        "degree": 11,
+        "entity_key": "EVENT:EVT-20260910-002",
+        "label": "Odds-refresh performance/runtime-state work was completed with externalized provider budget state and hardened scan/refresh launch wrappers."
+      },
+      {
+        "degree": 11,
+        "entity_key": "EVENT:EVT-20260913-002",
+        "label": "The only approved Signal-Time form is an event-relative bounded window with explicit lead/age, separate closing capture, idempotency, and bulk market reuse; exact production values remain unapproved."
+      },
+      {
+        "degree": 11,
+        "entity_key": "EVENT:EVT-20260913-010",
+        "label": "Top-5 development is complete and the Research Gate is CEO approved at frozen SHA 6eaabbec7d0182103d815c72fae4976e261b40aa; 2425 and 2526 remain sealed and no model or betting strategy is production-approved."
+      },
+      {
+        "degree": 11,
+        "entity_key": "EVENT:EVT-20260913-011",
+        "label": "Current ownership is Builder 1 Top-5 Shadow Integration, Builder 2 Top-5 Production / Activation Readiness, and Builder 3 Memory / Obsidian / Observability; every builder completion handoff must begin with its explicit builder number."
+      },
+      {
+        "degree": 11,
+        "entity_key": "EVIDENCE:EVD-P0C-002-PROD-001",
+        "label": "P0-C2 Authenticated Private State & Dual Fetch production closure evidence"
+      }
+    ],
+    "unresolved_reference_count": 9
+  },
+  "baseline": {
+    "connected_components": 615,
+    "definition": "canonical entity index before Semantic Graph V2 link materialization",
+    "edge_count": 0,
+    "entity_count": 615,
+    "graph_nodes": 615,
+    "isolated_node_count": 615,
+    "isolated_node_percent": 100.0,
+    "largest_component": 1
+  },
+  "generated_at": "2026-09-15T22:57:19Z",
+  "graph_digest": "ddbddc00bab6f17894b8b17650badda2556fb4612187b7f5136c261c78408ff4",
+  "graph_version": "semantic-link-graph-v2",
+  "schema": 2,
+  "unresolved_references": [
+    {
+      "field_relation": "body_link",
+      "raw_target": "CURRENT_STATE",
+      "reason": "authored wikilink target is not indexed",
+      "source_entity": "ARCHITECTURE:SYSTEM_MAP",
+      "source_file": "architecture/SYSTEM_MAP.md"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/TOP5_CEO_HANDOFF.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260910-001",
+      "source_file": "events/records/EVT-20260910-001.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/leagues/bl1/results/PARITY_REPORT.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260910-001",
+      "source_file": "events/records/EVT-20260910-001.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "docs/top5_production_architecture.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-002",
+      "source_file": "events/records/EVT-20260913-002.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/TOP5_CEO_HANDOFF.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-002",
+      "source_file": "events/records/EVT-20260913-002.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/TOP5_CEO_HANDOFF.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-003",
+      "source_file": "events/records/EVT-20260913-003.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/leagues/bl1/results/PARITY_REPORT.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-003",
+      "source_file": "events/records/EVT-20260913-003.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "docs/top5_production_architecture.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-005",
+      "source_file": "events/records/EVT-20260913-005.json"
+    },
+    {
+      "field_relation": "evidence",
+      "raw_target": "research/top5/TOP5_CEO_HANDOFF.md",
+      "reason": "canonical source path is not indexed",
+      "source_entity": "EVENT:EVT-20260913-010",
+      "source_file": "events/records/EVT-20260913-010.json"
+    }
+  ]
+}

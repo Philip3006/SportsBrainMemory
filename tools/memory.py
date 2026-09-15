@@ -21,6 +21,11 @@ from memorylib.observer import (
     parse_builder_handoff,
     write_runtime_outputs,
 )
+from memorylib.semantic_graph import (
+    build_semantic_graph,
+    semantic_graph_health,
+    validate_semantic_graph,
+)
 
 def main():
     p=argparse.ArgumentParser()
@@ -54,6 +59,15 @@ def main():
     c.add_argument('task_id')
     c.add_argument('--allow-draft',action='store_true')
     c.add_argument('--output')
+    graph = sp.add_parser('graph')
+    graph_sp = graph.add_subparsers(dest='graph_cmd', required=True)
+    graph_build = graph_sp.add_parser('build')
+    graph_build.add_argument('--vault')
+    graph_build.add_argument('--include-runtime', action='store_true')
+    graph_validate = graph_sp.add_parser('validate')
+    graph_validate.add_argument('--graph-root')
+    graph_health = graph_sp.add_parser('health')
+    graph_health.add_argument('--graph-root')
     a=p.parse_args()
 
     if a.cmd=='validate':
@@ -141,6 +155,24 @@ def main():
         r=acceptance_run(ROOT)
         print(json.dumps(r,indent=2,sort_keys=True))
         return 0 if r['ok'] else 1
+    if a.cmd=='graph':
+        if a.graph_cmd=='build':
+            vault = Path(a.vault) if a.vault else None
+            result = build_semantic_graph(
+                ROOT,
+                vault=vault,
+                include_runtime=bool(a.include_runtime or vault),
+            )
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0
+        graph_root = Path(a.graph_root) if a.graph_root else None
+        if a.graph_cmd=='validate':
+            result = validate_semantic_graph(ROOT, graph_root)
+            print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+            return 1 if result.errors or result.warnings else 0
+        if a.graph_cmd=='health':
+            print(json.dumps(semantic_graph_health(ROOT, graph_root), indent=2, sort_keys=True))
+            return 0
 
 if __name__=='__main__':
     raise SystemExit(main())
