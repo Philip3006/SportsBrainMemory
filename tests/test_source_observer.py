@@ -168,6 +168,12 @@ Safety: no production mutation and no live activation
         self.assertEqual(validate_runtime_payload(store), [])
         with self.assertRaises(CandidateValidationError):
             parse_builder_handoff("BUILDER: 1/2\nROLE: ambiguous")
+        with self.assertRaises(CandidateValidationError):
+            parse_builder_handoff("BUILDER: 1/4\nROLE: ambiguous")
+        with self.assertRaises(CandidateValidationError):
+            parse_builder_handoff("BUILDER: 5\nROLE: invalid")
+        with self.assertRaises(CandidateValidationError):
+            parse_builder_handoff("BUILDER: four\nROLE: invalid")
 
     def test_blocker_classification_is_fail_closed(self):
         validate_blocker({"blocker_id": "x", "classification": "EXTERNAL", "status": "OPEN", "summary": "quota", "auto_resolve": False})
@@ -232,7 +238,7 @@ CI: green
 
     def test_absent_builder_evidence_is_unknown(self):
         control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": []})
-        for builder_number in (1, 2, 3):
+        for builder_number in (1, 2, 3, 4):
             self.assertIn(f"Builder {builder_number} — **UNKNOWN / NO CURRENT HANDOFF EVIDENCE**", control_plane)
 
     def test_stale_builder_handoff_is_visibly_stale(self):
@@ -330,6 +336,58 @@ Final recommendation: READY FOR CEO REVIEW
         control_plane = (self.vault / "_live/CEO_CONTROL_PLANE.md").read_text(encoding="utf-8")
         self.assertIn("INGESTED STATUS", control_plane)
         self.assertIn("UNKNOWN / NO CURRENT HANDOFF EVIDENCE", control_plane)
+
+    def test_builder_four_parses_and_identical_handoffs_dedupe(self):
+        handoff = self._handoff(4, "2026-09-15T09:00:00+00:00", "RELIABILITY READY", "feat/provider-cascade", "4" * 40, blocker="provider credential unavailable")
+        repeated = self._handoff(4, "2026-09-15T10:00:00+00:00", "RELIABILITY READY", "feat/provider-cascade", "4" * 40, blocker="provider credential unavailable")
+        self.assertEqual(handoff["builder_number"], 4)
+        self.assertEqual(handoff["candidate_id"], repeated["candidate_id"])
+        store = self.vault / "_live/BUILDER_HANDOFFS.json"
+        ingest_handoff(store, handoff)
+        ingest_handoff(store, repeated)
+        stored = json.loads(store.read_text(encoding="utf-8"))["candidates"]
+        self.assertEqual(len(stored), 1)
+        self.assertEqual(stored[0]["observation_count"], 2)
+        self.assertEqual(validate_runtime_payload(store), [])
+
+    def test_builder_four_substantive_change_preserves_old_and_surfaces_blocker_transition(self):
+        quota = self._handoff(4, "2026-09-15T09:00:00+00:00", "RELIABILITY BLOCKED", "feat/provider-cascade", "4" * 40, blocker="quota exhausted")
+        credential = self._handoff(4, "2026-09-15T10:00:00+00:00", "RELIABILITY BLOCKED", "feat/provider-cascade", "4" * 40, blocker="credential invalid")
+        self.assertNotEqual(quota["candidate_id"], credential["candidate_id"])
+        store = self.vault / "_live/BUILDER_HANDOFFS.json"
+        ingest_handoff(store, quota)
+        ingest_handoff(store, credential)
+        stored = json.loads(store.read_text(encoding="utf-8"))["candidates"]
+        self.assertEqual(len(stored), 2)
+        self.assertEqual({item["candidate_id"] for item in stored}, {quota["candidate_id"], credential["candidate_id"]})
+        payload = observe_sources(
+            self.memory,
+            FixtureGitHubClient({SPORTS: snapshot("1" * 40, []), MEMORY: snapshot("2" * 40, [])}),
+            previous={"builder_handoffs": [quota, credential]},
+            observed_at="2026-09-15T11:00:00+00:00",
+        )
+        self.assertIn("BLOCKER_STATE_CHANGE_REQUIRES_CEO_REVIEW", {item["type"] for item in payload["conflicts"]})
+
+    def test_latest_builder_one_two_three_four_evidence_is_independent(self):
+        handoffs = [
+            self._handoff(1, "2026-09-15T08:00:00+00:00", "BUILDER ONE OLD", "feat/one-old", "1" * 40),
+            self._handoff(1, "2026-09-15T09:00:00+00:00", "BUILDER ONE NEW", "feat/one-new", "a" * 40),
+            self._handoff(2, "2026-09-15T09:00:00+00:00", "BUILDER TWO CURRENT", "feat/two", "2" * 40),
+            self._handoff(3, "2026-09-15T09:00:00+00:00", "BUILDER THREE CURRENT", "feat/three", "3" * 40),
+            self._handoff(4, "2026-09-15T09:00:00+00:00", "BUILDER FOUR CURRENT", "feat/four", "4" * 40),
+        ]
+        control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": handoffs})
+        self.assertIn("BUILDER ONE NEW", control_plane)
+        self.assertNotIn("BUILDER ONE OLD", control_plane)
+        for status in ("BUILDER TWO CURRENT", "BUILDER THREE CURRENT", "BUILDER FOUR CURRENT"):
+            self.assertIn(status, control_plane)
+
+    def test_builder_four_stale_evidence_is_marked_stale_and_visible(self):
+        stale = self._handoff(4, "2026-09-13T08:00:00+00:00", "OLD RELIABILITY STATE", "feat/stale-four", "4" * 40)
+        control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": [stale]})
+        self.assertIn("Builder 4", control_plane)
+        self.assertIn("freshness: **STALE**", control_plane)
+        self.assertIn("not unquestionably current", control_plane)
 
 
 def write_and_render(payload: dict) -> str:

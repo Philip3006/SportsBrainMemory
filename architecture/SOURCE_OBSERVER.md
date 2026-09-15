@@ -21,7 +21,10 @@ workflow state.
   never inserted into `events/records/` by the observer.
 - Builder handoffs are stored as non-canonical operational evidence under
   `_live/BUILDER_HANDOFFS.json` and require an explicit `BUILDER: 1`, `BUILDER:
-  2`, or `BUILDER: 3` header.
+  2`, `BUILDER: 3`, or `BUILDER: 4` header. Builder 4's governed
+  responsibility is Top-5 Multi-Provider Cascade / Odds Reliability, but the
+  live role and status are always taken from handoff evidence rather than a
+  hardcoded workstream fallback.
 - Runtime observer output is separate from the existing canonical sync and
   does not change the 90-second LaunchAgent contract.
 
@@ -37,7 +40,7 @@ data.
 ## CEO Control Plane
 
 `_live/CEO_CONTROL_PLANE.md` projects source state, PR #59 detection, pending
-candidates, Builder 1/2/3 state, external blockers, source conflicts, frozen
+candidates, Builder 1/2/3/4 state, external blockers, source conflicts, frozen
 Research SHA, SEALED 2425/2526 state, NO-BET/no-live state, both repository
 main SHAs, and separate canonical/observer freshness. It is generated runtime
 state and is not canonical history.
