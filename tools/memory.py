@@ -40,6 +40,7 @@ from memorylib.semantic_graph import (
     semantic_graph_health,
     validate_semantic_graph,
 )
+from memorylib.consistency_auditor import audit_consistency, write_audit_report
 
 def main():
     p=argparse.ArgumentParser()
@@ -120,6 +121,11 @@ def main():
     bootstrap_validate.add_argument('path')
     bootstrap_inspect = bootstrap_sp.add_parser('inspect')
     bootstrap_inspect.add_argument('path')
+    audit = sp.add_parser('audit-consistency', help='read-only Memory Consistency / Governance Auditor V5')
+    audit.add_argument('--vault', help='optional external Obsidian Vault runtime root')
+    audit.add_argument('--output', help='explicit external output file or directory')
+    audit.add_argument('--reference-time', help='fixed ISO-8601 time for deterministic freshness evaluation')
+    audit.add_argument('--json', action='store_true', dest='json_output', help='render the deterministic JSON report')
     graph = sp.add_parser('graph')
     graph_sp = graph.add_subparsers(dest='graph_cmd', required=True)
     graph_build = graph_sp.add_parser('build')
@@ -251,6 +257,20 @@ def main():
             print(markdown)
             print(json.dumps({'bootstrap_digest': payload['bootstrap_digest'], 'source_memory_sha': payload['source_memory_sha'], 'output': result.get('json') if result else None}, indent=2, sort_keys=True), file=sys.stderr)
         return 0
+    if a.cmd=='audit-consistency':
+        vault = Path(a.vault) if a.vault else None
+        report = audit_consistency(ROOT, vault=vault, reference_time=a.reference_time)
+        if a.output:
+            write_audit_report(report, Path(a.output), root=ROOT, vault=vault)
+            if a.json_output:
+                print(json.dumps(report.to_dict(), indent=2, sort_keys=True, ensure_ascii=False))
+            else:
+                print(report.markdown(), end='')
+        elif a.json_output:
+            print(json.dumps(report.to_dict(), indent=2, sort_keys=True, ensure_ascii=False))
+        else:
+            print(report.markdown(), end='')
+        return 1 if any(item['severity'] == 'ERROR' for item in report.findings) else 0
     if a.cmd=='fingerprint':
         print(tree_fingerprint(ROOT))
         return 0

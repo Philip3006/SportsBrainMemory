@@ -21,7 +21,7 @@ import tempfile
 from typing import Any, Iterable, Mapping, TypedDict
 
 from .frontmatter import parse_frontmatter
-from .governance import BUILDER_NUMBERS
+from .governance import BUILDER_NUMBERS, BUILDER_PROFILE_PARTNERS, CEO_PROFILE_PARTNERS
 from .observer import _latest_builder_evidence, _valid_handoffs
 from .semantic_graph import (
     Entity,
@@ -60,12 +60,12 @@ REASON_PRIORITY = {
 }
 
 PROFILES = {
-    "CEO": {"focus": ("objective", "progress", "blockers", "risks", "decisions", "builders", "critical_path", "next_safe_action"), "partners": BUILDER_NUMBERS},
-    "BUILDER_1": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": (2, 4)},
-    "BUILDER_2": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": (4,)},
-    "BUILDER_3": {"focus": ("task", "workstream", "memory", "graph", "sync", "safety", "blockers", "verification"), "partners": ()},
-    "BUILDER_4": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": (1, 2)},
-    "BUILDER_5": {"focus": ("task", "workstream", "dispatcher", "orchestration", "contracts", "safety", "blockers", "verification"), "partners": (1, 2, 3, 4)},
+    "CEO": {"focus": ("objective", "progress", "blockers", "risks", "decisions", "builders", "critical_path", "next_safe_action"), "partners": CEO_PROFILE_PARTNERS},
+    "BUILDER_1": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": BUILDER_PROFILE_PARTNERS[1]},
+    "BUILDER_2": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": BUILDER_PROFILE_PARTNERS[2]},
+    "BUILDER_3": {"focus": ("task", "workstream", "memory", "graph", "sync", "safety", "blockers", "verification"), "partners": BUILDER_PROFILE_PARTNERS[3]},
+    "BUILDER_4": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": BUILDER_PROFILE_PARTNERS[4]},
+    "BUILDER_5": {"focus": ("task", "workstream", "dispatcher", "orchestration", "contracts", "safety", "blockers", "verification"), "partners": BUILDER_PROFILE_PARTNERS[5]},
     "GENERIC_REVIEW": {"focus": ("objective", "verified_state", "dependencies", "provenance"), "partners": ()},
 }
 
@@ -534,11 +534,14 @@ def _is_superseded(graph: SemanticGraph, key: str) -> bool:
 
 
 def _profile_partners(consumer: str) -> tuple[int, ...]:
-    return {
-        "BUILDER_1": (2, 4), "BUILDER_2": (4,), "BUILDER_3": (),
-        "BUILDER_4": (1, 2), "BUILDER_5": (1, 2, 3, 4),
-        "CEO": BUILDER_NUMBERS, "GENERIC_REVIEW": (),
-    }.get(consumer, ())
+    if consumer == "CEO":
+        return tuple(CEO_PROFILE_PARTNERS)
+    if consumer.startswith("BUILDER_"):
+        try:
+            return tuple(BUILDER_PROFILE_PARTNERS[int(consumer.removeprefix("BUILDER_"))])
+        except (KeyError, ValueError):
+            return ()
+    return ()
 
 
 def _entity_for_builder(graph: SemanticGraph, number: int) -> str:
