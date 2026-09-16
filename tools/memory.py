@@ -9,6 +9,13 @@ from memorylib.graph import Graph
 from memorylib.render import compile_shadow
 from memorylib.dashboard import render_all
 from memorylib.context import build_context
+from memorylib.context_compiler import (
+    ContextRequest,
+    build_context_atomic,
+    compile_context,
+    inspect_context_pack,
+    validate_context_pack,
+)
 from memorylib.acceptance import run as acceptance_run, tree_fingerprint
 from memorylib.v2 import build_context_packets, ingest_events
 from memorylib.live import render_live_status
@@ -56,9 +63,31 @@ def main():
     l.add_argument('--source-repo',required=True)
     l.add_argument('--vault',required=True)
     c=sp.add_parser('context')
-    c.add_argument('task_id')
-    c.add_argument('--allow-draft',action='store_true')
-    c.add_argument('--output')
+    context_sp=c.add_subparsers(dest='context_cmd', required=True)
+    context_build=context_sp.add_parser('build')
+    context_build.add_argument('--consumer', required=True)
+    context_build.add_argument('--builder-number', type=int)
+    context_build.add_argument('--task', default='')
+    context_build.add_argument('--workstream', default='')
+    context_build.add_argument('--repository', action='append', dest='repository_scope')
+    context_build.add_argument('--seed', action='append', dest='entity_seeds')
+    context_build.add_argument('--domain', action='append', dest='requested_domains')
+    context_build.add_argument('--budget-tokens', type=int, default=6000)
+    context_build.add_argument('--max-entities', type=int, default=80)
+    context_build.add_argument('--freshness', default='ANY', choices=['ANY', 'FRESH_ONLY', 'FRESH_OR_AGING'])
+    context_build.add_argument('--include-runtime', action='store_true')
+    context_build.add_argument('--vault')
+    context_build.add_argument('--request-id')
+    context_build.add_argument('--request-json')
+    context_build.add_argument('--json', action='store_true', dest='json_output')
+    context_validate=context_sp.add_parser('validate')
+    context_validate.add_argument('path')
+    context_inspect=context_sp.add_parser('inspect')
+    context_inspect.add_argument('path')
+    context_legacy=context_sp.add_parser('legacy')
+    context_legacy.add_argument('task_id')
+    context_legacy.add_argument('--allow-draft',action='store_true')
+    context_legacy.add_argument('--output')
     graph = sp.add_parser('graph')
     graph_sp = graph.add_subparsers(dest='graph_cmd', required=True)
     graph_build = graph_sp.add_parser('build')
@@ -71,7 +100,11 @@ def main():
     graph_health = graph_sp.add_parser('health')
     graph_health.add_argument('--graph-root')
     graph_health.add_argument('--vault')
-    a=p.parse_args()
+    argv=sys.argv[1:]
+    # Preserve the pre-V3 shorthand: ``memory.py context TASK-ID``.
+    if len(argv) >= 2 and argv[0] == 'context' and argv[1] not in {'build', 'validate', 'inspect', 'legacy', '-h', '--help'}:
+        argv=[argv[0], 'legacy', *argv[1:]]
+    a=p.parse_args(argv)
 
     if a.cmd=='validate':
         r=validate(ROOT,a.profile)
@@ -91,12 +124,52 @@ def main():
         print(json.dumps({'memory_health_score':score,'errors':r.errors,'warnings':r.warnings,'diagnostic_only':True},indent=2))
         return 1 if r.errors else 0
     if a.cmd=='context':
-        r=build_context(ROOT,a.task_id,allow_draft=a.allow_draft)
-        if a.output:
-            (ROOT/a.output).write_text(r.text,encoding='utf-8')
+        if a.context_cmd=='legacy':
+            r=build_context(ROOT,a.task_id,allow_draft=a.allow_draft)
+            if a.output:
+                (ROOT/a.output).write_text(r.text,encoding='utf-8')
+            else:
+                print(r.text)
+            print(json.dumps({'estimated_tokens':r.estimated_tokens,'hard_limit':r.hard_limit,'included_ids':r.included_ids},indent=2),file=sys.stderr)
+            return 0
+        if a.context_cmd=='validate':
+            print(json.dumps({'valid': True, 'pack': validate_context_pack(Path(a.path))}, indent=2, sort_keys=True))
+            return 0
+        if a.context_cmd=='inspect':
+            print(json.dumps(inspect_context_pack(Path(a.path)), indent=2, sort_keys=True))
+            return 0
+        if a.request_json:
+            request_data=json.loads(Path(a.request_json).read_text(encoding='utf-8'))
         else:
-            print(r.text)
-        print(json.dumps({'estimated_tokens':r.estimated_tokens,'hard_limit':r.hard_limit,'included_ids':r.included_ids},indent=2),file=sys.stderr)
+            request_data={
+                'request_id': a.request_id,
+                'consumer_type': a.consumer,
+                'builder_number': a.builder_number,
+                'task': a.task,
+                'workstream': a.workstream,
+                'repository_scope': a.repository_scope or [],
+                'entity_seeds': a.entity_seeds or [],
+                'requested_domains': a.requested_domains or [],
+                'token_budget': a.budget_tokens,
+                'max_entity_count': a.max_entities,
+                'freshness_requirement': a.freshness,
+                'include_runtime': a.include_runtime,
+            }
+        request=ContextRequest.from_mapping(request_data)
+        vault=Path(a.vault) if a.vault else None
+        if vault:
+            result=build_context_atomic(ROOT, request, vault=vault)
+            payload=result['pack']
+            markdown=Path(result['markdown']).read_text(encoding='utf-8')
+        else:
+            compilation=compile_context(ROOT, request)
+            payload=compilation.pack
+            markdown=compilation.markdown
+        if a.json_output:
+            print(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False))
+        else:
+            print(markdown)
+            print(json.dumps({'context_digest': payload['context_digest'], 'estimated_tokens': payload['estimated_tokens'], 'included_entity_count': payload['included_entity_count'], 'output': result.get('json') if vault else None}, indent=2, sort_keys=True), file=sys.stderr)
         return 0
     if a.cmd=='fingerprint':
         print(tree_fingerprint(ROOT))

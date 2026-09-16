@@ -5,6 +5,7 @@ from .validate import validate
 from .registry import Registry
 from .dashboard import render_all
 from .context import build_context
+from .context_compiler import ContextRequest, compile_context, validate_context_pack
 
 def tree_fingerprint(root:Path):
     h=hashlib.sha256()
@@ -89,6 +90,28 @@ def run(root:Path):
     st=reg.by_id.get('STATE-20260816-001')
     sep=bool(st and st.meta.get('source_release_sha')!=st.meta.get('runtime_data_head'))
     gates.append(('source_runtime_provenance_separate',sep,''))
+
+    # V3 is on-demand and noncanonical: exercise compilation in memory and
+    # verify its contract without writing to the checkout or a Vault.
+    try:
+        v3_request = ContextRequest.from_mapping({
+            'request_id': 'ACCEPTANCE-CONTEXT-V3',
+            'consumer_type': 'BUILDER_4',
+            'task': 'acceptance context contract',
+            'token_budget': 6000,
+            'max_entity_count': 80,
+            'generated_at': '2026-09-16T00:00:00Z',
+        })
+        v3 = compile_context(root, v3_request)
+        # Validate the object using the same contract as persisted packs.
+        import json as _json
+        v3_tmp = Path(tempfile.mkdtemp(prefix='sbmem-context-acceptance-')) / 'pack.json'
+        v3_tmp.write_text(_json.dumps(v3.pack, ensure_ascii=False), encoding='utf-8')
+        validate_context_pack(v3_tmp)
+        shutil.rmtree(v3_tmp.parent, ignore_errors=True)
+        gates.append(('context_compiler_v3', True, f"entities={v3.pack['included_entity_count']} tokens={v3.pack['estimated_tokens']}"))
+    except Exception as exc:
+        gates.append(('context_compiler_v3', False, str(exc)))
 
     td=Path(tempfile.mkdtemp(prefix='sbmem-scale-'))
     try:
