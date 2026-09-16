@@ -27,7 +27,8 @@ absent handoff is shown as `UNKNOWN / NO CURRENT HANDOFF EVIDENCE`.
 ## Package contract
 
 Every package includes the request identity, embedded V3 context pack,
-authoritative dependencies, missing dependencies, active blockers,
+authoritative dependencies, required dependency status, missing or
+non-authoritative dependencies, active blockers,
 cross-Builder contracts, safety invariants, optional repository/path scope,
 prohibited operations, verification requirements, unresolved CEO decisions,
 stale/conflicting/unknown evidence, the exact source Memory SHA, the V3
@@ -44,6 +45,12 @@ review; stale, unknown, missing, and non-mandatory conflicting evidence is
 retained and surfaced through review flags. No automatic resolution or
 canonical rewrite occurs.
 
+Required dependencies are classified as `SATISFIED_AUTHORITATIVE`, `MISSING`,
+or `PRESENT_NONAUTHORITATIVE`. Only canonical or verified matches enter the
+authoritative dependency section. Candidate and runtime-derived matches are
+preserved but raise `DEPENDENCY_AUTHORITY_MISSING` and never satisfy the
+requirement.
+
 ## CLI
 
 Build an in-memory package:
@@ -58,14 +65,20 @@ python3 tools/memory.py builder-bootstrap build \
 ```
 
 Use `--vault /external/vault` to atomically write the JSON and Markdown
-artifacts under `_live/builder-bootstrap`. The output must be outside the
-canonical Memory checkout. Existing output is restored if validation or
-promotion fails.
+artifacts under `_live/builder-bootstrap`. The resolved
+`vault/_live/builder-bootstrap` target is checked directly, including symlink
+resolution, and must be outside the canonical Memory checkout. Existing
+output is restored if validation or promotion fails.
 
 ```text
 python3 tools/memory.py builder-bootstrap validate /external/vault/_live/builder-bootstrap/BOOT-....json
 python3 tools/memory.py builder-bootstrap inspect /external/vault/_live/builder-bootstrap/BOOT-....json
 ```
+
+Validation re-derives the evidence-facing sections from the embedded V3 pack
+and preserved request provenance. Removing or altering a blocker, dependency
+status, review flag, current Builder evidence, scope, or CEO decision is
+rejected even if a caller recomputes the non-authenticating bootstrap digest.
 
 The interface accepts future dispatcher metadata for task identity, scopes,
 dependencies, prohibited operations, verification requirements, freshness,

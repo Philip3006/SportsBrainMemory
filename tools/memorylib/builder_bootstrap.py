@@ -81,6 +81,8 @@ class BuilderBootstrapPack(TypedDict, total=False):
     context_request: dict[str, Any]
     context_pack: dict[str, Any]
     authoritative_dependencies: list[dict[str, Any]]
+    required_dependencies: list[str]
+    required_dependency_status: list[dict[str, Any]]
     missing_dependencies: list[dict[str, Any]]
     active_blockers: list[dict[str, Any]]
     required_cross_builder_contracts: list[dict[str, Any]]
@@ -402,13 +404,35 @@ def _dependency_records(pack: Mapping[str, Any]) -> list[dict[str, Any]]:
     return sorted(result, key=lambda item: (str(item.get("source")), str(item.get("relation")), str(item.get("target"))))
 
 
-def _missing_dependencies(request: BuilderBootstrapRequest, pack: Mapping[str, Any]) -> list[dict[str, Any]]:
+def _required_dependency_status(request: BuilderBootstrapRequest, pack: Mapping[str, Any]) -> list[dict[str, Any]]:
     items = _context_items(pack)
-    missing = []
+    statuses: list[dict[str, Any]] = []
     for dependency in request.required_dependencies:
-        if not any(_matches(item, dependency) for item in items):
-            missing.append({"dependency": dependency, "required": True, "status": "MISSING"})
-    return missing
+        matches = [item for item in items if _matches(item, dependency)]
+        authoritative = [item for item in matches if item.get("authority_class") in {"CANONICAL", "VERIFIED"}]
+        if authoritative:
+            value = {"dependency": dependency, "required": True, "status": "SATISFIED_AUTHORITATIVE"}
+        elif matches:
+            value = {
+                "dependency": dependency,
+                "required": True,
+                "status": "PRESENT_NONAUTHORITATIVE",
+                "matching_evidence": [
+                    {"entity_id": item.get("entity_id"), "authority_class": item.get("authority_class")}
+                    for item in sorted(matches, key=lambda item: str(item.get("entity_id")))
+                ],
+            }
+        else:
+            value = {"dependency": dependency, "required": True, "status": "MISSING"}
+        statuses.append(value)
+    return statuses
+
+
+def _missing_dependencies(request: BuilderBootstrapRequest, pack: Mapping[str, Any]) -> list[dict[str, Any]]:
+    return [
+        value for value in _required_dependency_status(request, pack)
+        if value.get("status") != "SATISFIED_AUTHORITATIVE"
+    ]
 
 
 def _active_blockers(pack: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -545,7 +569,8 @@ def _bootstrap_markdown(pack: Mapping[str, Any]) -> str:
     ])
     for title, key in (
         ("AUTHORITATIVE DEPENDENCIES", "authoritative_dependencies"),
-        ("MISSING DEPENDENCIES", "missing_dependencies"),
+        ("REQUIRED DEPENDENCY STATUS", "required_dependency_status"),
+        ("MISSING / NON-AUTHORITATIVE DEPENDENCIES", "missing_dependencies"),
         ("ACTIVE BLOCKERS", "active_blockers"),
         ("REQUIRED CROSS-BUILDER CONTRACTS", "required_cross_builder_contracts"),
         ("SAFETY INVARIANTS", "safety_invariants"),
@@ -575,6 +600,7 @@ def _safe_task_identity(request: BuilderBootstrapRequest) -> dict[str, Any]:
         "task": request.task,
         "workstream": request.workstream,
         "metadata": _stable(request.task_metadata),
+        "scope": _scope(request),
     }
     _assert_secret_free(value, "task_identity")
     return value
@@ -591,6 +617,81 @@ def _scope(request: BuilderBootstrapRequest) -> dict[str, list[str]] | None:
 
 def _unique_values(*groups: Iterable[str]) -> list[str]:
     return sorted({value for group in groups for value in group if _normal_text(value)})
+
+
+def _derive_sections(
+    request: BuilderBootstrapRequest,
+    context_pack: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Derive every evidence-facing V4 section from the embedded V3 pack."""
+    items = _context_items(context_pack)
+    dependency_status = _required_dependency_status(request, context_pack)
+    missing = [value for value in dependency_status if value.get("status") != "SATISFIED_AUTHORITATIVE"]
+    dependency_by_name = {value["dependency"]: value for value in dependency_status}
+    authoritative = _dependency_records(context_pack)
+    for dependency in request.required_dependencies:
+        if dependency_by_name[dependency].get("status") != "SATISFIED_AUTHORITATIVE":
+            continue
+        matches = [
+            item for item in items
+            if _matches(item, dependency) and item.get("authority_class") in {"CANONICAL", "VERIFIED"}
+        ]
+        if matches and not any(
+            entry.get("target") in {item.get("entity_id") for item in matches}
+            or entry.get("source") in {item.get("entity_id") for item in matches}
+            for entry in authoritative
+        ):
+            authoritative.append({
+                "dependency": dependency,
+                "entity_id": matches[0].get("entity_id"),
+                "authority_class": matches[0].get("authority_class"),
+                "summary": matches[0].get("summary") or matches[0].get("label"),
+                "provenance": matches[0].get("provenance", {}),
+            })
+    authoritative = sorted(authoritative, key=lambda item: json.dumps(_stable(item), sort_keys=True, ensure_ascii=True))
+
+    conflicts = _conflicting_evidence(context_pack)
+    stale = _stale_evidence(context_pack)
+    unknown = _unknown_evidence(context_pack)
+    blockers = _active_blockers(context_pack)
+    contracts = _contracts(context_pack, request.builder_number)
+    invariants = _safety_invariants(context_pack)
+    decisions = _unresolved_decisions(context_pack)
+    role = _builder_evidence_role(items, request.builder_number) or "UNKNOWN / NO CURRENT HANDOFF EVIDENCE"
+    review_flags: set[str] = set()
+    if conflicts:
+        review_flags.add("CONTEXT_CONFLICT")
+    if stale:
+        review_flags.add("STALE_EVIDENCE")
+    if unknown:
+        review_flags.add("UNKNOWN_EVIDENCE")
+    if any(item.get("status") == "MISSING" for item in missing):
+        review_flags.add("MISSING_DEPENDENCY")
+    if any(item.get("status") == "PRESENT_NONAUTHORITATIVE" for item in missing):
+        review_flags.add("DEPENDENCY_AUTHORITY_MISSING")
+    if request.include_runtime and not context_pack.get("graph_available", False):
+        review_flags.add("RUNTIME_GRAPH_UNAVAILABLE")
+    if context_pack.get("truncated"):
+        review_flags.add("TRUNCATED_CONTEXT")
+    if decisions:
+        review_flags.add("UNRESOLVED_CEO_DECISION")
+    if any(item.get("review_required") for item in blockers):
+        review_flags.add("PRESERVED_UNVERIFIED")
+    return {
+        "authoritative_dependencies": authoritative,
+        "required_dependency_status": dependency_status,
+        "missing_dependencies": missing,
+        "active_blockers": blockers,
+        "required_cross_builder_contracts": contracts,
+        "safety_invariants": invariants,
+        "unresolved_ceo_decisions": decisions,
+        "stale_evidence": stale,
+        "conflicting_evidence": conflicts,
+        "unknown_evidence": unknown,
+        "review_flags": sorted(review_flags),
+        "role": role,
+        "current_evidence": _current_builder_evidence(context_pack, request.builder_number),
+    }
 
 
 def compile_builder_bootstrap(
@@ -612,45 +713,7 @@ def compile_builder_bootstrap(
         identifiers = ", ".join(str(item.get("type") or item.get("code") or item.get("warning") or "CONFLICT") for item in mandatory_conflicts)
         raise BuilderBootstrapError(f"mandatory context conflict requires CEO review: {identifiers}")
 
-    items = _context_items(context_pack)
-    missing = _missing_dependencies(request_obj, context_pack)
-    authoritative = _dependency_records(context_pack)
-    for dependency in request_obj.required_dependencies:
-        matches = [item for item in items if _matches(item, dependency) and item.get("authority_class") in {"CANONICAL", "VERIFIED"}]
-        if matches and not any(entry.get("target") in {item.get("entity_id") for item in matches} or entry.get("source") in {item.get("entity_id") for item in matches} for entry in authoritative):
-            authoritative.append({
-                "dependency": dependency,
-                "entity_id": matches[0].get("entity_id"),
-                "authority_class": matches[0].get("authority_class"),
-                "summary": matches[0].get("summary") or matches[0].get("label"),
-                "provenance": matches[0].get("provenance", {}),
-            })
-    authoritative = sorted(authoritative, key=lambda item: json.dumps(_stable(item), sort_keys=True, ensure_ascii=True))
-
-    stale = _stale_evidence(context_pack)
-    unknown = _unknown_evidence(context_pack)
-    blockers = _active_blockers(context_pack)
-    contracts = _contracts(context_pack, request_obj.builder_number)
-    invariants = _safety_invariants(context_pack)
-    decisions = _unresolved_decisions(context_pack)
-    role = _builder_evidence_role(items, request_obj.builder_number) or "UNKNOWN / NO CURRENT HANDOFF EVIDENCE"
-    review_flags: set[str] = set()
-    if conflicts:
-        review_flags.add("CONTEXT_CONFLICT")
-    if stale:
-        review_flags.add("STALE_EVIDENCE")
-    if unknown:
-        review_flags.add("UNKNOWN_EVIDENCE")
-    if missing:
-        review_flags.add("MISSING_DEPENDENCY")
-    if request_obj.include_runtime and not context_pack.get("graph_available", False):
-        review_flags.add("RUNTIME_GRAPH_UNAVAILABLE")
-    if context_pack.get("truncated"):
-        review_flags.add("TRUNCATED_CONTEXT")
-    if decisions:
-        review_flags.add("UNRESOLVED_CEO_DECISION")
-    if any(item.get("review_required") for item in blockers):
-        review_flags.add("PRESERVED_UNVERIFIED")
+    derived = _derive_sections(request_obj, context_pack)
 
     prohibited = _unique_values(PROHIBITED_OPERATIONS, request_obj.prohibited_operations)
     verification = _unique_values(VERIFICATION_REQUIREMENTS, request_obj.verification_requirements)
@@ -661,26 +724,28 @@ def compile_builder_bootstrap(
         "builder": {
             "number": request_obj.builder_number,
             "label": f"Builder {request_obj.builder_number}",
-            "role": role,
+            "role": derived["role"],
             "role_baseline": BUILDER_ROLES[request_obj.builder_number],
-            "current_evidence": _current_builder_evidence(context_pack, request_obj.builder_number),
+            "current_evidence": derived["current_evidence"],
         },
         "task_identity": _safe_task_identity(request_obj),
         "context_request": context_request.to_dict(),
         "context_pack": context_pack,
-        "authoritative_dependencies": authoritative,
-        "missing_dependencies": missing,
-        "active_blockers": blockers,
-        "required_cross_builder_contracts": contracts,
-        "safety_invariants": invariants,
+        "authoritative_dependencies": derived["authoritative_dependencies"],
+        "required_dependencies": list(request_obj.required_dependencies),
+        "required_dependency_status": derived["required_dependency_status"],
+        "missing_dependencies": derived["missing_dependencies"],
+        "active_blockers": derived["active_blockers"],
+        "required_cross_builder_contracts": derived["required_cross_builder_contracts"],
+        "safety_invariants": derived["safety_invariants"],
         "allowed_scope": _scope(request_obj),
         "prohibited_operations": prohibited,
         "verification_requirements": verification,
-        "unresolved_ceo_decisions": decisions,
-        "stale_evidence": stale,
-        "conflicting_evidence": conflicts,
-        "unknown_evidence": unknown,
-        "review_flags": sorted(review_flags),
+        "unresolved_ceo_decisions": derived["unresolved_ceo_decisions"],
+        "stale_evidence": derived["stale_evidence"],
+        "conflicting_evidence": derived["conflicting_evidence"],
+        "unknown_evidence": derived["unknown_evidence"],
+        "review_flags": derived["review_flags"],
         "execution_authorization": "NOT_PROVIDED",
         "safety_decision": "NOT_EVALUATED",
         "source_memory_sha": context_pack["source_memory_sha"],
@@ -698,12 +763,46 @@ build_builder_bootstrap = compile_builder_bootstrap
 compile_bootstrap_pack = compile_builder_bootstrap
 
 
+def _request_from_pack(payload: Mapping[str, Any]) -> BuilderBootstrapRequest:
+    task = payload.get("task_identity")
+    context = payload.get("context_request")
+    builder = payload.get("builder")
+    scope = task.get("scope") if isinstance(task, Mapping) else None
+    if not isinstance(task, Mapping) or not isinstance(context, Mapping) or not isinstance(builder, Mapping):
+        raise BuilderBootstrapValidationError("bootstrap request provenance is incomplete")
+    if scope is not None and (not isinstance(scope, Mapping) or not isinstance(scope.get("repositories"), list) or not isinstance(scope.get("paths"), list)):
+        raise BuilderBootstrapValidationError("task identity scope is invalid")
+    required = payload.get("required_dependencies")
+    if not isinstance(required, list) or not all(isinstance(value, str) and value.strip() for value in required):
+        raise BuilderBootstrapValidationError("required_dependencies must be a list of non-empty strings")
+    return BuilderBootstrapRequest.from_mapping({
+        "bootstrap_id": payload.get("bootstrap_id"),
+        "builder_number": builder.get("number"),
+        "task_id": task.get("task_id"),
+        "task": task.get("task", ""),
+        "workstream": task.get("workstream", ""),
+        "task_metadata": task.get("metadata", {}),
+        "repository_scope": (scope or {}).get("repositories", []) if isinstance(scope, Mapping) else [],
+        "path_scope": (scope or {}).get("paths", []) if isinstance(scope, Mapping) else [],
+        "required_dependencies": required,
+        "prohibited_operations": payload.get("prohibited_operations", []),
+        "verification_requirements": payload.get("verification_requirements", []),
+        "token_budget": context.get("token_budget", 6000),
+        "max_entity_count": context.get("max_entity_count", 80),
+        "freshness_requirement": context.get("freshness_requirement", "ANY"),
+        "include_runtime": context.get("include_runtime", False),
+        "context_request_id": context.get("request_id", ""),
+        "generated_at": payload.get("generated_at"),
+    })
+
+
 def _validate_pack_payload(payload: Mapping[str, Any], *, expected_budget: int | None = None) -> BuilderBootstrapPack:
     if not isinstance(payload, Mapping):
         raise BuilderBootstrapValidationError("bootstrap pack must be an object")
     required = {
         "schema_version", "bootstrap_version", "bootstrap_id", "builder", "task_identity",
-        "context_request", "context_pack", "authoritative_dependencies", "missing_dependencies",
+        "context_request", "context_pack", "authoritative_dependencies", "required_dependencies",
+        "required_dependency_status", "missing_dependencies",
         "active_blockers", "required_cross_builder_contracts", "safety_invariants", "allowed_scope",
         "prohibited_operations", "verification_requirements", "unresolved_ceo_decisions",
         "stale_evidence", "conflicting_evidence", "unknown_evidence", "review_flags",
@@ -715,6 +814,8 @@ def _validate_pack_payload(payload: Mapping[str, Any], *, expected_budget: int |
         raise BuilderBootstrapValidationError("bootstrap pack missing field(s): " + ", ".join(missing))
     if payload.get("schema_version") != BOOTSTRAP_SCHEMA or payload.get("bootstrap_version") != BOOTSTRAP_VERSION:
         raise BuilderBootstrapValidationError("unsupported Builder Bootstrap schema/version")
+    if not isinstance(payload.get("bootstrap_id"), str) or not payload["bootstrap_id"].strip():
+        raise BuilderBootstrapValidationError("bootstrap_id must be a non-empty identifier")
     builder = payload.get("builder")
     if not isinstance(builder, Mapping) or builder.get("number") not in BUILDER_NUMBERS:
         raise BuilderBootstrapValidationError("builder identity must be exactly 1 through 7")
@@ -726,6 +827,11 @@ def _validate_pack_payload(payload: Mapping[str, Any], *, expected_budget: int |
     task = payload.get("task_identity")
     if not isinstance(task, Mapping) or not task.get("task_id"):
         raise BuilderBootstrapValidationError("task_identity must include task_id")
+    if not isinstance(task.get("metadata", {}), Mapping) or "scope" not in task:
+        raise BuilderBootstrapValidationError("task_identity must preserve metadata and scope provenance")
+    context_request_payload = payload.get("context_request")
+    if not isinstance(context_request_payload, Mapping):
+        raise BuilderBootstrapValidationError("context_request must be an object")
     context = payload.get("context_pack")
     if not isinstance(context, Mapping):
         raise BuilderBootstrapValidationError("context_pack must be an object")
@@ -746,6 +852,27 @@ def _validate_pack_payload(payload: Mapping[str, Any], *, expected_budget: int |
         raise BuilderBootstrapValidationError("semantic_digest does not match embedded Context Compiler digest")
     if payload.get("semantic_graph_digest") != context.get("semantic_graph_digest"):
         raise BuilderBootstrapValidationError("semantic_graph_digest does not match embedded context")
+    try:
+        expected_request = _request_from_pack(payload)
+        expected_context_request = _context_request(expected_request).to_dict()
+    except (BuilderBootstrapError, ContextCompilerError) as exc:
+        raise BuilderBootstrapValidationError(f"bootstrap request provenance is invalid: {exc}") from exc
+    if dict(context_request_payload) != expected_context_request:
+        raise BuilderBootstrapValidationError("context_request does not match task/request provenance")
+    derived = _derive_sections(expected_request, context)
+    derived_fields = (
+        "authoritative_dependencies", "required_dependency_status", "missing_dependencies",
+        "active_blockers", "required_cross_builder_contracts", "safety_invariants",
+        "unresolved_ceo_decisions", "stale_evidence", "conflicting_evidence",
+        "unknown_evidence", "review_flags",
+    )
+    for field_name in derived_fields:
+        if payload.get(field_name) != derived[field_name]:
+            raise BuilderBootstrapValidationError(f"derived field does not match embedded context: {field_name}")
+    if payload.get("allowed_scope") != _scope(expected_request):
+        raise BuilderBootstrapValidationError("allowed_scope does not match task identity scope")
+    if builder.get("role") != derived["role"] or builder.get("current_evidence") != derived["current_evidence"]:
+        raise BuilderBootstrapValidationError("Builder current evidence or role does not match embedded context")
     if payload.get("execution_authorization") != "NOT_PROVIDED" or payload.get("safety_decision") != "NOT_EVALUATED":
         raise BuilderBootstrapValidationError("bootstrap must not claim authorization or a safety decision")
     for field_name in ("authoritative_dependencies", "missing_dependencies", "active_blockers", "required_cross_builder_contracts", "safety_invariants", "unresolved_ceo_decisions", "stale_evidence", "conflicting_evidence", "unknown_evidence", "review_flags", "prohibited_operations", "verification_requirements"):
@@ -814,6 +941,19 @@ def _write_json(path: Path, value: Any) -> None:
         handle.write("\n")
 
 
+def _ensure_external_bootstrap_output(root: Path, vault: Path) -> Path:
+    """Reject the actual resolved V4 output target if it enters canonical Memory."""
+    root = Path(root).resolve()
+    target = (Path(vault) / BOOTSTRAP_DIR).resolve()
+    try:
+        target.relative_to(root)
+    except ValueError:
+        return target
+    raise ContextCompilerError(
+        f"Builder Bootstrap output must be outside the canonical Memory checkout: {target}"
+    )
+
+
 def build_builder_bootstrap_atomic(
     root: Path,
     request: BuilderBootstrapRequest | Mapping[str, Any],
@@ -824,6 +964,7 @@ def build_builder_bootstrap_atomic(
     root = Path(root).resolve()
     vault = Path(vault).resolve()
     _ensure_external_context_output(root, vault)
+    _ensure_external_bootstrap_output(root, vault)
     compilation = compile_builder_bootstrap(root, request, vault=vault)
     request_obj = request if isinstance(request, BuilderBootstrapRequest) else BuilderBootstrapRequest.from_mapping(request)
     output_dir = vault / BOOTSTRAP_DIR

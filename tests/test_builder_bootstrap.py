@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import copy
 from pathlib import Path
 import shutil
 import sys
@@ -15,6 +16,8 @@ from memorylib.builder_bootstrap import (  # noqa: E402
     BUILDER_ROLES,
     BuilderBootstrapError,
     BuilderBootstrapRequest,
+    BuilderBootstrapValidationError,
+    _bootstrap_digest,
     build_builder_bootstrap_atomic,
     compile_builder_bootstrap,
     inspect_builder_bootstrap,
@@ -129,8 +132,44 @@ CI: green
 
     def test_missing_dependency_is_explicit(self) -> None:
         pack = compile_builder_bootstrap(self.root, self.request(6, required_dependencies=["WS-NOT-PRESENT"])).pack
+        self.assertEqual(pack["required_dependency_status"][0]["status"], "MISSING")
         self.assertEqual(pack["missing_dependencies"], [{"dependency": "WS-NOT-PRESENT", "required": True, "status": "MISSING"}])
         self.assertIn("MISSING_DEPENDENCY", pack["review_flags"])
+
+    def test_dependency_authority_statuses_are_distinct(self) -> None:
+        verified_path = "verifications/records/VER-BOOTSTRAP.md"
+        write_record(self.root, verified_path, "VER-BOOTSTRAP", "verification", "verified", summary="Verified dependency")
+        canonical = compile_builder_bootstrap(self.root, self.request(1, required_dependencies=["WS-DEP"])).pack
+        verified = compile_builder_bootstrap(self.root, self.request(1, required_dependencies=["VER-BOOTSTRAP"])).pack
+        self.write_handoffs(self.handoff(1, "2026-09-16T11:00:00Z"))
+        build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
+        candidate_id = json.loads(json.dumps(self.handoff(1, "2026-09-16T11:00:00Z")))["candidate_id"]
+        # Reuse the exact handoff identity written into the runtime graph.
+        candidate = json.loads((self.vault / "_live/BUILDER_HANDOFFS.json").read_text(encoding="utf-8"))["candidates"][0]
+        self.assertEqual(candidate_id, candidate["candidate_id"])
+        candidate_only = compile_builder_bootstrap(self.root, self.request(1, required_dependencies=[candidate_id], include_runtime=True), vault=self.vault).pack
+        self.assertEqual(canonical["required_dependency_status"][0]["status"], "SATISFIED_AUTHORITATIVE")
+        self.assertEqual(verified["required_dependency_status"][0]["status"], "SATISFIED_AUTHORITATIVE")
+        self.assertEqual(candidate_only["required_dependency_status"][0]["status"], "PRESENT_NONAUTHORITATIVE")
+        self.assertIn("DEPENDENCY_AUTHORITY_MISSING", candidate_only["review_flags"])
+        self.assertFalse(candidate_only["authoritative_dependencies"] and any(entry.get("entity_id") == f"EVIDENCE:{candidate_id}" for entry in candidate_only["authoritative_dependencies"]))
+
+        runtime_id = "BLK-BOOTSTRAP-RUNTIME"
+        write_json(self.vault, "_live/BLOCKERS.json", {"schema": 1, "blockers": [{
+            "blocker_id": runtime_id, "classification": "EXTERNAL", "status": "OPEN",
+            "summary": "runtime-only dependency", "auto_resolve": False,
+        }]})
+        build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
+        runtime_only = compile_builder_bootstrap(self.root, self.request(1, required_dependencies=[f"BLOCKER:{runtime_id}"], include_runtime=True), vault=self.vault).pack
+        self.assertEqual(runtime_only["required_dependency_status"][0]["status"], "PRESENT_NONAUTHORITATIVE")
+        self.assertIn("DEPENDENCY_AUTHORITY_MISSING", runtime_only["review_flags"])
+
+    def test_dependency_status_and_digest_ordering_are_deterministic(self) -> None:
+        first = compile_builder_bootstrap(self.root, self.request(2, required_dependencies=["WS-DEP", "WS-MISSING"])).pack
+        second = compile_builder_bootstrap(self.root, self.request(2, required_dependencies=["WS-MISSING", "WS-DEP"])).pack
+        self.assertEqual(first["required_dependency_status"], second["required_dependency_status"])
+        self.assertEqual(first["missing_dependencies"], second["missing_dependencies"])
+        self.assertEqual(first["bootstrap_digest"], second["bootstrap_digest"])
 
     def test_runtime_unavailable_is_explicit_and_candidates_never_canonical(self) -> None:
         self.write_handoffs(self.handoff(7, "2026-09-16T11:00:00Z", blocker="provider outage"))
@@ -179,6 +218,7 @@ CI: green
         before = {path.relative_to(self.root): path.read_bytes() for path in self.root.rglob("*") if path.is_file()}
         result = build_builder_bootstrap_atomic(self.root, self.request(4), vault=self.vault)
         json_path = Path(result["json"])
+        last_good = json_path.read_bytes()
         self.assertTrue(json_path.resolve().is_relative_to(self.vault.resolve()))
         self.assertEqual(validate_builder_bootstrap(json_path)["bootstrap_digest"], result["bootstrap_digest"])
         after = {path.relative_to(self.root): path.read_bytes() for path in self.root.rglob("*") if path.is_file()}
@@ -186,6 +226,16 @@ CI: green
         with self.assertRaisesRegex(ContextCompilerError, "outside the canonical Memory checkout"):
             build_builder_bootstrap_atomic(self.root, self.request(4), vault=self.root / "vault")
         self.assertFalse(list(self.vault.glob(".builder-bootstrap-*")))
+
+        linked_vault = Path(tempfile.mkdtemp(prefix="sbmem-bootstrap-linked-vault-"))
+        try:
+            (linked_vault / "_live").mkdir(parents=True)
+            (linked_vault / "_live" / "builder-bootstrap").symlink_to(self.root, target_is_directory=True)
+            with self.assertRaisesRegex(ContextCompilerError, "Builder Bootstrap output must be outside"):
+                build_builder_bootstrap_atomic(self.root, self.request(4), vault=linked_vault)
+            self.assertEqual(json_path.read_bytes(), last_good)
+        finally:
+            shutil.rmtree(linked_vault, ignore_errors=True)
 
     def test_validate_inspect_and_human_readable_output(self) -> None:
         result = build_builder_bootstrap_atomic(self.root, self.request(2), vault=self.vault)
@@ -206,6 +256,32 @@ CI: green
         self.assertTrue(pack["active_blockers"])
         self.assertTrue(pack["safety_invariants"])
         self.assertTrue(pack["unresolved_ceo_decisions"])
+
+    def test_validator_rejects_tampered_derived_sections_even_with_recomputed_digest(self) -> None:
+        self.write_handoffs(self.handoff(7, "2026-09-16T11:00:00Z", blocker="provider unavailable"))
+        build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
+        pack = compile_builder_bootstrap(
+            self.root,
+            self.request(7, task_metadata={"entity_seeds": ["DEC-CEO"]}, required_dependencies=["WS-NOT-PRESENT"], repository_scope=["memory"], path_scope=["tools/memorylib"], include_runtime=True),
+            vault=self.vault,
+        ).pack
+        pack_path = self.vault / "tamper.json"
+
+        mutations = {
+            "active blocker removal": lambda value: value["active_blockers"].clear(),
+            "missing dependency removal": lambda value: value["missing_dependencies"].clear(),
+            "review flag change": lambda value: value["review_flags"].append("UNDECLARED"),
+            "current evidence change": lambda value: value["builder"]["current_evidence"].update({"status": "TAMPERED"}),
+            "allowed scope change": lambda value: value["allowed_scope"]["paths"].append("outside-scope"),
+            "CEO decision removal": lambda value: value["unresolved_ceo_decisions"].clear(),
+        }
+        for label, mutate in mutations.items():
+            tampered = copy.deepcopy(pack)
+            mutate(tampered)
+            tampered["bootstrap_digest"] = _bootstrap_digest(tampered)
+            write_json(self.vault, "tamper.json", tampered)
+            with self.assertRaisesRegex(BuilderBootstrapValidationError, "derived field|Builder current evidence|allowed_scope"):
+                validate_builder_bootstrap(pack_path)
 
     def test_builder_four_to_seven_latest_evidence_is_independent(self) -> None:
         handoffs = [self.handoff(number, f"2026-09-16T0{number}:00:00Z") for number in range(4, 8)]
