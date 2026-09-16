@@ -16,6 +16,13 @@ from memorylib.context_compiler import (
     inspect_context_pack,
     validate_context_pack,
 )
+from memorylib.builder_bootstrap import (
+    BuilderBootstrapRequest,
+    build_builder_bootstrap_atomic,
+    compile_builder_bootstrap,
+    inspect_builder_bootstrap,
+    validate_builder_bootstrap,
+)
 from memorylib.acceptance import run as acceptance_run, tree_fingerprint
 from memorylib.v2 import build_context_packets, ingest_events
 from memorylib.live import render_live_status
@@ -88,6 +95,31 @@ def main():
     context_legacy.add_argument('task_id')
     context_legacy.add_argument('--allow-draft',action='store_true')
     context_legacy.add_argument('--output')
+    bootstrap = sp.add_parser('builder-bootstrap')
+    bootstrap_sp = bootstrap.add_subparsers(dest='bootstrap_cmd', required=True)
+    bootstrap_build = bootstrap_sp.add_parser('build')
+    bootstrap_build.add_argument('--builder', type=int)
+    bootstrap_build.add_argument('--task-id')
+    bootstrap_build.add_argument('--task', default='')
+    bootstrap_build.add_argument('--workstream', default='')
+    bootstrap_build.add_argument('--metadata-json')
+    bootstrap_build.add_argument('--repository', action='append', dest='repository_scope')
+    bootstrap_build.add_argument('--path', action='append', dest='path_scope')
+    bootstrap_build.add_argument('--required-dependency', action='append', dest='required_dependencies')
+    bootstrap_build.add_argument('--prohibited-operation', action='append', dest='prohibited_operations')
+    bootstrap_build.add_argument('--verification-requirement', action='append', dest='verification_requirements')
+    bootstrap_build.add_argument('--budget-tokens', type=int, default=6000)
+    bootstrap_build.add_argument('--max-entities', type=int, default=80)
+    bootstrap_build.add_argument('--freshness', default='ANY', choices=['ANY', 'FRESH_ONLY', 'FRESH_OR_AGING'])
+    bootstrap_build.add_argument('--include-runtime', action='store_true')
+    bootstrap_build.add_argument('--vault')
+    bootstrap_build.add_argument('--request-id', dest='bootstrap_id')
+    bootstrap_build.add_argument('--context-request-id')
+    bootstrap_build.add_argument('--json', action='store_true', dest='json_output')
+    bootstrap_validate = bootstrap_sp.add_parser('validate')
+    bootstrap_validate.add_argument('path')
+    bootstrap_inspect = bootstrap_sp.add_parser('inspect')
+    bootstrap_inspect.add_argument('path')
     graph = sp.add_parser('graph')
     graph_sp = graph.add_subparsers(dest='graph_cmd', required=True)
     graph_build = graph_sp.add_parser('build')
@@ -170,6 +202,54 @@ def main():
         else:
             print(markdown)
             print(json.dumps({'context_digest': payload['context_digest'], 'estimated_tokens': payload['estimated_tokens'], 'included_entity_count': payload['included_entity_count'], 'output': result.get('json') if vault else None}, indent=2, sort_keys=True), file=sys.stderr)
+        return 0
+    if a.cmd=='builder-bootstrap':
+        if a.bootstrap_cmd=='validate':
+            print(json.dumps({'valid': True, 'pack': validate_builder_bootstrap(Path(a.path))}, indent=2, sort_keys=True, ensure_ascii=False))
+            return 0
+        if a.bootstrap_cmd=='inspect':
+            print(json.dumps(inspect_builder_bootstrap(Path(a.path)), indent=2, sort_keys=True, ensure_ascii=False))
+            return 0
+        if a.metadata_json:
+            request_data=json.loads(Path(a.metadata_json).read_text(encoding='utf-8'))
+            if not isinstance(request_data, dict):
+                raise ValueError('bootstrap metadata JSON must be an object')
+            if a.builder is not None and 'builder' not in request_data and 'builder_number' not in request_data:
+                request_data['builder_number']=a.builder
+        else:
+            request_data={
+                'bootstrap_id': a.bootstrap_id,
+                'builder_number': a.builder,
+                'task_id': a.task_id,
+                'task': a.task,
+                'workstream': a.workstream,
+                'repository_scope': a.repository_scope or [],
+                'path_scope': a.path_scope or [],
+                'required_dependencies': a.required_dependencies or [],
+                'prohibited_operations': a.prohibited_operations or [],
+                'verification_requirements': a.verification_requirements or [],
+                'token_budget': a.budget_tokens,
+                'max_entity_count': a.max_entities,
+                'freshness_requirement': a.freshness,
+                'include_runtime': a.include_runtime,
+                'context_request_id': a.context_request_id,
+            }
+        request=BuilderBootstrapRequest.from_mapping(request_data)
+        vault=Path(a.vault) if a.vault else None
+        if vault:
+            result=build_builder_bootstrap_atomic(ROOT, request, vault=vault)
+            payload=result['pack']
+            markdown=Path(result['markdown']).read_text(encoding='utf-8')
+        else:
+            compilation=compile_builder_bootstrap(ROOT, request)
+            payload=compilation.pack
+            markdown=compilation.markdown
+            result=None
+        if a.json_output:
+            print(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False))
+        else:
+            print(markdown)
+            print(json.dumps({'bootstrap_digest': payload['bootstrap_digest'], 'source_memory_sha': payload['source_memory_sha'], 'output': result.get('json') if result else None}, indent=2, sort_keys=True), file=sys.stderr)
         return 0
     if a.cmd=='fingerprint':
         print(tree_fingerprint(ROOT))

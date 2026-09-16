@@ -1,11 +1,13 @@
 from __future__ import annotations
 from pathlib import Path
 import tempfile, shutil, time, hashlib
+import json
 from .validate import validate
 from .registry import Registry
 from .dashboard import render_all
 from .context import build_context
 from .context_compiler import ContextRequest, compile_context, validate_context_pack
+from .builder_bootstrap import BuilderBootstrapRequest, compile_builder_bootstrap, validate_builder_bootstrap
 
 def tree_fingerprint(root:Path):
     h=hashlib.sha256()
@@ -112,6 +114,31 @@ def run(root:Path):
         gates.append(('context_compiler_v3', True, f"entities={v3.pack['included_entity_count']} tokens={v3.pack['estimated_tokens']}"))
     except Exception as exc:
         gates.append(('context_compiler_v3', False, str(exc)))
+
+    # Builder Bootstrap V4 is an in-memory delivery layer over V3.  Exercise
+    # the package contract with an external temporary validation file so the
+    # acceptance run cannot dirty canonical Memory or the user's Vault.
+    bootstrap_tmp = Path(tempfile.mkdtemp(prefix='sbmem-bootstrap-acceptance-'))
+    try:
+        bootstrap_request = BuilderBootstrapRequest.from_mapping({
+            'bootstrap_id': 'ACCEPTANCE-BUILDER-7',
+            'builder_number': 7,
+            'task_id': 'ACCEPTANCE-TASK-BUILDER-7',
+            'task': 'acceptance Builder Bootstrap V4 contract',
+            'workstream': 'Memory Context Delivery',
+            'token_budget': 6000,
+            'max_entity_count': 80,
+            'generated_at': '2026-09-16T00:00:00Z',
+        })
+        bootstrap = compile_builder_bootstrap(root, bootstrap_request)
+        bootstrap_path = bootstrap_tmp / 'bootstrap.json'
+        bootstrap_path.write_text(json.dumps(bootstrap.pack, ensure_ascii=False), encoding='utf-8')
+        validate_builder_bootstrap(bootstrap_path)
+        gates.append(('builder_bootstrap_v4', True, f"builder=7 entities={bootstrap.pack['context_pack']['included_entity_count']}"))
+    except Exception as exc:
+        gates.append(('builder_bootstrap_v4', False, str(exc)))
+    finally:
+        shutil.rmtree(bootstrap_tmp, ignore_errors=True)
 
     td=Path(tempfile.mkdtemp(prefix='sbmem-scale-'))
     try:

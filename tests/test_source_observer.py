@@ -171,7 +171,7 @@ Safety: no production mutation and no live activation
         with self.assertRaises(CandidateValidationError):
             parse_builder_handoff("BUILDER: 1/4\nROLE: ambiguous")
         with self.assertRaises(CandidateValidationError):
-            parse_builder_handoff("BUILDER: 5\nROLE: invalid")
+            parse_builder_handoff("BUILDER: 8\nROLE: invalid")
         with self.assertRaises(CandidateValidationError):
             parse_builder_handoff("BUILDER: four\nROLE: invalid")
 

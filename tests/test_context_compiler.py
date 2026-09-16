@@ -92,12 +92,12 @@ Observed at: {observed_at}
         write_json(self.vault, "_live/BUILDER_HANDOFFS.json", {"schema": 1, "generated_at": "2026-09-16T12:00:00Z", "candidates": list(handoffs)})
 
     def test_all_consumer_profiles_and_invalid_builder_fail_closed(self) -> None:
-        for consumer in ("CEO", "BUILDER_1", "BUILDER_2", "BUILDER_3", "BUILDER_4", "GENERIC_REVIEW"):
+        for consumer in ("CEO", "BUILDER_1", "BUILDER_2", "BUILDER_3", "BUILDER_4", "BUILDER_5", "BUILDER_6", "BUILDER_7", "GENERIC_REVIEW"):
             compiled = compile_context(self.root, request(consumer))
             self.assertEqual(compiled.pack["consumer"], consumer)
             self.assertLessEqual(compiled.pack["estimated_tokens"], 6000)
         with self.assertRaises(ContextCompilerError):
-            request("BUILDER_5")
+            request("BUILDER_8")
         with self.assertRaises(ContextCompilerError):
             ContextRequest.from_mapping({"request_id": "bad", "consumer_type": "BUILDER_4", "builder_number": 1})
 
