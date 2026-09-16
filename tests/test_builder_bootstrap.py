@@ -24,7 +24,7 @@ from memorylib.builder_bootstrap import (  # noqa: E402
     validate_builder_bootstrap,
 )
 from memorylib.context_compiler import ContextCompilerError  # noqa: E402
-from memorylib.observer import FixtureGitHubClient, handoff_evidence_id, ingest_handoff, observe_sources, parse_builder_handoff  # noqa: E402
+from memorylib.observer import CandidateValidationError, FixtureGitHubClient, handoff_evidence_id, ingest_handoff, observe_sources, parse_builder_handoff  # noqa: E402
 from memorylib.semantic_graph import build_semantic_graph_atomic  # noqa: E402
 
 
@@ -103,22 +103,26 @@ CI: green
     def write_handoffs(self, *handoffs: dict) -> None:
         write_json(self.vault, "_live/BUILDER_HANDOFFS.json", {"schema": 1, "candidates": list(handoffs)})
 
-    def test_builders_one_to_seven_and_invalid_identity(self) -> None:
-        for number in range(1, 8):
+    def test_builders_one_to_five_and_invalid_identity(self) -> None:
+        for number in range(1, 6):
             pack = compile_builder_bootstrap(self.root, self.request(number)).pack
             self.assertEqual(pack["builder"]["number"], number)
             self.assertEqual(pack["builder"]["role_baseline"], BUILDER_ROLES[number])
             self.assertEqual(pack["context_pack"]["consumer"], f"BUILDER_{number}")
-        for invalid in (0, 8, "four", "1/4", "BUILDER: 1/4"):
+        self.assertEqual(BUILDER_ROLES[5], "Autonomous Development / Night Shift Dispatcher Owner")
+        for invalid in (0, 6, 7, 8, "four", "1/4", "BUILDER: 1/4"):
             with self.assertRaises(BuilderBootstrapError):
                 BuilderBootstrapRequest.from_mapping({"builder": invalid, "task_id": "TASK-BAD"})
         self.assertEqual(parse_builder_handoff("BUILDER: 4\nROLE: Provider\nStatus: ready")["builder_number"], 4)
-        self.assertEqual(parse_builder_handoff("BUILDER: 7\nROLE: Reliability\nStatus: ready")["builder_number"], 7)
+        self.assertEqual(parse_builder_handoff("BUILDER: 5\nROLE: Dispatcher\nStatus: ready")["builder_number"], 5)
+        for unsupported in (6, 7):
+            with self.assertRaises(CandidateValidationError):
+                parse_builder_handoff(f"BUILDER: {unsupported}\nROLE: unsupported\nStatus: ready")
 
     def test_metadata_scope_prohibited_and_verification_contract(self) -> None:
         pack = compile_builder_bootstrap(self.root, self.request(
             5,
-            task_metadata={"requested_domains": ["pwa"], "entity_seeds": ["WS-ONE"]},
+            task_metadata={"requested_domains": ["dispatcher"], "entity_seeds": ["WS-ONE"]},
             repository_scope=["Philip3006/SportsBrainMemory"],
             path_scope=["tools/memorylib"],
             required_dependencies=["WS-DEP"],
@@ -128,10 +132,10 @@ CI: green
         self.assertEqual(pack["allowed_scope"], {"repositories": ["Philip3006/SportsBrainMemory"], "paths": ["tools/memorylib"]})
         self.assertIn("change external production", pack["prohibited_operations"])
         self.assertIn("verify no generated canonical changes", pack["verification_requirements"])
-        self.assertEqual(pack["task_identity"]["metadata"]["requested_domains"], ["pwa"])
+        self.assertEqual(pack["task_identity"]["metadata"]["requested_domains"], ["dispatcher"])
 
     def test_missing_dependency_is_explicit(self) -> None:
-        pack = compile_builder_bootstrap(self.root, self.request(6, required_dependencies=["WS-NOT-PRESENT"])).pack
+        pack = compile_builder_bootstrap(self.root, self.request(5, required_dependencies=["WS-NOT-PRESENT"])).pack
         self.assertEqual(pack["required_dependency_status"][0]["status"], "MISSING")
         self.assertEqual(pack["missing_dependencies"], [{"dependency": "WS-NOT-PRESENT", "required": True, "status": "MISSING"}])
         self.assertIn("MISSING_DEPENDENCY", pack["review_flags"])
@@ -172,29 +176,29 @@ CI: green
         self.assertEqual(first["bootstrap_digest"], second["bootstrap_digest"])
 
     def test_runtime_unavailable_is_explicit_and_candidates_never_canonical(self) -> None:
-        self.write_handoffs(self.handoff(7, "2026-09-16T11:00:00Z", blocker="provider outage"))
-        pack = compile_builder_bootstrap(self.root, self.request(7, include_runtime=True), vault=self.vault).pack
+        self.write_handoffs(self.handoff(5, "2026-09-16T11:00:00Z", blocker="provider outage"))
+        pack = compile_builder_bootstrap(self.root, self.request(5, include_runtime=True), vault=self.vault).pack
         self.assertFalse(pack["context_pack"]["graph_available"])
         self.assertEqual(pack["context_pack"]["runtime_count"], 0)
         self.assertIn("RUNTIME_GRAPH_UNAVAILABLE", pack["review_flags"])
         self.assertFalse(any(item.get("candidate_type") in {"CANDIDATE_OPERATIONAL_EVIDENCE", "SOURCE_CANDIDATE_EVENT"} for item in pack["context_pack"]["included_entities"]))
 
     def test_stale_and_conflicting_context_are_visible(self) -> None:
-        self.write_handoffs(self.handoff(7, "2026-09-14T00:00:00Z"))
+        self.write_handoffs(self.handoff(5, "2026-09-14T00:00:00Z"))
         build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
         write_json(self.vault, "_live/SOURCE_OBSERVER.json", {"schema": 1, "conflicts": [{"type": "STATUS_CONFLICT", "severity": "CEO_DECISION_REQUIRED"}], "candidates": []})
-        pack = compile_builder_bootstrap(self.root, self.request(7, include_runtime=True), vault=self.vault).pack
+        pack = compile_builder_bootstrap(self.root, self.request(5, include_runtime=True), vault=self.vault).pack
         self.assertIn("STALE_EVIDENCE", pack["review_flags"])
         self.assertIn("CONTEXT_CONFLICT", pack["review_flags"])
         self.assertTrue(pack["stale_evidence"])
         self.assertTrue(pack["conflicting_evidence"])
 
     def test_mandatory_conflict_fails_closed(self) -> None:
-        self.write_handoffs(self.handoff(7, "2026-09-16T11:00:00Z"))
+        self.write_handoffs(self.handoff(5, "2026-09-16T11:00:00Z"))
         build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
         write_json(self.vault, "_live/SOURCE_OBSERVER.json", {"schema": 1, "conflicts": [{"mandatory": True, "type": "BLOCKER_CONFLICT", "severity": "CEO_DECISION_REQUIRED"}], "candidates": []})
         with self.assertRaisesRegex(BuilderBootstrapError, "mandatory context conflict"):
-            compile_builder_bootstrap(self.root, self.request(7, include_runtime=True), vault=self.vault)
+            compile_builder_bootstrap(self.root, self.request(5, include_runtime=True), vault=self.vault)
 
     def test_semantic_determinism_and_source_sha_change(self) -> None:
         first = compile_builder_bootstrap(self.root, self.request(3, generated_at="2026-09-16T10:00:00Z")).pack
@@ -258,11 +262,11 @@ CI: green
         self.assertTrue(pack["unresolved_ceo_decisions"])
 
     def test_validator_rejects_tampered_derived_sections_even_with_recomputed_digest(self) -> None:
-        self.write_handoffs(self.handoff(7, "2026-09-16T11:00:00Z", blocker="provider unavailable"))
+        self.write_handoffs(self.handoff(5, "2026-09-16T11:00:00Z", blocker="provider unavailable"))
         build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
         pack = compile_builder_bootstrap(
             self.root,
-            self.request(7, task_metadata={"entity_seeds": ["DEC-CEO"]}, required_dependencies=["WS-NOT-PRESENT"], repository_scope=["memory"], path_scope=["tools/memorylib"], include_runtime=True),
+            self.request(5, task_metadata={"entity_seeds": ["DEC-CEO"]}, required_dependencies=["WS-NOT-PRESENT"], repository_scope=["memory"], path_scope=["tools/memorylib"], include_runtime=True),
             vault=self.vault,
         ).pack
         pack_path = self.vault / "tamper.json"
@@ -283,11 +287,11 @@ CI: green
             with self.assertRaisesRegex(BuilderBootstrapValidationError, "derived field|Builder current evidence|allowed_scope"):
                 validate_builder_bootstrap(pack_path)
 
-    def test_builder_four_to_seven_latest_evidence_is_independent(self) -> None:
-        handoffs = [self.handoff(number, f"2026-09-16T0{number}:00:00Z") for number in range(4, 8)]
+    def test_builder_four_and_five_latest_evidence_is_independent(self) -> None:
+        handoffs = [self.handoff(number, f"2026-09-16T0{number}:00:00Z") for number in range(4, 6)]
         self.write_handoffs(*handoffs)
         build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
-        for number in range(4, 8):
+        for number in range(4, 6):
             pack = compile_builder_bootstrap(self.root, self.request(number, include_runtime=True), vault=self.vault).pack
             current = pack["builder"]["current_evidence"]
             self.assertEqual(current["status"], "READY FOR CEO REVIEW")

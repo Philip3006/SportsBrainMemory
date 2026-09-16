@@ -57,7 +57,7 @@ authored.
 
 ## Builder governance
 
-Builder identities 1–4 are supported. The graph may show the governed identity
+Builder identities 1–5 are supported. The graph may show the governed identity
 of a Builder without asserting a current workstream. Current role, branch,
 head, PR, status, blocker, tests/CI, observed time, and freshness come only
 from the latest valid explicit handoff when runtime evidence is included. The

@@ -121,9 +121,9 @@ def run(root:Path):
     bootstrap_tmp = Path(tempfile.mkdtemp(prefix='sbmem-bootstrap-acceptance-'))
     try:
         bootstrap_request = BuilderBootstrapRequest.from_mapping({
-            'bootstrap_id': 'ACCEPTANCE-BUILDER-7',
-            'builder_number': 7,
-            'task_id': 'ACCEPTANCE-TASK-BUILDER-7',
+            'bootstrap_id': 'ACCEPTANCE-BUILDER-5',
+            'builder_number': 5,
+            'task_id': 'ACCEPTANCE-TASK-BUILDER-5',
             'task': 'acceptance Builder Bootstrap V4 contract',
             'workstream': 'Memory Context Delivery',
             'token_budget': 6000,
@@ -134,7 +134,7 @@ def run(root:Path):
         bootstrap_path = bootstrap_tmp / 'bootstrap.json'
         bootstrap_path.write_text(json.dumps(bootstrap.pack, ensure_ascii=False), encoding='utf-8')
         validate_builder_bootstrap(bootstrap_path)
-        gates.append(('builder_bootstrap_v4', True, f"builder=7 entities={bootstrap.pack['context_pack']['included_entity_count']}"))
+        gates.append(('builder_bootstrap_v4', True, f"builder=5 entities={bootstrap.pack['context_pack']['included_entity_count']}"))
     except Exception as exc:
         gates.append(('builder_bootstrap_v4', False, str(exc)))
     finally:

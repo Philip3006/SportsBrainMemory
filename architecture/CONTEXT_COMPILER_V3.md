@@ -48,8 +48,8 @@ existing 90-second LaunchAgent.
 }
 ```
 
-Consumers are `CEO`, `BUILDER_1` through `BUILDER_7`, and `GENERIC_REVIEW`.
-Builder identities are fail-closed to exactly 1–7; ambiguous or unknown
+Consumers are `CEO`, `BUILDER_1` through `BUILDER_5`, and `GENERIC_REVIEW`.
+Builder identities are fail-closed to exactly 1–5; ambiguous or unknown
 identities are rejected.
 
 ## Pack contract and provenance
@@ -83,10 +83,10 @@ never treated as importance.
 Builder profiles preserve the operational boundaries: Builder 1 receives
 relevant Builder 2 validation and Builder 4 observation contracts; Builder 2
 receives the relevant Builder 4 seam; Builder 3 receives Memory/graph context;
-Builder 4 receives relevant Builder 1/2 contracts; Builders 5–7 receive
-app/PWA, regression, and runtime-observability context with their declared
-cross-builder partners. Profile metadata guides selection but never supplies
-current status.
+Builder 4 receives relevant Builder 1/2 contracts; Builder 5 receives
+dispatcher/orchestration context and visibility into Builders 1–4. Builder 5
+does not gain merge, deploy, activation, provider-call, or CEO-decision
+authority. Profile metadata guides selection but never supplies current status.
 
 Superseded decisions remain provenance-available but are ranked as history;
 explicitly selected history is labeled as such. `SUPERSEDES`, `RESOLVES`, and

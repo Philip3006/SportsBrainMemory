@@ -15,12 +15,13 @@ import subprocess
 import tempfile
 from typing import Any
 
+from .governance import BUILDER_NUMBERS, BUILDER_NUMBER_SET
 from .v2 import FROZEN_RESEARCH_SHA, freshness_state
 
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 SHORT_SHA_RE = re.compile(r"\b[0-9a-f]{7,40}\b")
 PR_RE = re.compile(r"(?:pull\s*request|PR)\s*#?(\d+)", re.IGNORECASE)
-BUILDER_HEADER_RE = re.compile(r"^BUILDER: ([1-7])$")
+BUILDER_HEADER_RE = re.compile(r"^BUILDER: ([1-5])$")
 BLOCKER_CLASSES = {"INTERNAL", "EXTERNAL", "CEO_DECISION_REQUIRED", "SAFETY_CRITICAL"}
 SECRET_RE = re.compile(r"(?i)(?:bearer\s+|gh[pousr]_)[A-Za-z0-9._-]{20,}")
 
@@ -606,7 +607,7 @@ def parse_builder_handoff(text: str, observed_at: str | None = None) -> dict[str
     first = next((line.strip() for line in lines if line.strip()), "")
     match = BUILDER_HEADER_RE.fullmatch(first)
     if not match:
-        raise CandidateValidationError("handoff must begin with exactly BUILDER: 1, BUILDER: 2, BUILDER: 3, BUILDER: 4, BUILDER: 5, BUILDER: 6, or BUILDER: 7")
+        raise CandidateValidationError("handoff must begin with exactly BUILDER: 1, BUILDER: 2, BUILDER: 3, BUILDER: 4, or BUILDER: 5")
     builder_number = int(match.group(1))
     normalized_lines = []
     for line in lines:
@@ -706,8 +707,8 @@ def validate_handoff_evidence(evidence: dict[str, Any]) -> None:
     if evidence.get("candidate_type") != "CANDIDATE_OPERATIONAL_EVIDENCE" or evidence.get("canonical") is not False or evidence.get("promotion_required") is not True:
         raise CandidateValidationError("builder handoff evidence must remain non-canonical and require promotion")
     builder_number = evidence.get("builder_number")
-    if builder_number not in set(range(1, 8)) or evidence.get("builder") != f"Builder {builder_number}":
-        raise CandidateValidationError("handoff builder identity must be an explicit matching Builder 1/2/3/4/5/6/7")
+    if builder_number not in BUILDER_NUMBER_SET or evidence.get("builder") != f"Builder {builder_number}":
+        raise CandidateValidationError("handoff builder identity must be an explicit matching Builder 1/2/3/4/5")
     if evidence.get("head_sha") is not None and not SHA_RE.fullmatch(str(evidence["head_sha"])):
         raise CandidateValidationError("handoff head_sha must be a full lowercase SHA when present")
     try:
@@ -767,7 +768,7 @@ def render_control_plane(payload: dict[str, Any]) -> str:
         "## Builder State",
         "",
     ]
-    for builder_number in range(1, 8):
+    for builder_number in BUILDER_NUMBERS:
         evidence = latest_handoffs.get(builder_number)
         if evidence is None:
             lines.append(f"- Builder {builder_number} — **UNKNOWN / NO CURRENT HANDOFF EVIDENCE**")

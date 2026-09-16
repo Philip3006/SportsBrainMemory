@@ -30,22 +30,12 @@ from .context_compiler import (
     compile_context,
     validate_context_pack,
 )
+from .governance import BUILDER_NUMBERS, BUILDER_NUMBER_SET, BUILDER_ROLES
 
 
 BOOTSTRAP_SCHEMA = 4
 BOOTSTRAP_VERSION = "memory-builder-bootstrap-v4.0"
 BOOTSTRAP_DIR = "_live/builder-bootstrap"
-BUILDER_NUMBERS = frozenset(range(1, 8))
-
-BUILDER_ROLES = {
-    1: "Research / Shadow / Evidence Lifecycle",
-    2: "Independent Qualification / Authority",
-    3: "Memory / Context / Observability",
-    4: "Provider Cascade / Controlled Shadow Infrastructure",
-    5: "Live App Delivery / PWA Integration",
-    6: "Bug / Regression",
-    7: "Runtime Reliability / Product Observability",
-}
 
 DEPENDENCY_RELATIONS = {
     "depends_on", "blocked_by", "blocks", "implements", "verification",
@@ -132,16 +122,16 @@ def _values(value: Any) -> list[str]:
 
 def _builder_number(value: Any) -> int:
     if isinstance(value, bool):
-        raise BuilderBootstrapError("builder must be an explicit integer from 1 through 7")
+        raise BuilderBootstrapError("builder must be an explicit integer from 1 through 5")
     if isinstance(value, int):
         number = value
     else:
-        match = re.fullmatch(r"(?:BUILDER[_: ]*)?([1-7])", _normal_text(value), re.IGNORECASE)
+        match = re.fullmatch(r"(?:BUILDER[_: ]*)?([1-5])", _normal_text(value), re.IGNORECASE)
         if not match:
-            raise BuilderBootstrapError("builder must be exactly Builder 1 through Builder 7")
+            raise BuilderBootstrapError("builder must be exactly Builder 1 through Builder 5")
         number = int(match.group(1))
-    if number not in BUILDER_NUMBERS:
-        raise BuilderBootstrapError("builder must be exactly 1, 2, 3, 4, 5, 6, or 7")
+    if number not in BUILDER_NUMBER_SET:
+        raise BuilderBootstrapError("builder must be exactly 1, 2, 3, 4, or 5")
     return number
 
 
@@ -818,10 +808,10 @@ def _validate_pack_payload(payload: Mapping[str, Any], *, expected_budget: int |
         raise BuilderBootstrapValidationError("bootstrap_id must be a non-empty identifier")
     builder = payload.get("builder")
     if not isinstance(builder, Mapping) or builder.get("number") not in BUILDER_NUMBERS:
-        raise BuilderBootstrapValidationError("builder identity must be exactly 1 through 7")
+        raise BuilderBootstrapValidationError("builder identity must be exactly 1 through 5")
     number = int(builder["number"])
     if builder.get("label") != f"Builder {number}" or builder.get("role_baseline") != BUILDER_ROLES[number]:
-        raise BuilderBootstrapValidationError("builder identity role baseline does not match Builder 1–7 contract")
+        raise BuilderBootstrapValidationError("builder identity role baseline does not match Builder 1–5 contract")
     if not isinstance(builder.get("role"), str) or not builder["role"].strip():
         raise BuilderBootstrapValidationError("builder role must be explicit or UNKNOWN")
     task = payload.get("task_identity")

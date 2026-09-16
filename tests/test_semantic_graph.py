@@ -88,6 +88,10 @@ workstream: TOP5-SHADOW
         self.assertIn("PR:philip3006/sportsbrain#59", entities)
         self.assertIn("COMMIT:" + "2" * 40, entities)
         self.assertIn("BUILDER:BUILDER-4", entities)
+        for number in (1, 2, 3, 4, 5):
+            self.assertIn(f"BUILDER:BUILDER-{number}", entities)
+        for number in (6, 7):
+            self.assertNotIn(f"BUILDER:BUILDER-{number}", entities)
         self.assertTrue(any(source == "EVENT:EVT-20260916-001" and relation == "source_pr" for source, relation, _ in edges))
         self.assertTrue(any(source == "EVENT:EVT-20260916-001" and relation == "affected_workstream" for source, relation, _ in edges))
         self.assertEqual(result["health"]["baseline"]["edge_count"], 0)

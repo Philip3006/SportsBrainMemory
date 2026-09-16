@@ -21,6 +21,7 @@ import tempfile
 from typing import Any, Iterable, Mapping, TypedDict
 
 from .frontmatter import parse_frontmatter
+from .governance import BUILDER_NUMBERS
 from .observer import _latest_builder_evidence, _valid_handoffs
 from .semantic_graph import (
     Entity,
@@ -36,9 +37,8 @@ CONTEXT_SCHEMA = 3
 COMPILER_VERSION = "memory-context-compiler-v3.1"
 SELECTION_POLICY_VERSION = "v3-deterministic-authority-first-20260916"
 CONTEXT_DIR = "_live/context"
-CONSUMER_TYPES = {"CEO", "BUILDER_1", "BUILDER_2", "BUILDER_3", "BUILDER_4", "BUILDER_5", "BUILDER_6", "BUILDER_7", "GENERIC_REVIEW"}
+CONSUMER_TYPES = {"CEO", *(f"BUILDER_{number}" for number in BUILDER_NUMBERS), "GENERIC_REVIEW"}
 FRESHNESS_REQUIREMENTS = {"ANY", "FRESH_ONLY", "FRESH_OR_AGING"}
-BUILDER_NUMBERS = set(range(1, 8))
 
 RELATION_PRIORITY: dict[str, int] = {
     "invariant": 110, "blocked_by": 100, "blocks": 100,
@@ -60,14 +60,12 @@ REASON_PRIORITY = {
 }
 
 PROFILES = {
-    "CEO": {"focus": ("objective", "progress", "blockers", "risks", "decisions", "builders", "critical_path", "next_safe_action"), "partners": (1, 2, 3, 4)},
+    "CEO": {"focus": ("objective", "progress", "blockers", "risks", "decisions", "builders", "critical_path", "next_safe_action"), "partners": BUILDER_NUMBERS},
     "BUILDER_1": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": (2, 4)},
     "BUILDER_2": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": (4,)},
     "BUILDER_3": {"focus": ("task", "workstream", "memory", "graph", "sync", "safety", "blockers", "verification"), "partners": ()},
     "BUILDER_4": {"focus": ("task", "workstream", "decisions", "contracts", "dependencies", "safety", "blockers", "verification"), "partners": (1, 2)},
-    "BUILDER_5": {"focus": ("task", "workstream", "app", "pwa", "integration", "contracts", "safety", "verification"), "partners": (6, 7)},
-    "BUILDER_6": {"focus": ("task", "workstream", "bug", "regression", "verification", "dependencies", "safety", "blockers"), "partners": (5, 7)},
-    "BUILDER_7": {"focus": ("task", "workstream", "runtime", "reliability", "observability", "contracts", "safety", "verification"), "partners": (4, 5, 6)},
+    "BUILDER_5": {"focus": ("task", "workstream", "dispatcher", "orchestration", "contracts", "safety", "blockers", "verification"), "partners": (1, 2, 3, 4)},
     "GENERIC_REVIEW": {"focus": ("objective", "verified_state", "dependencies", "provenance"), "partners": ()},
 }
 
@@ -232,7 +230,7 @@ class ContextRequest:
             raise ContextCompilerError(f"unsupported consumer_type: {consumer!r}")
         number = self.builder_number
         if number is not None and (isinstance(number, bool) or number not in BUILDER_NUMBERS):
-            raise ContextCompilerError("builder_number must be exactly 1, 2, 3, 4, 5, 6, or 7")
+            raise ContextCompilerError("builder_number must be exactly 1, 2, 3, 4, or 5")
         expected = int(consumer.split("_", 1)[1]) if consumer.startswith("BUILDER_") else None
         if expected is not None and number not in (None, expected):
             raise ContextCompilerError("builder_number must match consumer_type")
@@ -538,8 +536,8 @@ def _is_superseded(graph: SemanticGraph, key: str) -> bool:
 def _profile_partners(consumer: str) -> tuple[int, ...]:
     return {
         "BUILDER_1": (2, 4), "BUILDER_2": (4,), "BUILDER_3": (),
-        "BUILDER_4": (1, 2), "BUILDER_5": (6, 7), "BUILDER_6": (5, 7),
-        "BUILDER_7": (4, 5, 6), "CEO": (1, 2, 3, 4, 5, 6, 7), "GENERIC_REVIEW": (),
+        "BUILDER_4": (1, 2), "BUILDER_5": (1, 2, 3, 4),
+        "CEO": BUILDER_NUMBERS, "GENERIC_REVIEW": (),
     }.get(consumer, ())
 
 

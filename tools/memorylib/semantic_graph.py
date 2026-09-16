@@ -20,6 +20,7 @@ import time
 from typing import Any, Iterable
 
 from .frontmatter import parse_frontmatter
+from .governance import BUILDER_NUMBERS, BUILDER_NUMBER_SET
 
 
 GRAPH_SCHEMA = 2
@@ -76,7 +77,7 @@ SHA_RE = re.compile(r"(?<![0-9a-f])([0-9a-f]{40})(?![0-9a-f])")
 PR_RE = re.compile(r"(?:github\s+)?(?:pull\s+request|PR)\s*#?(\d+)", re.IGNORECASE)
 ID_RE = re.compile(r"\b(?:EVT|DEC|EVD|FND|VER|TASK|WS|PRV|MOD|DAT|STATE|CMP|JOB|WRT|BLK)-[A-Za-z0-9][A-Za-z0-9-]*\b")
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]")
-BUILDER_RE = re.compile(r"^Builder ([1-7])$", re.IGNORECASE)
+BUILDER_RE = re.compile(r"^Builder ([1-5])$", re.IGNORECASE)
 
 CANONICAL_SCAN_DIRS = (
     "_meta", "architecture", "builder", "components", "datasets", "decisions",
@@ -402,7 +403,7 @@ class SemanticGraph:
         return self
 
     def _seed_builder_identities(self) -> None:
-        for number in range(1, 8):
+        for number in BUILDER_NUMBERS:
             self._add_entity(
                 "BUILDER", f"BUILDER-{number}", f"Builder {number}",
                 "governance/builder-identities", "GOVERNED_IDENTITY", False,
@@ -672,8 +673,8 @@ class SemanticGraph:
         builder_match = None
         if isinstance(builder_value, str):
             builder_match = BUILDER_RE.fullmatch(builder_value.strip())
-        if builder_match is None and isinstance(builder_number, int) and builder_number in set(range(1, 8)):
-            builder_match = re.fullmatch(r"([1-7])", str(builder_number))
+        if builder_match is None and isinstance(builder_number, int) and builder_number in BUILDER_NUMBER_SET:
+            builder_match = re.fullmatch(r"([1-5])", str(builder_number))
         if builder_match:
             number = int(builder_match.group(1))
             target = self._builder_key(number)
@@ -783,7 +784,7 @@ class SemanticGraph:
                 return None
             return self._add_entity(namespace, raw, raw, source_path, "CANONICAL_REFERENCE" if canonical else "RUNTIME_DERIVED", canonical)
         if namespace == "BUILDER":
-            match = re.fullmatch(r"(?:Builder\s*)?([1-7])", raw, re.IGNORECASE)
+            match = re.fullmatch(r"(?:Builder\s*)?([1-5])", raw, re.IGNORECASE)
             if match:
                 return self._builder_key(int(match.group(1)))
         if inferred and inferred in self.entities:
@@ -940,7 +941,7 @@ def _render_builder_moc(entities: Iterable[Entity]) -> str:
         GRAPH_MARKER,
         "# Builders Graph MOC",
         "",
-        "Builder identities are governed as 1–4; role and status remain evidence-derived.",
+        "Builder identities are governed as 1–5; role and status remain evidence-derived.",
         "",
         f"- Entity count: **{len(selected)}**",
         "",
@@ -1000,7 +1001,7 @@ def render_semantic_graph(graph: SemanticGraph, output_root: Path | None = None)
             top5_keys.add(edge.source)
     moc_specs = {
         "MOC-TOP5.md": ("Top-5 Graph MOC", "Only entities connected by explicit Top-5 workstream relations are listed.", [graph.entities[key] for key in sorted(top5_keys) if key in graph.entities]),
-        "MOC-BUILDERS.md": ("Builders Graph MOC", "Builder identities are governed as 1–7; role and status remain evidence-derived.", by_namespace["BUILDER"]),
+        "MOC-BUILDERS.md": ("Builders Graph MOC", "Builder identities are governed as 1–5; role and status remain evidence-derived.", by_namespace["BUILDER"]),
         "MOC-PROVIDERS.md": ("Providers Graph MOC", "Providers appear only from canonical structured fields, records, or runtime evidence.", by_namespace["PROVIDER"]),
         "MOC-MODELS.md": ("Models Graph MOC", "Models appear only from canonical structured fields or records.", by_namespace["MODEL"]),
         "MOC-WORKSTREAMS.md": ("Workstreams Graph MOC", "Workstreams are linked from explicit structured workstream fields and authored links.", by_namespace["WORKSTREAM"]),
