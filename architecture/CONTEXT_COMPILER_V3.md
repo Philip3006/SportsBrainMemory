@@ -67,12 +67,13 @@ answers “why was this included?” without storing hidden reasoning.
 
 ## Authority and retrieval policy
 
-Authority order is `CANONICAL`, `VERIFIED`, `CANDIDATE`, then
-`RUNTIME_DERIVED`. Authority is evaluated before relevance and recency. Explicit
-seeds, task/workstream matches, owner identities, high-value relations, active
-blockers, governing decisions, safety invariants, recent verification, and a
-bounded second hop are selected deterministically. The compiler never dumps the
-full graph and does not use embeddings or LLM guesses.
+Priority classes are safety invariants, active blockers, governing decisions,
+and explicit required task/contract context, in that order. Within a priority
+class, authority is `CANONICAL`, `VERIFIED`, `CANDIDATE`, then
+`RUNTIME_DERIVED`, followed by deterministic relevance and recency. Explicit
+seeds, task/workstream matches, owner identities, high-value relations, recent
+verification, and a bounded second hop are selected deterministically. The
+compiler never dumps the full graph and does not use embeddings or LLM guesses.
 
 Relation priorities include `invariant`, `BLOCKED_BY`/`blocked_by`, `VERIFIED_BY`,
 `IMPLEMENTS`, `SUPERSEDES`, `GOVERNED_BY`, `DEPENDS_ON`, `VALIDATES`, ownership,
@@ -106,9 +107,11 @@ separate categories. No technical default is promoted into CEO policy.
 Runtime handoffs use the existing policy: FRESH through 6 hours, AGING above 6
 hours, and STALE above 24 hours. A stale handoff is labeled stale and is not
 presented as current. `UNKNOWN`, `STALE`, and `CONFLICTING` remain visible.
-When the materialized runtime graph is unavailable, V3 uses a documented
-canonical graph fallback and sets `graph_available=false`; direct runtime
-records, if present, remain explicitly noncanonical.
+When the materialized runtime graph is unavailable or fails validation, V3 uses
+a canonical-only graph fallback, sets `graph_available=false`, withholds all
+runtime handoffs/candidates/blockers, and explains the withholding in warnings.
+If mandatory safety, blocker, or governing-decision material cannot fit the
+requested entity/token budget, compilation fails closed.
 
 Candidates keep `canonical=false` and `promotion_required=true`. The compiler
 does not auto-promote candidates, resolve blockers, rewrite events, access or
@@ -118,7 +121,8 @@ unlock sealed 2425/2526 data, or change NO-BET/no-live-activation invariants.
 
 The estimate is deterministic UTF-8 bytes divided by four, rounded up. Entities
 are ranked before selection and added only while both `max_entity_count` and
-`token_budget` remain satisfied. Safety invariants and active blockers outrank
+`token_budget` remain satisfied. Safety invariants, active blockers, and
+governing decisions are mandatory and outrank explicit task context and
 optional history. If material is omitted, `truncated=true` and the pack reports
 `candidate_entity_count`, `included_entity_count`, `omitted_entity_count`, and
 metrics for truncated entities and budget utilization. The compiler never
@@ -126,13 +130,14 @@ silently exceeds the requested budget.
 
 ## Digests and cache
 
-`context_digest` is calculated from semantic pack content, excluding only
-`generated_at` and observation bookkeeping (`first_observed_at`,
-`last_observed_at`, `observation_count`). A changed decision, blocker,
-verification, request, graph relationship, or substantive runtime state changes
-the digest. `cache_key` combines source Memory SHA, graph digest, runtime digest,
-semantic request, and compiler version. Generated timestamps alone do not
-invalidate semantic identity.
+`context_digest` is calculated from semantic pack content, excluding
+`generated_at`, the operational `cache_key`, and observation bookkeeping
+(`first_observed_at`, `last_observed_at`, `observation_count`). A changed
+decision, blocker, verification, request, graph relationship, or substantive
+runtime state changes the digest. `cache_key` combines source Memory SHA, graph
+digest, runtime digest, semantic request, compiler version, and the normalized
+freshness reference time. Thus an unchanged semantic result can retain its
+digest while freshness-reference changes cannot reuse an old cache entry.
 
 ## CLI
 
@@ -146,7 +151,8 @@ python3 tools/memory.py context inspect /path/to/Obsidian-Vault/_live/context/CT
 
 Build output is atomically written through a temporary sibling and validated
 before promotion. If promotion fails, prior JSON/Markdown files are restored.
-No generated pack write touches the Memory checkout.
+Resolved Vault and `_live/context` output paths inside or resolving into the
+Memory checkout are rejected before any output operation.
 
 ## Secrets, rollback, and non-proofs
 

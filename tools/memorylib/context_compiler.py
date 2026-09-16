@@ -22,7 +22,14 @@ from typing import Any, Iterable, Mapping, TypedDict
 
 from .frontmatter import parse_frontmatter
 from .observer import _latest_builder_evidence, _valid_handoffs
-from .semantic_graph import Entity, GraphEdge, GraphIssue, SemanticGraph, canonical_input_digest
+from .semantic_graph import (
+    Entity,
+    GraphEdge,
+    GraphIssue,
+    SemanticGraph,
+    canonical_input_digest,
+    validate_semantic_graph,
+)
 
 
 CONTEXT_SCHEMA = 3
@@ -440,7 +447,7 @@ def _runtime_candidate_records(snapshot: Mapping[str, Any]) -> tuple[dict[str, A
     return records, latest, blockers
 
 
-def _runtime_graph_available(vault: Path | None) -> bool:
+def _runtime_graph_available(root: Path, vault: Path | None) -> bool:
     if not vault:
         return False
     path = vault / "_live" / "graph" / "GRAPH_MANIFEST.json"
@@ -450,7 +457,13 @@ def _runtime_graph_available(vault: Path | None) -> bool:
         manifest = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return False
-    return isinstance(manifest, dict) and manifest.get("noncanonical_view") is True
+    if not isinstance(manifest, dict) or manifest.get("noncanonical_view") is not True:
+        return False
+    try:
+        validation = validate_semantic_graph(root, path.parent, vault=vault, link_base=vault)
+    except Exception:
+        return False
+    return validation.errors == 0 and validation.warnings == 0
 
 
 def _seed_match(graph: SemanticGraph, seed: str) -> list[str]:
@@ -496,8 +509,12 @@ def _is_safety(entity: Entity) -> bool:
     return any(token in text for token in ("no-bet", "sealed", "no-live", "no_production", "research", "closing"))
 
 
+def _is_blocker_entity(entity: Entity) -> bool:
+    return entity.namespace == "BLOCKER" or str(entity.source_type or "").casefold() == "blocker" or str(entity.metadata.get("type", "")).casefold() == "blocker"
+
+
 def _is_active_blocker(entity: Entity) -> bool:
-    if entity.namespace != "BLOCKER":
+    if not _is_blocker_entity(entity):
         return False
     status = str(entity.metadata.get("status", "")).upper()
     return status not in {"RESOLVED", "CLOSED", "REPORTED_CHANGED", "PRESERVED_UNVERIFIED"}
@@ -599,7 +616,7 @@ def _entity_item(
         source_type = synthetic.get("candidate_type")
         current_status = None
     else:
-        namespace = entity.namespace
+        namespace = "BLOCKER" if _is_blocker_entity(entity) else entity.namespace
         stable_id = entity.stable_id
         label = entity.label
         paths = sorted(entity.source_paths)
@@ -658,11 +675,11 @@ def _entity_item(
         item["candidate_type"] = synthetic.get("candidate_type")
         item["promotion_required"] = synthetic.get("promotion_required")
         item["canonical"] = False
-    if candidate.key.startswith("BLOCKER:"):
+    if namespace == "BLOCKER":
         item["blocker"] = {
-            key: synthetic.get(key)
+            key: (synthetic or source).get(key)
             for key in ("blocker_id", "status", "classification", "summary", "auto_resolve", "owner", "dependency", "last_observed_at", "provenance")
-            if synthetic and synthetic.get(key) not in (None, "", [], {})
+            if (synthetic or source).get(key) not in (None, "", [], {})
         }
     if namespace == "BUILDER" and current_status is None:
         item["runtime_status"] = {"state": "UNKNOWN", "message": "NO CURRENT HANDOFF EVIDENCE"}
@@ -791,12 +808,28 @@ def _render_markdown(request: ContextRequest, pack: Mapping[str, Any], items: li
 def _pack_without_digest(pack: Mapping[str, Any]) -> dict[str, Any]:
     value = json.loads(json.dumps(pack, ensure_ascii=False))
     value.pop("context_digest", None)
+    # Cache identity is an operational reuse key, not semantic context.
+    value.pop("cache_key", None)
     value.pop("generated_at", None)
     value.pop("markdown", None)
     return _semantic_value(value)
 
 
+def _priority_class(candidate: _Candidate) -> int:
+    """Return the governance priority class, independent of authority."""
+    if "SAFETY_INVARIANT" in candidate.reasons:
+        return 4
+    if "ACTIVE_BLOCKER" in candidate.reasons:
+        return 3
+    if "GOVERNING_DECISION" in candidate.reasons:
+        return 2
+    if candidate.explicit or "REQUIRED_CROSS_BUILDER_CONTRACT" in candidate.reasons:
+        return 1
+    return 0
+
+
 def _rank_candidate(graph: SemanticGraph, candidate: _Candidate, item: Mapping[str, Any]) -> tuple[Any, ...]:
+    priority = _priority_class(candidate)
     authority = AUTHORITY_RANK.get(str(item.get("authority_class")), 0)
     safety = 1 if "SAFETY_INVARIANT" in candidate.reasons else 0
     blocker = 1 if "ACTIVE_BLOCKER" in candidate.reasons else 0
@@ -805,7 +838,7 @@ def _rank_candidate(graph: SemanticGraph, candidate: _Candidate, item: Mapping[s
     timestamp = _parse_time(item.get("provenance", {}).get("observed_at"))
     recency = timestamp.timestamp() if timestamp else 0
     superseded = 1 if "SUPERSEDED_HISTORY" in candidate.reasons else 0
-    return (-authority, -safety, -blocker, superseded, -reason_score, -relation_score, -recency, candidate.hops, candidate.key)
+    return (-priority, -authority, -safety, -blocker, superseded, -reason_score, -relation_score, -recency, candidate.hops, candidate.key)
 
 
 def _build_graph(root: Path, vault: Path | None, include_runtime: bool, graph_available: bool, reference_time: str) -> SemanticGraph:
@@ -833,14 +866,18 @@ def compile_context(root: Path, request: ContextRequest | Mapping[str, Any], *, 
     request = request if isinstance(request, ContextRequest) else ContextRequest.from_mapping(request)
     vault = Path(vault).resolve() if vault else None
     snapshot = _runtime_snapshot(vault) if request.include_runtime else {}
-    runtime_available = _runtime_graph_available(vault) if request.include_runtime else False
+    runtime_available = _runtime_graph_available(root, vault) if request.include_runtime else False
     warnings: list[str] = []
     if request.include_runtime and not runtime_available:
-        warnings.append("graph_available=false: runtime Semantic Graph projection is unavailable; canonical graph fallback used")
-    runtime_records, latest_handoffs, blockers = _runtime_candidate_records(snapshot)
+        warnings.append("graph_available=false: runtime context withheld because the runtime Semantic Graph projection is unavailable or failed validation; canonical-only context used")
+    runtime_records, latest_handoffs, blockers = _runtime_candidate_records(snapshot) if runtime_available else ({}, {}, [])
     graph = _build_graph(root, vault, request.include_runtime, runtime_available, request.generated_at)
     if graph.issues:
         warnings.extend(f"{issue.code}: {issue.message}" for issue in graph.issues if issue is not None)
+    if request.include_runtime and runtime_available and any(issue and issue.code == "RUNTIME_GRAPH_BUILD_FAILED" for issue in graph.issues):
+        runtime_available = False
+        runtime_records, latest_handoffs, blockers = {}, {}, []
+        warnings.append("graph_available=false: runtime context withheld because the runtime Semantic Graph build failed; canonical-only context used")
     conflicts = _source_conflicts(snapshot)
     if conflicts:
         warnings.append("CONFLICTING EVIDENCE: runtime source conflicts require CEO review")
@@ -866,6 +903,14 @@ def compile_context(root: Path, request: ContextRequest | Mapping[str, Any], *, 
         if request.freshness_requirement == "FRESH_OR_AGING" and item["authority_class"] in {"CANDIDATE", "RUNTIME_DERIVED"} and item.get("freshness") == "STALE":
             continue
         eligible.append(candidate)
+    mandatory = [candidate for candidate in ranked if _priority_class(candidate) >= 2]
+    eligible_ids = {candidate.key for candidate in eligible}
+    freshness_excluded_mandatory = [candidate.key for candidate in mandatory if candidate.key not in eligible_ids]
+    if freshness_excluded_mandatory:
+        raise ContextCompilerError(
+            "mandatory safety/blocker/decision evidence was excluded by freshness policy: "
+            + ", ".join(sorted(freshness_excluded_mandatory))
+        )
 
     base: dict[str, Any] = {
         "schema_version": CONTEXT_SCHEMA,
@@ -875,7 +920,7 @@ def compile_context(root: Path, request: ContextRequest | Mapping[str, Any], *, 
         "consumer": request.consumer_type,
         "source_memory_sha": _git_head(root),
         "semantic_graph_digest": _graph_semantic_digest(graph),
-        "runtime_digest": _runtime_digest(snapshot) if request.include_runtime else None,
+        "runtime_digest": _runtime_digest(snapshot) if request.include_runtime and runtime_available else None,
         "selection_policy_version": SELECTION_POLICY_VERSION,
         "profile": PROFILES.get(request.consumer_type, PROFILES["GENERIC_REVIEW"]),
         "seed_entities": list(request.entity_seeds),
@@ -888,14 +933,12 @@ def compile_context(root: Path, request: ContextRequest | Mapping[str, Any], *, 
         "source_memory_sha": base["source_memory_sha"],
         "semantic_graph_digest": base["semantic_graph_digest"],
         "runtime_digest": base["runtime_digest"],
+        "freshness_reference": (_parse_time(request.generated_at) or reference).isoformat(),
         "request": request.semantic_dict(),
         "compiler_version": COMPILER_VERSION,
     })
-    selected: list[_Candidate] = []
-    selected_items: list[dict[str, Any]] = []
-    for candidate in eligible:
-        item = raw_items[candidate.key]
-        proposed = selected_items + [item]
+
+    def draft_for(proposed: list[dict[str, Any]]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
         proposed_edges = _edge_items(graph, {entry["entity_id"] for entry in proposed})
         draft = dict(base)
         draft.update({
@@ -912,7 +955,32 @@ def compile_context(root: Path, request: ContextRequest | Mapping[str, Any], *, 
             "metrics": {},
         })
         draft["estimated_tokens"] = _estimate_tokens(_render_markdown(request, draft, proposed, proposed_edges))
-        if len(proposed) > request.max_entity_count or draft["estimated_tokens"] > request.token_budget:
+        return draft, proposed_edges
+
+    def fits(proposed: list[dict[str, Any]]) -> bool:
+        draft, _ = draft_for(proposed)
+        return len(proposed) <= request.max_entity_count and draft["estimated_tokens"] <= request.token_budget
+
+    selected: list[_Candidate] = []
+    selected_items: list[dict[str, Any]] = []
+    mandatory_ids = {candidate.key for candidate in mandatory}
+    for candidate in mandatory:
+        item = raw_items[candidate.key]
+        proposed = selected_items + [item]
+        if not fits(proposed):
+            raise ContextCompilerError(
+                "mandatory safety/blocker/decision evidence cannot fit the requested "
+                f"token/entity budget: {candidate.key}"
+            )
+        selected.append(candidate)
+        selected_items.append(item)
+
+    for candidate in eligible:
+        if candidate.key in mandatory_ids:
+            continue
+        item = raw_items[candidate.key]
+        proposed = selected_items + [item]
+        if not fits(proposed):
             continue
         selected.append(candidate)
         selected_items.append(item)
@@ -1075,10 +1143,26 @@ def _write_json(path: Path, value: Any) -> None:
         handle.write("\n")
 
 
+def _ensure_external_context_output(root: Path, vault: Path) -> None:
+    """Reject any resolved Vault/output path inside the active Memory checkout."""
+    root = root.resolve()
+    vault = vault.resolve()
+    output_dir = (vault / CONTEXT_DIR).resolve()
+    for label, path in (("Vault", vault), ("context output", output_dir)):
+        try:
+            path.relative_to(root)
+        except ValueError:
+            continue
+        raise ContextCompilerError(
+            f"{label} must be outside the canonical Memory checkout: {path}"
+        )
+
+
 def build_context_atomic(root: Path, request: ContextRequest | Mapping[str, Any], *, vault: Path) -> dict[str, Any]:
     """Build and atomically promote one noncanonical pack into Vault _live/context."""
     root = Path(root).resolve()
     vault = Path(vault).resolve()
+    _ensure_external_context_output(root, vault)
     compilation = compile_context(root, request, vault=vault)
     request_obj = request if isinstance(request, ContextRequest) else ContextRequest.from_mapping(request)
     output_dir = vault / CONTEXT_DIR

@@ -66,12 +66,12 @@ class ContextCompilerTests(unittest.TestCase):
         write_record(self.root, "decisions/records/DEC-NEW.md", "DEC-NEW", "decision", "active", supersedes=["DEC-OLD"])
         write_record(self.root, "decisions/records/DEC-OLD.md", "DEC-OLD", "decision", "active")
         write_record(self.root, "models/UNRELATED.md", "MOD-UNRELATED", "model", "active", builder="Builder 4", builder_number=4)
-        self.vault = self.root / "vault"
-        self.vault.mkdir()
+        self.vault = Path(tempfile.mkdtemp(prefix="sbmem-context-vault-"))
 
     def tearDown(self) -> None:
         import shutil
         shutil.rmtree(self.root, ignore_errors=True)
+        shutil.rmtree(self.vault, ignore_errors=True)
 
     def _handoff(self, number: int, observed_at: str, status: str = "CURRENT", blocker: str | None = None) -> dict:
         text = f"""BUILDER: {number}
@@ -132,6 +132,8 @@ Observed at: {observed_at}
         stale = compile_context(self.root, request("BUILDER_4", include_runtime=True, generated_at="2026-09-17T12:00:00Z"), vault=self.vault)
         self.assertEqual(stale.pack["freshness_state"], "STALE")
         self.assertTrue(any("STALE" in warning for warning in stale.pack["warnings"]))
+        self.assertNotEqual(compiled.pack["context_digest"], stale.pack["context_digest"])
+        self.assertNotEqual(compiled.pack["cache_key"], stale.pack["cache_key"])
         write_json(self.vault, "_live/SOURCE_OBSERVER.json", {"schema": 1, "conflicts": [{"type": "STATUS_CONFLICT", "severity": "CEO_DECISION_REQUIRED"}], "candidates": []})
         conflict = compile_context(self.root, request("BUILDER_4", include_runtime=True), vault=self.vault)
         self.assertEqual(conflict.pack["freshness_state"], "CONFLICTING")
@@ -141,8 +143,14 @@ Observed at: {observed_at}
         self._write_handoffs(self._handoff(4, "2026-09-16T11:00:00Z"))
         compiled = compile_context(self.root, request("BUILDER_4", include_runtime=True), vault=self.vault)
         self.assertFalse(compiled.pack["graph_available"])
-        self.assertTrue(any("graph_available=false" in warning for warning in compiled.pack["warnings"]))
-        self.assertGreater(compiled.pack["runtime_count"], 0)
+        self.assertEqual(compiled.pack["runtime_count"], 0)
+        self.assertIsNone(compiled.pack["runtime_digest"])
+        self.assertTrue(any("runtime context withheld" in warning for warning in compiled.pack["warnings"]))
+        self.assertFalse(any(item.get("candidate_type") in {"SOURCE_CANDIDATE_EVENT", "CANDIDATE_OPERATIONAL_EVIDENCE"} for item in compiled.pack["included_entities"]))
+        write_json(self.vault, "_live/graph/GRAPH_MANIFEST.json", {"schema": 2, "noncanonical_view": True})
+        invalid_graph = compile_context(self.root, request("BUILDER_4", include_runtime=True), vault=self.vault)
+        self.assertFalse(invalid_graph.pack["graph_available"])
+        self.assertEqual(invalid_graph.pack["runtime_count"], 0)
 
     def test_missing_runtime_builder_is_explicit_unknown(self) -> None:
         compiled = compile_context(self.root, request("BUILDER_4", include_runtime=True), vault=self.vault)
@@ -193,9 +201,71 @@ Observed at: {observed_at}
         first = compile_context(self.root, request("BUILDER_1", entity_seeds=["WS-ONE"], generated_at="2026-09-16T10:00:00Z"))
         second = compile_context(self.root, request("BUILDER_1", entity_seeds=["WS-ONE"], generated_at="2026-09-16T11:00:00Z"))
         self.assertEqual(first.pack["context_digest"], second.pack["context_digest"])
+        self.assertNotEqual(first.pack["cache_key"], second.pack["cache_key"])
         write_text(self.root, "workstreams/ONE.md", (self.root / "workstreams/ONE.md").read_text(encoding="utf-8").replace("WS-ONE authored context", "WS-ONE changed verified context"))
         third = compile_context(self.root, request("BUILDER_1", entity_seeds=["WS-ONE"], generated_at="2026-09-16T11:00:00Z"))
         self.assertNotEqual(first.pack["context_digest"], third.pack["context_digest"])
+
+    def test_mandatory_safety_blockers_and_decision_priority(self) -> None:
+        write_record(self.root, "invariants/INV-SAFETY.md", "INV-SAFETY", "invariant", "active", summary="NO-BET and sealed 2425/2526 remain enforced")
+        write_record(self.root, "findings/records/BLK-CANON.md", "BLK-CANON", "blocker", "active", classification="HARD", summary="canonical release gate remains open")
+        write_record(self.root, "decisions/records/DEC-GOV.md", "DEC-GOV", "decision", "active", summary="CEO decision governs the release boundary")
+        self._write_handoffs(self._handoff(4, "2026-09-16T11:00:00Z", "CURRENT", "provider credential unavailable"))
+        build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
+        compiled = compile_context(
+            self.root,
+            request("BUILDER_4", include_runtime=True, max_entity_count=4, token_budget=12000),
+            vault=self.vault,
+        )
+        included = compiled.pack["included_entities"]
+        ids = {item["entity_id"] for item in included}
+        self.assertIn("INVARIANT:INV-SAFETY", ids)
+        self.assertIn("FINDING:BLK-CANON", ids)
+        self.assertTrue(any(item["entity_id"] == "FINDING:BLK-CANON" and item["namespace"] == "BLOCKER" and item["authority_class"] == "CANONICAL" for item in included))
+        self.assertTrue(any(item["namespace"] == "BLOCKER" and item["authority_class"] == "RUNTIME_DERIVED" for item in included))
+        self.assertLessEqual(compiled.pack["included_entity_count"], 4)
+        self.assertTrue(compiled.pack["truncated"])
+
+        focused = compile_context(
+            self.root,
+            request("BUILDER_4", include_runtime=True, entity_seeds=["DEC-NEW"], max_entity_count=5, token_budget=12000),
+            vault=self.vault,
+        )
+        focused_ids = {item["entity_id"] for item in focused.pack["included_entities"]}
+        self.assertIn("DECISION:DEC-NEW", focused_ids)
+        self.assertNotIn("DECISION:DEC-OLD", focused_ids)
+        self.assertGreater(focused.pack["candidate_entity_count"], focused.pack["included_entity_count"])
+
+        ceo = compile_context(self.root, request("CEO", include_runtime=True, max_entity_count=20, token_budget=12000), vault=self.vault)
+        self.assertIn("DECISION:DEC-GOV", {item["entity_id"] for item in ceo.pack["included_entities"]})
+
+    def test_impossible_mandatory_budget_fails_closed(self) -> None:
+        write_record(self.root, "invariants/INV-SAFETY.md", "INV-SAFETY", "invariant", "active", summary="NO-BET and sealed 2425/2526 remain enforced")
+        write_record(self.root, "findings/records/BLK-CANON.md", "BLK-CANON", "blocker", "active", classification="HARD", summary="canonical release gate remains open")
+        self._write_handoffs(self._handoff(4, "2026-09-16T11:00:00Z", "CURRENT", "provider credential unavailable"))
+        build_semantic_graph_atomic(self.root, self.vault, reference_time="2026-09-16T12:00:00Z")
+        with self.assertRaisesRegex(ContextCompilerError, "mandatory"):
+            compile_context(
+                self.root,
+                request("BUILDER_4", include_runtime=True, max_entity_count=2, token_budget=12000),
+                vault=self.vault,
+            )
+
+    def test_external_output_guard_rejects_checkout_paths_and_preserves_last_good(self) -> None:
+        result = build_context_atomic(self.root, request("BUILDER_3", request_id="CTX-GUARD"), vault=self.vault)
+        output = Path(result["json"])
+        before = output.read_bytes()
+        invalid_paths = [self.root, self.root / "nested-vault"]
+        alias = self.root.parent / f"{self.root.name}-alias"
+        alias.symlink_to(self.root, target_is_directory=True)
+        invalid_paths.append(alias)
+        try:
+            for invalid in invalid_paths:
+                with self.assertRaisesRegex(ContextCompilerError, "outside the canonical Memory checkout"):
+                    build_context_atomic(self.root, request("BUILDER_3", request_id="CTX-GUARD"), vault=invalid)
+                self.assertEqual(output.read_bytes(), before)
+        finally:
+            alias.unlink(missing_ok=True)
 
     def test_atomic_output_validation_and_last_good_preservation(self) -> None:
         req = request("BUILDER_3", entity_seeds=["WS-ONE"], request_id="CTX-ATOMIC")
