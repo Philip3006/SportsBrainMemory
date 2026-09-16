@@ -48,6 +48,12 @@ from memorylib.dispatcher_context_envelope import (
     validate_dispatcher_context_envelope,
     write_dispatcher_context_envelope,
 )
+from memorylib.drift_resolution_planner import (
+    inspect_drift_resolution_plan,
+    plan_drift_resolution,
+    validate_drift_resolution_plan,
+    write_drift_resolution_plan,
+)
 
 def main():
     p=argparse.ArgumentParser()
@@ -161,6 +167,18 @@ def main():
     envelope_validate.add_argument('path')
     envelope_inspect = envelope_sp.add_parser('inspect')
     envelope_inspect.add_argument('path')
+    planner = sp.add_parser('drift-resolution-plan', aliases=['drift-plan'], help='read-only Memory Drift Resolution Planner V7')
+    planner_sp = planner.add_subparsers(dest='planner_cmd', required=True)
+    planner_build = planner_sp.add_parser('build')
+    planner_build.add_argument('--envelope', help='optional external Dispatcher Context Envelope JSON')
+    planner_build.add_argument('--vault', help='optional external Vault used as read-only audit input')
+    planner_build.add_argument('--output', help='explicit external output file or directory; omitted means no writes')
+    planner_build.add_argument('--reference-time', help='fixed ISO-8601 time for deterministic planning')
+    planner_build.add_argument('--json', action='store_true', dest='json_output', help='render the deterministic JSON plan')
+    planner_validate = planner_sp.add_parser('validate')
+    planner_validate.add_argument('path')
+    planner_inspect = planner_sp.add_parser('inspect')
+    planner_inspect.add_argument('path')
     graph = sp.add_parser('graph')
     graph_sp = graph.add_subparsers(dest='graph_cmd', required=True)
     graph_build = graph_sp.add_parser('build')
@@ -350,6 +368,29 @@ def main():
         else:
             print(compilation.markdown, end='')
             print(json.dumps({'classification': compilation.envelope['classification'], 'semantic_envelope_digest': compilation.envelope['semantic_envelope_digest'], 'output': output_result}, indent=2, sort_keys=True), file=sys.stderr)
+        return 0
+    if a.cmd in {'drift-resolution-plan', 'drift-plan'}:
+        if a.planner_cmd=='validate':
+            print(json.dumps({'valid': True, 'plan': validate_drift_resolution_plan(Path(a.path))}, indent=2, sort_keys=True, ensure_ascii=False))
+            return 0
+        if a.planner_cmd=='inspect':
+            print(json.dumps(inspect_drift_resolution_plan(Path(a.path)), indent=2, sort_keys=True, ensure_ascii=False))
+            return 0
+        vault = Path(a.vault) if a.vault else None
+        compilation = plan_drift_resolution(
+            ROOT,
+            envelope=Path(a.envelope) if a.envelope else None,
+            vault=vault,
+            reference_time=a.reference_time,
+        )
+        output_result=None
+        if a.output:
+            output_result=write_drift_resolution_plan(compilation, Path(a.output), root=ROOT, vault=vault)
+        if a.json_output:
+            print(json.dumps(compilation.plan, indent=2, sort_keys=True, ensure_ascii=False))
+        else:
+            print(compilation.markdown, end='')
+            print(json.dumps({'planner_status': compilation.plan['planner_status'], 'semantic_plan_digest': compilation.plan['semantic_plan_digest'], 'output': output_result}, indent=2, sort_keys=True), file=sys.stderr)
         return 0
     if a.cmd=='fingerprint':
         print(tree_fingerprint(ROOT))

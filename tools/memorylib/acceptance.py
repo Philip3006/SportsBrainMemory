@@ -9,6 +9,7 @@ from .context import build_context
 from .context_compiler import ContextRequest, compile_context, validate_context_pack
 from .builder_bootstrap import BuilderBootstrapRequest, compile_builder_bootstrap, validate_builder_bootstrap
 from .dispatcher_context_envelope import DispatcherContextEnvelopeRequest, compile_dispatcher_context_envelope, validate_dispatcher_context_envelope
+from .drift_resolution_planner import plan_drift_resolution, validate_drift_resolution_plan
 
 def tree_fingerprint(root:Path):
     h=hashlib.sha256()
@@ -166,6 +167,25 @@ def run(root:Path):
         gates.append(('dispatcher_context_envelope_v1', False, str(exc)))
     finally:
         shutil.rmtree(envelope_tmp, ignore_errors=True)
+
+    # Drift Resolution Planner V7 is a read-only review layer over the V5 audit
+    # and optional V6 envelope.  Keep its validation file external so this gate
+    # cannot mutate canonical Memory, the Vault, or runtime projections.
+    planner_tmp = Path(tempfile.mkdtemp(prefix='sbmem-drift-plan-acceptance-'))
+    try:
+        plan = plan_drift_resolution(
+            root,
+            envelope=envelope.envelope,
+            reference_time='2026-09-16T00:00:00Z',
+        )
+        plan_path = planner_tmp / 'drift-plan.json'
+        plan_path.write_text(json.dumps(plan.plan, ensure_ascii=False), encoding='utf-8')
+        validate_drift_resolution_plan(plan_path)
+        gates.append(('drift_resolution_planner_v7', True, f"status={plan.plan['planner_status']} findings={plan.plan['summary']['finding_count']}"))
+    except Exception as exc:
+        gates.append(('drift_resolution_planner_v7', False, str(exc)))
+    finally:
+        shutil.rmtree(planner_tmp, ignore_errors=True)
 
     td=Path(tempfile.mkdtemp(prefix='sbmem-scale-'))
     try:
