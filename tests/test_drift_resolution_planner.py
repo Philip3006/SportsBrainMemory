@@ -127,6 +127,9 @@ class DriftResolutionPlannerTests(unittest.TestCase):
     def test_v6_stale_and_failed_closed_context_remains_visible(self):
         stale = self.compile(envelope=fake_envelope(source_sha="b" * 40))
         self.assertIn("V6_SOURCE_SHA_STALE", stale.plan["review_flags"])
+        self.assertEqual(stale.plan["planner_status"], "REMEDIATION_REVIEW_REQUIRED")
+        conflict = self.compile(envelope=fake_envelope(classification="CONTEXT_CONFLICT"))
+        self.assertEqual(conflict.plan["planner_status"], "REMEDIATION_FAILED_CLOSED")
         with patch.object(planner, "_read_envelope", return_value={"classification": "CONTEXT_FAILED_CLOSED", "source_memory_sha": SOURCE_SHA}):
             failed = planner.plan_drift_resolution(ROOT, audit=audit([finding("F-1")]), envelope=object(), reference_time=REFERENCE)
         self.assertIn("V6_CONTEXT_FAILED_CLOSED", failed.plan["review_flags"])

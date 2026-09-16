@@ -454,8 +454,11 @@ def plan_drift_resolution(
             review_flags.add("CONTEXT_BLOCKING_FINDINGS")
         if item["unresolved_ceo_decision"]:
             review_flags.add("UNRESOLVED_CEO_DECISION")
-    failed = classification == "CONTEXT_FAILED_CLOSED" or any(item["dispatcher_impact"] == "CONTEXT_BLOCKING" and item["severity"].upper() == "ERROR" for item in items)
-    if not findings:
+    failed = classification in {"CONTEXT_FAILED_CLOSED", "CONTEXT_CONFLICT"} or any(item["dispatcher_impact"] == "CONTEXT_BLOCKING" for item in items)
+    stale_or_unknown_context = {"V6_SOURCE_SHA_STALE", "V6_CONTEXT_STALE"} & review_flags
+    if "V6_ENVELOPE_UNAVAILABLE" not in review_flags:
+        stale_or_unknown_context |= {"V6_CONTEXT_UNKNOWN"} & review_flags
+    if not findings and not stale_or_unknown_context and not failed:
         planner_status = "REMEDIATION_NOT_REQUIRED"
     elif failed:
         planner_status = "REMEDIATION_FAILED_CLOSED"
