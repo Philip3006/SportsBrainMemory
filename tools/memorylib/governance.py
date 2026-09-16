@@ -13,3 +13,14 @@ BUILDER_ROLES = {
     4: "Provider Cascade / Controlled Shadow Infrastructure",
     5: "Autonomous Development / Night Shift Dispatcher Owner",
 }
+
+# These relationships are visibility contracts, not execution authority.  They
+# live beside the roster so the auditor can detect drift between consumers.
+BUILDER_PROFILE_PARTNERS = {
+    1: (2, 4),
+    2: (4,),
+    3: (),
+    4: (1, 2),
+    5: (1, 2, 3, 4),
+}
+CEO_PROFILE_PARTNERS = BUILDER_NUMBERS
