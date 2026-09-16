@@ -92,14 +92,30 @@ Observed at: {observed_at}
         write_json(self.vault, "_live/BUILDER_HANDOFFS.json", {"schema": 1, "generated_at": "2026-09-16T12:00:00Z", "candidates": list(handoffs)})
 
     def test_all_consumer_profiles_and_invalid_builder_fail_closed(self) -> None:
-        for consumer in ("CEO", "BUILDER_1", "BUILDER_2", "BUILDER_3", "BUILDER_4", "GENERIC_REVIEW"):
+        for consumer in ("CEO", "BUILDER_1", "BUILDER_2", "BUILDER_3", "BUILDER_4", "BUILDER_5", "GENERIC_REVIEW"):
             compiled = compile_context(self.root, request(consumer))
             self.assertEqual(compiled.pack["consumer"], consumer)
             self.assertLessEqual(compiled.pack["estimated_tokens"], 6000)
-        with self.assertRaises(ContextCompilerError):
-            request("BUILDER_5")
+        for unsupported in ("BUILDER_6", "BUILDER_7", "BUILDER_8"):
+            with self.assertRaises(ContextCompilerError):
+                request(unsupported)
         with self.assertRaises(ContextCompilerError):
             ContextRequest.from_mapping({"request_id": "bad", "consumer_type": "BUILDER_4", "builder_number": 1})
+
+    def test_builder_five_dispatcher_profile_sees_only_governed_partners(self) -> None:
+        compiled = compile_context(self.root, request("BUILDER_5"))
+        self.assertEqual(tuple(compiled.pack["profile"]["partners"]), (1, 2, 3, 4))
+        ids = {item["entity_id"] for item in compiled.pack["included_entities"]}
+        self.assertNotIn("BUILDER:BUILDER-6", ids)
+        self.assertNotIn("BUILDER:BUILDER-7", ids)
+
+    def test_ceo_profile_covers_only_current_governed_builders(self) -> None:
+        compiled = compile_context(self.root, request("CEO"))
+        ids = {item["entity_id"] for item in compiled.pack["included_entities"]}
+        for number in range(1, 6):
+            self.assertIn(f"BUILDER:BUILDER-{number}", ids)
+        for number in (6, 7):
+            self.assertNotIn(f"BUILDER:BUILDER-{number}", ids)
 
     def test_explicit_seed_direct_dependency_and_unrelated_branch_excluded(self) -> None:
         compiled = compile_context(self.root, request("BUILDER_1", entity_seeds=["WS-ONE"], task="", workstream=""))

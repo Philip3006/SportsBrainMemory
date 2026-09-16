@@ -171,7 +171,10 @@ Safety: no production mutation and no live activation
         with self.assertRaises(CandidateValidationError):
             parse_builder_handoff("BUILDER: 1/4\nROLE: ambiguous")
         with self.assertRaises(CandidateValidationError):
-            parse_builder_handoff("BUILDER: 5\nROLE: invalid")
+            parse_builder_handoff("BUILDER: 8\nROLE: invalid")
+        for unsupported in (6, 7):
+            with self.assertRaises(CandidateValidationError):
+                parse_builder_handoff(f"BUILDER: {unsupported}\nROLE: unsupported")
         with self.assertRaises(CandidateValidationError):
             parse_builder_handoff("BUILDER: four\nROLE: invalid")
 
@@ -238,7 +241,7 @@ CI: green
 
     def test_absent_builder_evidence_is_unknown(self):
         control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": []})
-        for builder_number in (1, 2, 3, 4):
+        for builder_number in (1, 2, 3, 4, 5):
             self.assertIn(f"Builder {builder_number} — **UNKNOWN / NO CURRENT HANDOFF EVIDENCE**", control_plane)
 
     def test_stale_builder_handoff_is_visibly_stale(self):
@@ -368,24 +371,25 @@ Final recommendation: READY FOR CEO REVIEW
         )
         self.assertIn("BLOCKER_STATE_CHANGE_REQUIRES_CEO_REVIEW", {item["type"] for item in payload["conflicts"]})
 
-    def test_latest_builder_one_two_three_four_evidence_is_independent(self):
+    def test_latest_builder_one_through_five_evidence_is_independent(self):
         handoffs = [
             self._handoff(1, "2026-09-15T08:00:00+00:00", "BUILDER ONE OLD", "feat/one-old", "1" * 40),
             self._handoff(1, "2026-09-15T09:00:00+00:00", "BUILDER ONE NEW", "feat/one-new", "a" * 40),
             self._handoff(2, "2026-09-15T09:00:00+00:00", "BUILDER TWO CURRENT", "feat/two", "2" * 40),
             self._handoff(3, "2026-09-15T09:00:00+00:00", "BUILDER THREE CURRENT", "feat/three", "3" * 40),
             self._handoff(4, "2026-09-15T09:00:00+00:00", "BUILDER FOUR CURRENT", "feat/four", "4" * 40),
+            self._handoff(5, "2026-09-15T09:00:00+00:00", "BUILDER FIVE CURRENT", "feat/five", "5" * 40),
         ]
         control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": handoffs})
         self.assertIn("BUILDER ONE NEW", control_plane)
         self.assertNotIn("BUILDER ONE OLD", control_plane)
-        for status in ("BUILDER TWO CURRENT", "BUILDER THREE CURRENT", "BUILDER FOUR CURRENT"):
+        for status in ("BUILDER TWO CURRENT", "BUILDER THREE CURRENT", "BUILDER FOUR CURRENT", "BUILDER FIVE CURRENT"):
             self.assertIn(status, control_plane)
 
-    def test_builder_four_stale_evidence_is_marked_stale_and_visible(self):
-        stale = self._handoff(4, "2026-09-13T08:00:00+00:00", "OLD RELIABILITY STATE", "feat/stale-four", "4" * 40)
+    def test_builder_five_stale_evidence_is_marked_stale_and_visible(self):
+        stale = self._handoff(5, "2026-09-13T08:00:00+00:00", "OLD DISPATCHER STATE", "feat/stale-five", "5" * 40)
         control_plane = write_and_render({"observed_at": "2026-09-15T10:00:00+00:00", "builder_handoffs": [stale]})
-        self.assertIn("Builder 4", control_plane)
+        self.assertIn("Builder 5", control_plane)
         self.assertIn("freshness: **STALE**", control_plane)
         self.assertIn("not unquestionably current", control_plane)
 
