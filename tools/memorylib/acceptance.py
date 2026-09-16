@@ -8,6 +8,7 @@ from .dashboard import render_all
 from .context import build_context
 from .context_compiler import ContextRequest, compile_context, validate_context_pack
 from .builder_bootstrap import BuilderBootstrapRequest, compile_builder_bootstrap, validate_builder_bootstrap
+from .dispatcher_context_envelope import DispatcherContextEnvelopeRequest, compile_dispatcher_context_envelope, validate_dispatcher_context_envelope
 
 def tree_fingerprint(root:Path):
     h=hashlib.sha256()
@@ -139,6 +140,32 @@ def run(root:Path):
         gates.append(('builder_bootstrap_v4', False, str(exc)))
     finally:
         shutil.rmtree(bootstrap_tmp, ignore_errors=True)
+
+    # Dispatcher Context Envelope V1 is a read-only delivery layer over V3/V4/V5.
+    # Validate it through an external temporary file so acceptance never writes
+    # canonical Memory, the Vault, or a runtime projection.
+    envelope_tmp = Path(tempfile.mkdtemp(prefix='sbmem-envelope-acceptance-'))
+    try:
+        envelope_request = DispatcherContextEnvelopeRequest.from_mapping({
+            'envelope_id': 'ACCEPTANCE-ENVELOPE-BUILDER-1',
+            'builder_number': 1,
+            'task_id': 'ACCEPTANCE-TASK-ENVELOPE-BUILDER-1',
+            'task': 'acceptance Dispatcher Context Envelope V1 contract',
+            'workstream': 'Memory Context Delivery',
+            'token_budget': 6000,
+            'max_entity_count': 80,
+            'reference_time': '2026-09-16T00:00:00Z',
+            'generated_at': '2026-09-16T00:00:00Z',
+        })
+        envelope = compile_dispatcher_context_envelope(root, envelope_request)
+        envelope_path = envelope_tmp / 'envelope.json'
+        envelope_path.write_text(json.dumps(envelope.envelope, ensure_ascii=False), encoding='utf-8')
+        validate_dispatcher_context_envelope(envelope_path)
+        gates.append(('dispatcher_context_envelope_v1', True, f"builder=1 classification={envelope.envelope['classification']}"))
+    except Exception as exc:
+        gates.append(('dispatcher_context_envelope_v1', False, str(exc)))
+    finally:
+        shutil.rmtree(envelope_tmp, ignore_errors=True)
 
     td=Path(tempfile.mkdtemp(prefix='sbmem-scale-'))
     try:

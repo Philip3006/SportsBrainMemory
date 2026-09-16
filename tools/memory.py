@@ -41,6 +41,13 @@ from memorylib.semantic_graph import (
     validate_semantic_graph,
 )
 from memorylib.consistency_auditor import audit_consistency, write_audit_report
+from memorylib.dispatcher_context_envelope import (
+    DispatcherContextEnvelopeRequest,
+    compile_dispatcher_context_envelope,
+    inspect_dispatcher_context_envelope,
+    validate_dispatcher_context_envelope,
+    write_dispatcher_context_envelope,
+)
 
 def main():
     p=argparse.ArgumentParser()
@@ -126,6 +133,34 @@ def main():
     audit.add_argument('--output', help='explicit external output file or directory')
     audit.add_argument('--reference-time', help='fixed ISO-8601 time for deterministic freshness evaluation')
     audit.add_argument('--json', action='store_true', dest='json_output', help='render the deterministic JSON report')
+    envelope = sp.add_parser('dispatcher-context-envelope', aliases=['dispatcher-envelope'], help='read-only Dispatcher Context Envelope V1 over V3/V4/V5')
+    envelope_sp = envelope.add_subparsers(dest='envelope_cmd', required=True)
+    envelope_build = envelope_sp.add_parser('build')
+    envelope_build.add_argument('--builder', type=int, required=False, help='worker Builder 1 through 4; Builder 5 is the Dispatcher Owner, not a worker target')
+    envelope_build.add_argument('--task-id')
+    envelope_build.add_argument('--task', default='')
+    envelope_build.add_argument('--workstream', default='')
+    envelope_build.add_argument('--metadata-json')
+    envelope_build.add_argument('--repository', action='append', dest='repository_scope')
+    envelope_build.add_argument('--allowed-path', action='append', dest='allowed_paths')
+    envelope_build.add_argument('--prohibited-path', action='append', dest='prohibited_paths')
+    envelope_build.add_argument('--dependency', action='append', dest='declared_dependencies')
+    envelope_build.add_argument('--seed', action='append', dest='entity_seeds')
+    envelope_build.add_argument('--prohibited-operation', action='append', dest='prohibited_operations')
+    envelope_build.add_argument('--verification-requirement', action='append', dest='verification_requirements')
+    envelope_build.add_argument('--budget-tokens', '--context-budget', dest='budget_tokens', type=int, default=6000)
+    envelope_build.add_argument('--max-entities', type=int, default=80)
+    envelope_build.add_argument('--freshness', default='ANY', choices=['ANY', 'FRESH_ONLY', 'FRESH_OR_AGING'])
+    envelope_build.add_argument('--include-runtime', action='store_true')
+    envelope_build.add_argument('--vault', help='optional external Vault used as read-only runtime input')
+    envelope_build.add_argument('--output', help='explicit external output file or directory; omitted means no writes')
+    envelope_build.add_argument('--envelope-id')
+    envelope_build.add_argument('--reference-time')
+    envelope_build.add_argument('--json', action='store_true', dest='json_output')
+    envelope_validate = envelope_sp.add_parser('validate')
+    envelope_validate.add_argument('path')
+    envelope_inspect = envelope_sp.add_parser('inspect')
+    envelope_inspect.add_argument('path')
     graph = sp.add_parser('graph')
     graph_sp = graph.add_subparsers(dest='graph_cmd', required=True)
     graph_build = graph_sp.add_parser('build')
@@ -271,6 +306,51 @@ def main():
         else:
             print(report.markdown(), end='')
         return 1 if any(item['severity'] == 'ERROR' for item in report.findings) else 0
+    if a.cmd in {'dispatcher-context-envelope', 'dispatcher-envelope'}:
+        if a.envelope_cmd=='validate':
+            print(json.dumps({'valid': True, 'envelope': validate_dispatcher_context_envelope(Path(a.path))}, indent=2, sort_keys=True, ensure_ascii=False))
+            return 0
+        if a.envelope_cmd=='inspect':
+            print(json.dumps(inspect_dispatcher_context_envelope(Path(a.path)), indent=2, sort_keys=True, ensure_ascii=False))
+            return 0
+        if a.metadata_json:
+            request_data=json.loads(Path(a.metadata_json).read_text(encoding='utf-8'))
+            if not isinstance(request_data, dict):
+                raise ValueError('dispatcher envelope metadata JSON must be an object')
+            if a.builder is not None and 'builder' not in request_data and 'builder_number' not in request_data:
+                request_data['builder_number']=a.builder
+        else:
+            request_data={
+                'envelope_id': a.envelope_id,
+                'builder_number': a.builder,
+                'task_id': a.task_id,
+                'task': a.task,
+                'workstream': a.workstream,
+                'repository_scope': a.repository_scope or [],
+                'allowed_paths': a.allowed_paths or [],
+                'prohibited_paths': a.prohibited_paths or [],
+                'declared_dependencies': a.declared_dependencies or [],
+                'entity_seeds': a.entity_seeds or [],
+                'prohibited_operations': a.prohibited_operations or [],
+                'verification_requirements': a.verification_requirements or [],
+                'token_budget': a.budget_tokens,
+                'max_entity_count': a.max_entities,
+                'freshness_requirement': a.freshness,
+                'include_runtime': a.include_runtime,
+                'reference_time': a.reference_time,
+            }
+        request=DispatcherContextEnvelopeRequest.from_mapping(request_data)
+        vault=Path(a.vault) if a.vault else None
+        compilation=compile_dispatcher_context_envelope(ROOT, request, vault=vault)
+        output_result=None
+        if a.output:
+            output_result=write_dispatcher_context_envelope(compilation, Path(a.output), root=ROOT, vault=vault)
+        if a.json_output:
+            print(json.dumps(compilation.envelope, indent=2, sort_keys=True, ensure_ascii=False))
+        else:
+            print(compilation.markdown, end='')
+            print(json.dumps({'classification': compilation.envelope['classification'], 'semantic_envelope_digest': compilation.envelope['semantic_envelope_digest'], 'output': output_result}, indent=2, sort_keys=True), file=sys.stderr)
+        return 0
     if a.cmd=='fingerprint':
         print(tree_fingerprint(ROOT))
         return 0
