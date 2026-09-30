@@ -6,6 +6,8 @@ status: active
 last_updated: 2026-09-30T12:46:53+02:00
 freshness_class: stable
 canonical: true
+graph_domain: memory
+graph_role: support
 ---
 # New Builder — 30-Minute Onboarding
 

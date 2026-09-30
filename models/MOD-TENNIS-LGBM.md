@@ -4,6 +4,8 @@ type: model
 title: Tennis LGBM
 status: active
 canonical: true
+graph_domain: tennis
+graph_role: core
 tier: warm
 sport: tennis
 promotion_status: production_current_review_required

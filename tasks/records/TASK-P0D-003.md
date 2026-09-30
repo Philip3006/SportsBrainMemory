@@ -4,6 +4,8 @@ type: task
 title: AI Healer Boundary
 status: draft
 canonical: true
+graph_domain: governance
+graph_role: operational
 tier: warm
 workstream: P0-D
 created_at: 2026-08-16T13:04:00+02:00

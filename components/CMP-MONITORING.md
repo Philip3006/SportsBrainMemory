@@ -4,6 +4,8 @@ type: component
 title: Monitoring truth subsystem
 status: active
 canonical: true
+graph_domain: observability
+graph_role: core
 tier: warm
 source_paths:
   - src/monitoring/health_writer.py

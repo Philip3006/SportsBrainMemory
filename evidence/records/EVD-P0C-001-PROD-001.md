@@ -4,6 +4,8 @@ type: evidence
 title: P0-C1 Public / Private Serialization Boundary production closure evidence
 status: current
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-18T06:56:49Z
 updated_at: 2026-08-18T06:56:49Z

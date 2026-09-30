@@ -4,6 +4,8 @@ type: job
 title: consume_pending_bets
 status: observed
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 trigger_type: event_with_fallback
 schedule: "Worker dispatch + 30m GHA fallback"

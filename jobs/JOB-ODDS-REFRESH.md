@@ -4,6 +4,8 @@ type: job
 title: odds_refresh
 status: observed
 canonical: true
+graph_domain: providers-data
+graph_role: operational
 tier: warm
 trigger_type: interval
 schedule: "launchd 300s"

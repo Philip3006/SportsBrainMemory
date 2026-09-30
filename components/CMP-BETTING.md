@@ -4,6 +4,8 @@ type: component
 title: Canonical betting flow
 status: active
 canonical: true
+graph_domain: governance
+graph_role: operational
 tier: warm
 source_paths:
   - scripts/consume_pending_bets.py

@@ -4,6 +4,8 @@ type: writer-class
 title: SOURCE_WRITER
 status: active
 canonical: true
+graph_domain: memory
+graph_role: operational
 tier: warm
 authority: tracked source/config/tests/workflows/docs
 ---

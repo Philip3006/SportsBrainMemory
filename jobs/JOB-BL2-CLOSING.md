@@ -4,6 +4,8 @@ type: job
 title: bundesliga2_closing_odds
 status: observed
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 trigger_type: cron_set
 schedule: "four weekly pre-kickoff points"

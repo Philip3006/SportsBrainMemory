@@ -4,6 +4,8 @@ type: job
 title: tennis_scan
 status: observed
 canonical: true
+graph_domain: tennis
+graph_role: operational
 tier: warm
 trigger_type: cron_set
 schedule: "02,06,09,12,15,18,21,23 UTC"

@@ -4,6 +4,8 @@ type: job
 title: tennis_closing_odds
 status: observed
 canonical: true
+graph_domain: tennis
+graph_role: operational
 tier: warm
 trigger_type: interval
 schedule: "30m + manual"

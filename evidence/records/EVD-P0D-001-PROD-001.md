@@ -4,6 +4,8 @@ type: evidence
 title: P0-D1 Standard Runtime Writer Governance production closure evidence
 status: current
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-18T19:30:42Z
 updated_at: 2026-08-18T19:36:30Z

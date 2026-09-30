@@ -4,6 +4,8 @@ type: writer-class
 title: MODEL_ARTIFACT_WRITER
 status: active
 canonical: true
+graph_domain: model-research
+graph_role: operational
 tier: warm
 authority: candidate/approved model artifacts with provenance
 ---

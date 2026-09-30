@@ -6,6 +6,8 @@ status: active
 last_updated: 2026-09-30T12:46:53+02:00
 freshness_class: stable
 canonical: true
+graph_domain: product
+graph_role: core
 ---
 # Product Contract
 

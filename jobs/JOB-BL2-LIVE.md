@@ -4,6 +4,8 @@ type: job
 title: bundesliga2_live_push
 status: observed
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 trigger_type: windowed_interval
 schedule: "Fri 18-22; Sat/Sun 11-22 UTC, 2m"

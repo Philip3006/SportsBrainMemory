@@ -4,6 +4,8 @@ type: verification
 title: P0-C1 Public / Private Serialization Boundary production verification
 status: verified
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-18T06:56:49Z
 updated_at: 2026-08-18T06:56:49Z

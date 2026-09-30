@@ -4,6 +4,8 @@ type: writer-class
 title: RECOVERY_ACTOR
 status: active
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 authority: deterministic allowlisted retries
 ---

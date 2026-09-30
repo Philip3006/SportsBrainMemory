@@ -1,0 +1,54 @@
+{
+  "allowed_graph_domains": [
+    "top5",
+    "nations-league",
+    "tennis",
+    "production",
+    "providers-data",
+    "model-research",
+    "governance",
+    "observability",
+    "product",
+    "memory"
+  ],
+  "allowed_graph_roles": [
+    "core",
+    "operational",
+    "evidence",
+    "support",
+    "historical"
+  ],
+  "canonical_operational_missing_visual_metadata": [],
+  "canonical_operational_notes": 82,
+  "canonical_operational_with_graph_domain": 82,
+  "canonical_operational_with_graph_role": 82,
+  "graph_domain_counts": {
+    "governance": 11,
+    "memory": 8,
+    "model-research": 7,
+    "nations-league": 2,
+    "observability": 2,
+    "product": 2,
+    "production": 32,
+    "providers-data": 6,
+    "tennis": 7,
+    "top5": 5
+  },
+  "graph_role_counts": {
+    "core": 20,
+    "evidence": 22,
+    "operational": 37,
+    "support": 3
+  },
+  "invalid_graph_domains": [],
+  "invalid_graph_roles": [],
+  "notes": 285,
+  "notes_with_graph_domain": 82,
+  "notes_with_graph_role": 82,
+  "quality": {
+    "error_count": 0,
+    "issues": [],
+    "ok": true
+  },
+  "schema": "sportsbrain-memory-visual-metadata-v1"
+}

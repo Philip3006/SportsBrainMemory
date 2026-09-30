@@ -6,6 +6,8 @@ status: current
 last_updated: 2026-09-30T12:46:53+02:00
 freshness_class: release-bound
 canonical: true
+graph_domain: governance
+graph_role: support
 ---
 # PR / Evidence Index
 
