@@ -4,6 +4,8 @@ type: writer-class
 title: FINANCIAL_WRITER
 status: active
 canonical: true
+graph_domain: governance
+graph_role: operational
 tier: warm
 authority: canonical private financial mutations
 ---

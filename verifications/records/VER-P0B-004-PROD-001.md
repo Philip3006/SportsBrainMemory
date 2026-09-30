@@ -4,6 +4,8 @@ type: verification
 title: P0-B4 Release & Publication Provenance production verification
 status: verified
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-17T22:47:41Z
 updated_at: 2026-08-17T22:47:41Z

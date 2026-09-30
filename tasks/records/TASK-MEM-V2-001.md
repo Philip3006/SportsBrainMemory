@@ -4,6 +4,8 @@ type: task
 title: Memory V2 Live Obsidian System
 status: active
 canonical: true
+graph_domain: memory
+graph_role: operational
 tier: warm
 workstream: MEMORY-V2
 builder: Builder 3

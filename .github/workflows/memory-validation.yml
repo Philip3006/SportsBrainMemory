@@ -38,6 +38,9 @@ jobs:
       - name: Run graph-quality validator
         run: python tools/validate_graph.py
 
+      - name: Run visual metadata validator
+        run: python tools/validate_visual_metadata.py --check-report views/visual_metadata.json --json
+
       - name: Run memory acceptance gates
         run: python tools/memory.py acceptance
 

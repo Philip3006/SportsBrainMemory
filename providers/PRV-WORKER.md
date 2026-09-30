@@ -4,6 +4,8 @@ type: provider
 title: Cloudflare Worker
 status: active
 canonical: true
+graph_domain: production
+graph_role: core
 tier: warm
 ---
 # Cloudflare Worker

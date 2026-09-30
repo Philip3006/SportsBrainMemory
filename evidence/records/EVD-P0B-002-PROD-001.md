@@ -4,6 +4,8 @@ type: evidence
 title: P0-B2 Schedule & Window Truth production closure evidence
 status: current
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-17T17:00:00+02:00
 updated_at: 2026-08-17T17:00:00+02:00

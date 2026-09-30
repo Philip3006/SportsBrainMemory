@@ -4,6 +4,8 @@ type: job
 title: live_score_push
 status: observed
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 trigger_type: interval
 schedule: "launchd 120s"

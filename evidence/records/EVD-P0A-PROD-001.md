@@ -4,6 +4,8 @@ type: evidence
 title: P0-A production closure evidence
 status: current
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-14T02:38:31Z
 updated_at: 2026-08-16T13:04:00+02:00

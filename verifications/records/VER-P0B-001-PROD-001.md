@@ -4,6 +4,8 @@ type: verification
 title: P0-B1 Execution Truth production verification
 status: verified
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-16T23:00:00+02:00
 updated_at: 2026-08-16T23:00:00+02:00

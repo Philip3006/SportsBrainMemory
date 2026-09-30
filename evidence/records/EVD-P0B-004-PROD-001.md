@@ -4,6 +4,8 @@ type: evidence
 title: P0-B4 Release & Publication Provenance production closure evidence
 status: current
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-17T22:20:43Z
 updated_at: 2026-08-17T22:47:41Z

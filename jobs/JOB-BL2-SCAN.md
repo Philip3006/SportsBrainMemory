@@ -4,6 +4,8 @@ type: job
 title: bundesliga2_scan
 status: observed
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 trigger_type: cron_set
 schedule: "daily 06:00 + prematch points"

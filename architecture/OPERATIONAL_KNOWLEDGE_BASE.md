@@ -6,6 +6,8 @@ status: active
 last_updated: 2026-09-30T12:46:53+02:00
 freshness_class: stable
 canonical: true
+graph_domain: memory
+graph_role: core
 ---
 # SportsBrain Operational Knowledge Base
 
@@ -43,7 +45,8 @@ shadow/research, and historical evidence are intentionally separate.
 5. The exact evidence/PR entry in [[evidence/PR_EVIDENCE_INDEX]]
 6. The relevant runbook before touching a live boundary
 
-Graph quality and connectivity evidence: [[views/GRAPH_HEALTH]].
+Graph quality and connectivity evidence: [[views/GRAPH_HEALTH]]. Visual
+navigation: [[views/GRAPH_LEGEND]] and [[views/OBSIDIAN_GRAPH_GROUPS]].
 
 Supporting indexes: [[architecture/INDEX]], [[builder/INDEX]],
 [[decisions/INDEX]], [[evidence/INDEX]], [[findings/INDEX]],

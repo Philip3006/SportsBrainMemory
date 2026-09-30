@@ -6,6 +6,8 @@ status: active
 last_updated: 2026-09-30T12:46:53+02:00
 freshness_class: model-bound
 canonical: true
+graph_domain: nations-league
+graph_role: core
 ---
 # UEFA Nations League
 

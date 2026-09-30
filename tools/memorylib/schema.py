@@ -4,6 +4,12 @@ from pathlib import Path
 from typing import Any
 import json, re
 
+
+# These two scalar keys are a deliberately small cross-object extension for
+# the Obsidian visual layer. Their values are governed by
+# tools/validate_visual_metadata.py rather than by every object schema.
+VISUAL_METADATA_FIELDS = {'graph_domain', 'graph_role'}
+
 @dataclass(frozen=True)
 class SchemaIssue:
     code: str
@@ -39,7 +45,7 @@ def validate_meta(meta, schema):
     allowed = set(schema.get("properties",{}))
     if schema.get("additional_properties") is False:
         for key in meta:
-            if key not in allowed:
+            if key not in allowed and key not in VISUAL_METADATA_FIELDS:
                 issues.append(SchemaIssue("SCHEMA_UNKNOWN_FIELD",f"unknown field {key!r}","WARNING"))
     for key,spec in schema.get("properties",{}).items():
         if key not in meta:

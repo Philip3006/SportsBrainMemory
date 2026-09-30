@@ -4,6 +4,8 @@ type: verification
 title: P0-D1 Standard Runtime Writer Governance production verification
 status: verified
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-18T19:36:30Z
 updated_at: 2026-08-18T19:36:30Z

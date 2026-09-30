@@ -4,6 +4,8 @@ type: job
 title: bundesliga2_retrain
 status: observed
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 trigger_type: cron_set
 schedule: "daily 05:00 UTC"

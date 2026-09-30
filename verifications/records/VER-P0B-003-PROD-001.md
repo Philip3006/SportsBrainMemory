@@ -4,6 +4,8 @@ type: verification
 title: P0-B3 Recovery Truth production verification
 status: verified
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-17T21:07:18+02:00
 updated_at: 2026-08-17T21:07:18+02:00

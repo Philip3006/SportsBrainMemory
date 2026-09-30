@@ -6,6 +6,8 @@ status: current
 last_updated: 2026-09-30T13:35:08+02:00
 freshness_class: release-bound
 canonical: true
+graph_domain: memory
+graph_role: evidence
 ---
 # PR #10 Retarget Evidence
 

@@ -4,6 +4,8 @@ type: job
 title: tennis_settle
 status: observed
 canonical: true
+graph_domain: tennis
+graph_role: operational
 tier: warm
 trigger_type: cron_set
 schedule: "15 6-22/2 UTC"

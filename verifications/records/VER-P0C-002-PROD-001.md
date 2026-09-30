@@ -4,6 +4,8 @@ type: verification
 title: P0-C2 Authenticated Private State & Dual Fetch production verification
 status: verified
 canonical: true
+graph_domain: production
+graph_role: evidence
 tier: warm
 created_at: 2026-08-18T12:00:00Z
 updated_at: 2026-08-18T12:00:00Z

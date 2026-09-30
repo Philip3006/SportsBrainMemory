@@ -4,6 +4,8 @@ type: dataset
 title: Tennis production measurement population
 status: target
 canonical: true
+graph_domain: tennis
+graph_role: evidence
 tier: warm
 ---
 # Tennis Production Measurement Population

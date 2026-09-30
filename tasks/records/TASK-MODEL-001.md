@@ -4,6 +4,8 @@ type: task
 title: Tennis Train / Live Feature Parity
 status: draft
 canonical: true
+graph_domain: model-research
+graph_role: operational
 tier: warm
 workstream: MODEL_INTEGRITY
 created_at: 2026-08-16T13:04:00+02:00

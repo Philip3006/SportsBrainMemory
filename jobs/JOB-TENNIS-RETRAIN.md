@@ -4,6 +4,8 @@ type: job
 title: tennis_retrain
 status: observed
 canonical: true
+graph_domain: tennis
+graph_role: operational
 tier: warm
 trigger_type: cron_set
 schedule: "daily 05:00 UTC"

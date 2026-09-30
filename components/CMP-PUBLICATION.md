@@ -4,6 +4,8 @@ type: component
 title: Public/private publication boundary
 status: target
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 source_paths:
   - docs/data/

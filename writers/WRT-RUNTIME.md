@@ -4,6 +4,8 @@ type: writer-class
 title: RUNTIME_DATA_WRITER
 status: active
 canonical: true
+graph_domain: production
+graph_role: operational
 tier: warm
 authority: allowlisted runtime/cache/public data
 ---
