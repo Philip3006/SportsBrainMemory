@@ -12,3 +12,11 @@ authority: tracked source/config/tests/workflows/docs
 **Allowed authority:** tracked source/config/tests/workflows/docs.
 
 **Forbidden:** runtime bots; autonomous AI healer.
+
+## Related
+
+- [[domains/GOVERNANCE]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[architecture/MEMORY_V2]]
+- [[tasks/records/TASK-P0D-003]]
+- [[decisions/records/DEC-0031]]

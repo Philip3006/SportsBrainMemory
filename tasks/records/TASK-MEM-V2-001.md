@@ -45,3 +45,11 @@ view in Obsidian without runtime-noise commits or unsafe synchronization.
 Implementation is ready for CEO review. The branch must not be merged until
 the CEO accepts the canonical backfill, the user-level sync behavior, and the
 remaining unresolved remote/launchd limitations recorded in the handoff.
+
+## Related
+
+- [[architecture/MEMORY_V2]]
+- [[domains/BUILDERS]]
+- [[domains/GOVERNANCE]]
+- [[workstreams/MEMORY-V2]]
+- [[decisions/records/DEC-0026]]

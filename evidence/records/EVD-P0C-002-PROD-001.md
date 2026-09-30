@@ -69,3 +69,12 @@ findings:
 ## FND-20260814-013 closure basis
 
 Authenticated /me endpoint deployed with exact per-user token owner routing; no DEFAULT_USER fallback; master token → 403 fail-closed; Alice cannot access Bob; public /signals.json zero private fields; PWA dual-fetch independent. FND-20260814-013 is fully resolved by P0C-002 production evidence.
+
+## Related
+
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[domains/PWA_AND_WORKER]]
+- [[domains/SECURITY_AND_PRIVACY]]
+- [[components/CMP-BETTING]]
+- [[workstreams/P0-C]]
+- [[verifications/records/VER-P0C-002-PROD-001]]

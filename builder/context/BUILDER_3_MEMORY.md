@@ -32,7 +32,7 @@ This packet is generated and bounded. Read only the listed canonical records; do
   "source_latest_meaningful_at": "2026-09-28T23:34:07+02:00",
   "source_runtime_head_observed": "cdcfa2d57266cd3089d2910e6aa9d1a623a8300b",
   "canonical_baseline_sha": "8edeb2a45434465fbb94b6882a0a677708103271",
-  "canonical_updated_at": "2026-09-30T12:46:53+02:00",
+  "canonical_updated_at": "2026-09-30T13:35:08+02:00",
   "canonical_status": "FRESH",
   "builder_platform": "CODEX",
   "builder_roles": {
@@ -203,6 +203,13 @@ only safe canonical changes, and regenerates `_live/`. Any conflict stops the
 copy and writes `SYNC BLOCKED` visibly. No hard reset, production mutation,
 Cloudflare operation, financial ledger access, or sealed research outcome is
 allowed.
+
+## Related
+
+- [[architecture/OPERATIONAL_KNOWLEDGE_BASE]]
+- [[domains/GOVERNANCE]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[runbooks/incident-triage]]
 
 
 ## workstreams/MEMORY-V2.md

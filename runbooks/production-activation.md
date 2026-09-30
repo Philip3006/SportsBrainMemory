@@ -25,3 +25,13 @@ new work.
 
 **EVIDENCE TO SAVE:** CEO gate, exact SHAs, gate matrix, deployment ID,
 traffic, audit chain, and post-activation health.
+
+## Related
+
+- [[domains/GOVERNANCE]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[domains/TOP5]]
+- [[components/CMP-PUBLICATION]]
+- [[components/CMP-MONITORING]]
+- [[runbooks/top5-rollback]]
+- [[decisions/records/DEC-0031]]

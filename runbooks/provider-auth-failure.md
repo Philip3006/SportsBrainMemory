@@ -24,3 +24,11 @@ need to probe the provider to diagnose locally.
 
 **EVIDENCE TO SAVE:** Boolean availability, redacted source type, zero-request
 confirmation, and sanitized failure stage.
+
+## Related
+
+- [[domains/DATA_AND_PROVIDERS]]
+- [[domains/ODDS_AND_PROVIDERS]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[runbooks/quota-evidence-failure]]
+- [[decisions/records/DEC-0031]]

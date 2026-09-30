@@ -67,3 +67,11 @@ Disable AI healer entirely if diagnosis-only mode cannot be safely isolated.
 ## Builder report contract
 
 Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
+
+## Related
+
+- [[domains/GOVERNANCE]]
+- [[domains/MONITORING_AND_RECOVERY]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[workstreams/P0-D]]
+- [[writers/WRT-RECOVERY]]

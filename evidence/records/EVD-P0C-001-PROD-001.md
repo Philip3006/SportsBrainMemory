@@ -102,3 +102,12 @@ P0C-001 has materially mitigated the unauthenticated Worker default-user exposur
 3. FND-20260814-014: Privacy/legal text not updated. P0C-001 did not update legal copy. P0-C/legal scope.
 4. SEC-001: Ledger/DB still tracked publicly — not_enforced until P0-C ledger migration.
 5. SEC-003: Authenticated/private dual-fetch and removal of remaining DEFAULT_USER dependency not complete — partial only until TASK-P0C-002.
+
+## Related
+
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[domains/PWA_AND_WORKER]]
+- [[domains/SECURITY_AND_PRIVACY]]
+- [[components/CMP-PUBLICATION]]
+- [[workstreams/P0-C]]
+- [[verifications/records/VER-P0C-001-PROD-001]]

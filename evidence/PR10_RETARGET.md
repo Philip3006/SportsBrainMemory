@@ -31,3 +31,10 @@ as `tools/memorylib/v2.py`, `tools/memorylib/live.py`, or
 
 The exact current PR head is always taken from PR metadata and reported in the
 handoff; this note records the verified base and merge-base boundary.
+
+## Related
+
+- [[architecture/OPERATIONAL_KNOWLEDGE_BASE]]
+- [[state/records/STATE-20260930-002]]
+- [[evidence/PR_EVIDENCE_INDEX]]
+- [[decisions/records/DEC-0027]]

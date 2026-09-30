@@ -40,3 +40,15 @@ disabled.
 
 See [[findings/NEGATIVE_EVIDENCE]], [[runbooks/nl-shadow-verification]], and
 [[evidence/PR_EVIDENCE_INDEX]].
+
+## Related
+
+- [[domains/FOOTBALL]]
+- [[domains/MODELS]]
+- [[domains/MODEL_RESEARCH]]
+- [[domains/DATA_AND_PROVIDERS]]
+- [[decisions/records/DEC-0029]]
+- [[workstreams/TOP5-SHADOW-INTEGRATION]]
+- [[workstreams/TOP5-RESEARCH]]
+- [[runbooks/historical-research-data-ingestion]]
+- [[runbooks/pwa-publication-issue]]

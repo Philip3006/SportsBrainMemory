@@ -29,3 +29,10 @@ only safe canonical changes, and regenerates `_live/`. Any conflict stops the
 copy and writes `SYNC BLOCKED` visibly. No hard reset, production mutation,
 Cloudflare operation, financial ledger access, or sealed research outcome is
 allowed.
+
+## Related
+
+- [[architecture/OPERATIONAL_KNOWLEDGE_BASE]]
+- [[domains/GOVERNANCE]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[runbooks/incident-triage]]

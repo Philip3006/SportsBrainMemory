@@ -12,3 +12,10 @@ authority: candidate/approved model artifacts with provenance
 **Allowed authority:** candidate/approved model artifacts with provenance.
 
 **Forbidden:** implicit promotion.
+
+## Related
+
+- [[domains/MODEL_RESEARCH]]
+- [[models/MOD-TENNIS-LGBM]]
+- [[tasks/records/TASK-MODEL-002]]
+- [[decisions/records/DEC-0029]]

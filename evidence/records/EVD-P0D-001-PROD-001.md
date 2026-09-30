@@ -115,3 +115,13 @@ To revert: `git revert c79603efcc69891e38433d9e9e15123711c00938` (restore per-wo
 - **Class D** (cloud_healer): AI healer source mutation removal → P0D-003
 - **Local launchd cron jobs**: call `_git_safe_push.sh` directly, not through `_bot_commit_push.sh` → P0D-002 scope
 - Pre-existing: `test_fnd004_mandatory_submit_delivers_canonical_payload` — not introduced by P0D-001
+
+## Related
+
+- [[domains/GOVERNANCE]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[domains/MONITORING_AND_RECOVERY]]
+- [[workstreams/P0-D]]
+- [[writers/WRT-SOURCE]]
+- [[writers/WRT-RUNTIME]]
+- [[tasks/records/TASK-P0D-003]]

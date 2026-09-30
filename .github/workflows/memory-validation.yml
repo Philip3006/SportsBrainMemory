@@ -15,6 +15,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure deterministic Git test defaults
+        run: git config --global init.defaultBranch main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,6 +34,9 @@ jobs:
 
       - name: Run operational-memory validator
         run: python tools/validate_operational_memory.py
+
+      - name: Run graph-quality validator
+        run: python tools/validate_graph.py
 
       - name: Run memory acceptance gates
         run: python tools/memory.py acceptance

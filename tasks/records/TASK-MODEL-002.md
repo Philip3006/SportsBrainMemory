@@ -74,3 +74,11 @@ Rollback pointer/manifest to previously approved artifact; candidate remains ret
 ## Builder report contract
 
 Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
+
+## Related
+
+- [[domains/MODEL_RESEARCH]]
+- [[domains/TENNIS]]
+- [[models/MOD-TENNIS-LGBM]]
+- [[tasks/records/TASK-MEAS-001]]
+- [[decisions/records/DEC-0029]]

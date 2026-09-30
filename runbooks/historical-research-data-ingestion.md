@@ -26,3 +26,11 @@ workspace; preserve prior datasets and evidence.
 
 **EVIDENCE TO SAVE:** Source URL/commit, loader, row/column checks, digest,
 temporal-integrity result, and experiment linkage.
+
+## Related
+
+- [[domains/DATA_AND_PROVIDERS]]
+- [[domains/MODEL_RESEARCH]]
+- [[domains/NATIONS_LEAGUE]]
+- [[datasets/DAT-TENNIS-MEAS]]
+- [[decisions/records/DEC-0029]]

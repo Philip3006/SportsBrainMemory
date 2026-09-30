@@ -86,3 +86,11 @@ findings:
 ## OPS-006 scope note
 
 OPS-006 (full execution-plane provenance) is partially addressed by odds_refresh coverage. Full OPS-006 closure spans multiple workstream tasks and is not marked fully closed by this evidence.
+
+## Related
+
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[domains/MONITORING_AND_RECOVERY]]
+- [[domains/DATA_AND_PROVIDERS]]
+- [[workstreams/P0-B]]
+- [[verifications/records/VER-P0B-002-PROD-001]]

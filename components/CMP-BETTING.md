@@ -13,3 +13,11 @@ source_paths:
 # Canonical Betting Flow
 
 PWA → Worker → pending queue → Consumer → durable ledger, governed by P0-A invariants.
+
+## Related
+
+- [[domains/LEDGER_AND_MEASUREMENT]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[providers/PRV-WORKER]]
+- [[evidence/records/EVD-P0A-PROD-001]]
+- [[writers/WRT-FINANCIAL]]
