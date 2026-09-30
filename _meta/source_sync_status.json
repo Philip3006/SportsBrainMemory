@@ -1,10 +1,10 @@
 {
-  "evidence_timestamp": "2026-09-30T22:27:09+00:00",
+  "evidence_timestamp": "2026-09-30T23:00:54Z",
   "failure_reason": null,
-  "last_successful_import": "b4b52d50aab34455e04ec5546262ba1d68318748",
+  "last_successful_import": "327c1e654121eac10dfe76b259b9e7bca1aa11e5",
   "no_auto_closure": true,
   "production_truth": "NOT_INFERRED_FROM_SOURCE",
-  "runtime_data_head": "b4b52d50aab34455e04ec5546262ba1d68318748",
+  "runtime_data_head": "327c1e654121eac10dfe76b259b9e7bca1aa11e5",
   "schema": "sportsbrain-source-sync-v1",
   "source_changes": [
     {
@@ -113,7 +113,7 @@
       "source_path_count": 9
     }
   ],
-  "source_main_sha": "b4b52d50aab34455e04ec5546262ba1d68318748",
+  "source_main_sha": "327c1e654121eac10dfe76b259b9e7bca1aa11e5",
   "source_marker_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
   "source_release_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
   "status": "ONLINE",
