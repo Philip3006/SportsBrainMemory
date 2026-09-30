@@ -41,8 +41,10 @@ def git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProce
 
 
 def source_files(root: Path):
-    for path in sorted(root.rglob("*")):
-        if path.is_file() and not any(part in EXCLUDES for part in path.relative_to(root).parts):
+    tracked = git(root, "ls-files", "-z", check=False)
+    paths = [root / rel for rel in tracked.stdout.split("\0") if rel] if tracked.returncode == 0 else root.rglob("*")
+    for path in sorted(paths):
+        if path.is_file() and not path.is_symlink() and not any(part in EXCLUDES for part in path.relative_to(root).parts):
             yield path
 
 
@@ -99,12 +101,19 @@ def sync_vault(memory: Path, vault: Path) -> tuple[bool, str, dict[str, str]]:
         return False, "No sync manifest exists; initial seed is required and was not performed automatically.", previous
     source_relpaths = {source.relative_to(memory).as_posix() for source in source_files(memory)}
     conflicts: list[str] = []
+    for rel in source_relpaths - previous.keys():
+        if (vault / rel).exists():
+            conflicts.append(rel)
     for rel, expected in previous.items():
+        if Path(rel).is_absolute() or ".." in Path(rel).parts or any(part in EXCLUDES for part in Path(rel).parts):
+            return False, "Unsafe sync manifest path; no files copied.", previous
         path = vault / rel
-        if not path.exists() or file_sha256(path) != expected:
+        if path.is_symlink() or not path.exists() or file_sha256(path) != expected:
             conflicts.append(rel)
     if conflicts:
-        return False, "Vault local edits/conflicts detected; sync stopped: " + ", ".join(conflicts[:20]), previous
+        return False, "Vault local edits/conflicts detected; sync stopped: " + ", ".join(sorted(conflicts)), previous
+    if any((vault / rel).parent.resolve() != vault.resolve() and vault.resolve() not in (vault / rel).parent.resolve().parents for rel in source_relpaths):
+        return False, "Vault symlink parent escapes canonical mirror; no files copied.", previous
     removed: list[str] = []
     for rel, expected in previous.items():
         if rel in RETIRED_GENERATED_FILES and rel not in source_relpaths:
@@ -127,9 +136,6 @@ def sync_vault(memory: Path, vault: Path) -> tuple[bool, str, dict[str, str]]:
 
 
 def sync_repo(memory: Path, branch: str) -> tuple[str, str]:
-    fetched = git(memory, "fetch", "--prune", "origin", check=False)
-    if fetched.returncode:
-        return "DEGRADED", "Remote fetch failed; local canonical files were not pulled: " + (fetched.stderr.strip() or "unknown fetch error")
     current = git(memory, "branch", "--show-current").stdout.strip()
     if current != branch:
         return "SYNC BLOCKED", f"Current Memory branch is {current!r}; configured sync branch is {branch!r}. No pull attempted."
@@ -137,7 +143,10 @@ def sync_repo(memory: Path, branch: str) -> tuple[str, str]:
     allowed_prefixes = ("_changeset_p0c001_closure.json", ".claude/", ".obsidian/", "_live/", ".pytest_cache/", ".memory-backups/")
     unsafe = [line for line in status if line[3:] and not line[3:].startswith(allowed_prefixes)]
     if unsafe:
-        return "SYNC BLOCKED", "Memory clone has local edits; no pull attempted: " + ", ".join(unsafe[:12])
+        return "SYNC BLOCKED", "Memory clone has local edits; no pull attempted: " + ", ".join(unsafe)
+    fetched = git(memory, "fetch", "--prune", "origin", check=False)
+    if fetched.returncode:
+        return "DEGRADED", "Remote fetch failed; local canonical files were not pulled."
     remote_ref = f"origin/{branch}"
     remote = git(memory, "rev-parse", "--verify", remote_ref, check=False)
     if remote.returncode:
@@ -178,10 +187,14 @@ def refresh_runtime_graph(memory: Path, vault: Path) -> tuple[dict, str]:
             status = json.loads(status_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             status = {"status": "DEGRADED", "graph_root": "_live/graph", "last_good_graph": False}
-        status.setdefault("status", "DEGRADED")
+        status["status"] = "DEGRADED"
         status.setdefault("graph_root", "_live/graph")
-        status["error"] = str(exc)
-        return status, f"Semantic Graph V2 refresh failed safely; last valid graph was preserved: {exc}"
+        status["error"] = type(exc).__name__
+        status_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = status_path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(status, sort_keys=True) + "\n", encoding="utf-8")
+        temporary.replace(status_path)
+        return status, "Semantic Graph V2 refresh failed safely; last valid graph was preserved."
 
 
 def main() -> int:
@@ -189,7 +202,7 @@ def main() -> int:
     parser.add_argument("--memory-repo", required=True, type=Path)
     parser.add_argument("--vault", required=True, type=Path)
     parser.add_argument("--source-repo", required=True, type=Path)
-    parser.add_argument("--branch", default="feat/memory-v2-live-obsidian")
+    parser.add_argument("--branch", default="main")
     parser.add_argument("--seed", action="store_true", help="one-time recoverable seed of the existing Vault")
     args = parser.parse_args()
     lock = LOCK_PATH.open("w")
@@ -223,10 +236,10 @@ def main() -> int:
         return 0
     except Exception as exc:
         try:
-            render_live_status(args.memory_repo, args.vault, args.source_repo, sync_state="SYNC BLOCKED", sync_detail=f"Synchronizer exception: {exc}", last_sync_at=timestamp)
+            render_live_status(args.memory_repo, args.vault, args.source_repo, sync_state="SYNC BLOCKED", sync_detail=f"Synchronizer exception: {type(exc).__name__}", last_sync_at=timestamp)
         except Exception:
             pass
-        print(f"Memory sync failed safely: {exc}", file=sys.stderr)
+        print(f"Memory sync failed safely: {type(exc).__name__}", file=sys.stderr)
         return 1
     finally:
         fcntl.flock(lock, fcntl.LOCK_UN)

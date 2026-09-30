@@ -27,3 +27,4 @@ provider, deployment, publication, scheduler, or ledger boundary.
 - [[runbooks/production-activation]]
 - [[runbooks/incident-triage]]
 - [[runbooks/post-deploy-verification]]
+- [[runbooks/AUTOMATIC_MEMORY_OBSIDIAN_SYNC]]

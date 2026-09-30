@@ -19,12 +19,12 @@
     "historical"
   ],
   "canonical_operational_missing_visual_metadata": [],
-  "canonical_operational_notes": 82,
-  "canonical_operational_with_graph_domain": 82,
-  "canonical_operational_with_graph_role": 82,
+  "canonical_operational_notes": 83,
+  "canonical_operational_with_graph_domain": 83,
+  "canonical_operational_with_graph_role": 83,
   "graph_domain_counts": {
     "governance": 11,
-    "memory": 8,
+    "memory": 9,
     "model-research": 7,
     "nations-league": 2,
     "observability": 2,
@@ -37,14 +37,14 @@
   "graph_role_counts": {
     "core": 20,
     "evidence": 22,
-    "operational": 37,
+    "operational": 38,
     "support": 3
   },
   "invalid_graph_domains": [],
   "invalid_graph_roles": [],
-  "notes": 285,
-  "notes_with_graph_domain": 82,
-  "notes_with_graph_role": 82,
+  "notes": 286,
+  "notes_with_graph_domain": 83,
+  "notes_with_graph_role": 83,
   "quality": {
     "error_count": 0,
     "issues": [],

@@ -28,9 +28,9 @@ generated: true
 ## Now
 
 - Memory version: **V2 operational knowledge base**
-- Source release: `c6a7b7ed0c0824276650f241ec41ca53a27e63b7`
-- Runtime/data HEAD observed: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
-- Audited source main SHA: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
+- Source release: `40cf7500422dbc74d4f2089868deb6b67a35624a`
+- Runtime/data HEAD observed: `b4b52d50aab34455e04ec5546262ba1d68318748`
+- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`; completion event: `EVT-20260913-010`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 - Current Builder task: **TASK-MEM-V2-001**
@@ -46,7 +46,7 @@ generated: true
 - PWA and Worker/public surfaces are documented under [[domains/PRODUCTION_OPERATIONS]].
 - Nations League is shadow-only and non-actionable: [[domains/NATIONS_LEAGUE]].
 - Top-5 activation remains disabled and CEO-gated: [[domains/TOP5]].
-- PostHog PWA analytics is branch-only at PR #221 until merge/deploy.
+- PostHog PR #221 is squash-linked on inspected main; deployment and traffic are not inferred.
 
 ## Attention
 
@@ -95,9 +95,9 @@ generated: true
 
 ## Technical baseline
 
-- Source release SHA: `c6a7b7ed0c0824276650f241ec41ca53a27e63b7`
-- Runtime/data HEAD observed: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
-- Audited source main SHA: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
+- Source release SHA: `40cf7500422dbc74d4f2089868deb6b67a35624a`
+- Runtime/data HEAD observed: `b4b52d50aab34455e04ec5546262ba1d68318748`
+- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa` — completion event `EVT-20260913-010`
 - 2425 and 2526: **SEALED**; Top-5 live activation: **NOT APPROVED**.
 - P0-A production verification: **VERIFIED**
@@ -120,7 +120,7 @@ generated: true
 - **TOP5-SHADOW-READINESS** — completed_disabled
 - **WAVE-3D** — planned
 
-## Open / merge-ready evidence
+## Prior manual PR evidence (not freshly reverified)
 
 - PR-10
 - PR-221
@@ -144,6 +144,32 @@ Review and merge PR #10 only after its local CI passes; separately review/deploy
 
 Canonical technical state: [[state/records/STATE-20260930-002]]
 
+## Source-backed Git advancement
+
+- Git commit `7b2e69b22ce6049596646dfadb6dc35df6a6bb8a`; 3 source paths changed.
+- Git commit `cf014a08ffd1c32a766df05ce0c9afc2860047ae`; 3 source paths changed.
+- Git commit `ea47c08e86b5907245903a585822601f1bfd8259` — squash-linked PR #215; 9 source paths changed.
+- Git commit `36f817bbe3402fead323a928c2e5d75dc797f229` — squash-linked PR #217; 4 source paths changed.
+- Git commit `2b2b8c7d979016ac97e87cee4db75f8f2a03caf3` — squash-linked PR #221; 7 source paths changed.
+- Git commit `cc76098f809edd54fc45380e2352fdc2aca6ba9c` — squash-linked PR #224; 3 source paths changed.
+- Git commit `6d075c1fb2a0083806e0900710288094b589442d` — squash-linked PR #225; 3 source paths changed.
+- Git commit `c2cff34a4696edf4e8d0d2e2e57f0e489f6d8d29` — squash-linked PR #222; 11 source paths changed.
+- Git commit `a0f3d140a9c2f7e280f1fe0f92f7662627abffb9` — squash-linked PR #226; 11 source paths changed.
+- Git commit `edfa7af459ab0c249e211038960779a82aad2d5d` — squash-linked PR #227; 3 source paths changed.
+- Git commit `3ca89371cd83afc85c16deb2dd68a286bae2b1fb` — squash-linked PR #230; 3 source paths changed.
+- Git commit `a24e09bae845e4a3ec79f81a03c01d0970bebcf8` — squash-linked PR #229; 3 source paths changed.
+- Git commit `6fba833b61f9a3df659595bd37dddee788f954ed` — squash-linked PR #228; 2 source paths changed.
+- Git commit `bc4f54735548bfc434c74c7588dd6c972e90087a` — squash-linked PR #231; 3 source paths changed.
+- Git commit `70a8ebf3e2716438c24ce8f9d5f0ed3b4ec60047` — squash-linked PR #233; 3 source paths changed.
+- Git commit `78c1c6d417db7b17afc7e1ec1ef8c31647e5435c` — squash-linked PR #235; 3 source paths changed.
+- Git commit `393d61eb7124dc1585b2ab74eda03e2807c33db1` — squash-linked PR #234; 10 source paths changed.
+- Git commit `115bb6e1f3170fe8f36cec8a08a108410d502396` — squash-linked PR #236; 4 source paths changed.
+- Git commit `d84948c64840a025a1a17eb9497f1ad36e5ffc0c` — squash-linked PR #237; 2 source paths changed.
+- Git commit `a9bb3706a3a3e2d5f54b4cf69b34f434da689e25` — squash-linked PR #238; 7 source paths changed.
+- Git commit `40cf7500422dbc74d4f2089868deb6b67a35624a` — squash-linked PR #240; 9 source paths changed.
+
+Code presence/merge is not deployment, provider health or production verification. CEO findings and decisions remain unchanged.
+
 
 ## CURRENT_BLOCKERS.md
 
@@ -165,7 +191,7 @@ generated: true
 - [[findings/records/FND-20260814-021]]
 - [[findings/records/FND-20260814-022]]
 
-- Audited source main SHA: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
+- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
 - Research completion event: `EVT-20260913-010`; frozen SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 
@@ -183,7 +209,7 @@ generated: true
 <!-- GENERATED BY SportsBrainMemory V2: DO NOT EDIT -->
 # Current Priorities
 
-- Audited source main SHA: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
+- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`; completion event: `EVT-20260913-010`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 

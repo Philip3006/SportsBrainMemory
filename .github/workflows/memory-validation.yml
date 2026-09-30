@@ -1,6 +1,7 @@
 name: Memory validation
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [main]
   push:
@@ -43,6 +44,9 @@ jobs:
 
       - name: Run memory acceptance gates
         run: python tools/memory.py acceptance
+
+      - name: Verify visual metadata
+        run: python tools/validate_visual_metadata.py --check-report views/visual_metadata.json --json
 
       - name: Check patch whitespace
         run: git diff --check

@@ -1,0 +1,86 @@
+name: SportsBrain source sync
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+concurrency:
+  group: sportsbrain-source-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read public SportsBrain main without cross-repository credentials
+        run: git clone --branch main https://github.com/Philip3006/sportsbrain.git "$RUNNER_TEMP/sportsbrain-source"
+      - name: Prepare one guarded automation branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          branch=automation/sportsbrain-source-sync
+          # Never execute a branch-supplied guard against that same branch.
+          cp -R tools "$RUNNER_TEMP/memory-sync-trusted-tools"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            git fetch origin "$branch"
+            git checkout -b "$branch" FETCH_HEAD
+            if ! git merge-base --is-ancestor HEAD origin/main; then
+              python "$RUNNER_TEMP/memory-sync-trusted-tools/check_source_sync_branch.py"
+            fi
+            git merge --no-edit -m 'memory: automatic source evidence sync' origin/main
+          else
+            git checkout -b "$branch"
+          fi
+      - name: Import and validate transactionally
+        run: python "$RUNNER_TEMP/memory-sync-trusted-tools/sync_from_sportsbrain.py" --memory-repo "$GITHUB_WORKSPACE" --source-repo "$RUNNER_TEMP/sportsbrain-source" --status-output "$RUNNER_TEMP/memory-sync-status.json"
+      - name: Push one allowlisted PR and request guarded auto-merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -n "$(git status --porcelain)" || exit 0
+          git add --all
+          git commit -m 'memory: automatic source evidence sync'
+          python "$RUNNER_TEMP/memory-sync-trusted-tools/check_source_sync_branch.py"
+          git push -u origin automation/sportsbrain-source-sync
+          pr=$(gh pr list --head automation/sportsbrain-source-sync --state open --json number --jq '.[0].number // empty')
+          if test -z "$pr"; then
+            gh pr create --base main --head automation/sportsbrain-source-sync --title 'Memory: automatic SportsBrain source evidence' --body 'Canonical source-sync workflow; validated source-only facts. No CEO auto-closure or inferred production truth.'
+            pr=$(gh pr list --head automation/sportsbrain-source-sync --state open --json number --jq '.[0].number')
+          fi
+          # Do not rely on automatic PR events: token-created runs may require approval.
+          gh workflow run memory-validation.yml --ref automation/sportsbrain-source-sync
+          # Never enable immediate merging on an unprotected branch.
+          test "$(gh api repos/${{ github.repository }} --jq .allow_auto_merge)" = true
+          test "$(gh api repos/${{ github.repository }}/branches/main --jq .protected)" = true
+          gh api repos/${{ github.repository }}/branches/main/protection/required_status_checks --jq '.contexts + [.checks[].context]' | grep -q '"validate"'
+          gh pr merge "$pr" --auto --squash --match-head-commit "$(git rev-parse HEAD)"
+      - name: Mark failed cloud gates without corrupting canonical last-success state
+        if: failure()
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path(os.environ['RUNNER_TEMP']) / 'memory-sync-status.json'
+          status = json.loads(path.read_text()) if path.exists() else {}
+          status.update(status='SYNC_BLOCKED', failure_reason='WORKFLOW_PERMISSION_VALIDATION_OR_BRANCH_GATE', validation_status='CHECK_WORKFLOW_LOG')
+          path.write_text(json.dumps(status, sort_keys=True) + '\n')
+          PY
+      - name: Expose operational status without credentials
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-source-sync-status
+          path: ${{ runner.temp }}/memory-sync-status.json
