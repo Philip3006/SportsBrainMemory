@@ -109,3 +109,11 @@ findings:
 
 1. Worker/Cloudflare health provenance is transient — no dedicated persistent `/health` endpoint. Canonical upload succeeded; KV field may be overwritten by subsequent signals writes. Pre-existing behavior. Deferred to P0-D/P0-C architecture.
 2. OPS-007 runtime-main churn architecture — P0-B4 separates Source Release identity from runtime/data identity in the published artifact, but does not eliminate the frequency of data-only commits to main. P0-D scope.
+
+## Related
+
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[domains/DATA_AND_PROVIDERS]]
+- [[architecture/EXECUTION_AND_RELEASE]]
+- [[workstreams/P0-B]]
+- [[verifications/records/VER-P0B-004-PROD-001]]

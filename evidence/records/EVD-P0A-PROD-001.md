@@ -18,3 +18,10 @@ verified_by:
 # P0-A Production Closure Evidence
 
 Verified closure chain retained from CEO audit: final PR head `ed62a6d...`, exact-head CI green, merge commit `1d2ae062...`, post-merge main CI green, GitHub Pages green, Worker production verification green, and public PWA/data checks green.
+
+## Related
+
+- [[domains/LEDGER_AND_MEASUREMENT]]
+- [[components/CMP-BETTING]]
+- [[verifications/records/VER-P0A-PROD-001]]
+- [[decisions/records/DEC-0031]]

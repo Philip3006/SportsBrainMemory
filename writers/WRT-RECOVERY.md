@@ -12,3 +12,10 @@ authority: deterministic allowlisted retries
 **Allowed authority:** deterministic allowlisted retries.
 
 **Forbidden:** source mutation.
+
+## Related
+
+- [[domains/GOVERNANCE]]
+- [[domains/MONITORING_AND_RECOVERY]]
+- [[tasks/records/TASK-P0D-003]]
+- [[runbooks/incident-triage]]

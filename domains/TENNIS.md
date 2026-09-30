@@ -33,3 +33,16 @@ ESPN is used for strong live/completion evidence. TennisExplorer is supplemental
 ## Historical data
 
 Some Tennis ledger rows are blank/wm2026 contaminated. New explicit sport/provenance is preferred; historical correction must be evidence-based.
+
+## Related
+
+- [[domains/DATA_AND_PROVIDERS]]
+- [[domains/ODDS_AND_PROVIDERS]]
+- [[domains/MODEL_RESEARCH]]
+- [[domains/LEDGER_AND_MEASUREMENT]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[components/CMP-TENNIS-MODEL]]
+- [[models/MOD-TENNIS-LGBM]]
+- [[datasets/DAT-TENNIS-MEAS]]
+- [[runbooks/stale-odds]]
+- [[runbooks/historical-research-data-ingestion]]

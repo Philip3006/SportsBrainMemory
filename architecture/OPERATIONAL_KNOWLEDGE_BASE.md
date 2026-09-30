@@ -43,6 +43,8 @@ shadow/research, and historical evidence are intentionally separate.
 5. The exact evidence/PR entry in [[evidence/PR_EVIDENCE_INDEX]]
 6. The relevant runbook before touching a live boundary
 
+Graph quality and connectivity evidence: [[views/GRAPH_HEALTH]].
+
 Supporting indexes: [[architecture/INDEX]], [[builder/INDEX]],
 [[decisions/INDEX]], [[evidence/INDEX]], [[findings/INDEX]],
 [[invariants/INDEX]], [[jobs/INDEX]], [[providers/INDEX]],

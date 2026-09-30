@@ -70,3 +70,11 @@ Keep historical reports labeled historical/non-canonical; do not delete them.
 ## Builder report contract
 
 Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
+
+## Related
+
+- [[domains/MODEL_RESEARCH]]
+- [[domains/TENNIS]]
+- [[datasets/DAT-TENNIS-MEAS]]
+- [[workstreams/MODEL_INTEGRITY]]
+- [[decisions/records/DEC-0029]]

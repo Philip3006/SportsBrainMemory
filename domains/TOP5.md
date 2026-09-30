@@ -35,3 +35,15 @@ must all be independently satisfied. No note here grants activation.
 
 See [[workstreams/TOP5-PRODUCTION]], [[workstreams/TOP5-SHADOW-READINESS]],
 [[evidence/PR_EVIDENCE_INDEX]], and [[runbooks/top5-canary-preflight]].
+
+## Related
+
+- [[domains/DATA_AND_PROVIDERS]]
+- [[domains/ODDS_AND_PROVIDERS]]
+- [[domains/GOVERNANCE]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[decisions/records/DEC-0028]]
+- [[decisions/records/DEC-0031]]
+- [[components/CMP-PUBLICATION]]
+- [[components/CMP-MONITORING]]
+- [[runbooks/top5-rollback]]

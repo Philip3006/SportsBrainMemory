@@ -21,3 +21,4 @@ freshness_class: stable
 - [[architecture/MEMORY_CONSISTENCY_AUDITOR_V5]]
 - [[architecture/SEMANTIC_GRAPH_V2]]
 - [[architecture/SOURCE_OBSERVER]]
+- [[views/GRAPH_HEALTH]]

@@ -11,3 +11,10 @@ schedule: "daily 06:00 + prematch points"
 # bundesliga2_scan
 
 Observed execution expectation from the P0-B source audit. P0-B implementation must reconcile this record against active workflow/launchd source at task start.
+
+## Related
+
+- [[domains/FOOTBALL]]
+- [[domains/DATA_AND_PROVIDERS]]
+- [[domains/TOP5]]
+- [[runbooks/stale-odds]]

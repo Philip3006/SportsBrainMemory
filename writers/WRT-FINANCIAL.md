@@ -12,3 +12,10 @@ authority: canonical private financial mutations
 **Allowed authority:** canonical private financial mutations.
 
 **Forbidden:** generic incidental bot merge semantics.
+
+## Related
+
+- [[domains/LEDGER_AND_MEASUREMENT]]
+- [[components/CMP-BETTING]]
+- [[jobs/JOB-CONSUME]]
+- [[decisions/records/DEC-0031]]

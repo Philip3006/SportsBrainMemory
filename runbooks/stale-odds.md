@@ -24,3 +24,12 @@ do not rewrite history.
 
 **EVIDENCE TO SAVE:** Fixture/market IDs, timestamps, age calculation, and
 blocked decision.
+
+## Related
+
+- [[domains/DATA_AND_PROVIDERS]]
+- [[domains/ODDS_AND_PROVIDERS]]
+- [[domains/TOP5]]
+- [[domains/TENNIS]]
+- [[runbooks/quota-evidence-failure]]
+- [[decisions/records/DEC-0028]]

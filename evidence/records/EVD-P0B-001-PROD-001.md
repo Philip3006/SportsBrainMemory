@@ -47,3 +47,10 @@ findings:
 ## OPS-006 scope note
 
 OPS-006 (full execution-plane provenance) remains future scope and is **not** marked fully closed by this evidence.
+
+## Related
+
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[domains/MONITORING_AND_RECOVERY]]
+- [[workstreams/P0-B]]
+- [[verifications/records/VER-P0B-001-PROD-001]]

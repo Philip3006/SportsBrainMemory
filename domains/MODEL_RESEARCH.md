@@ -26,3 +26,16 @@ and a reproducible artifact. A research result is not a production signal.
 
 The negative-result registry is [[findings/NEGATIVE_EVIDENCE]]. Existing model
 notes remain historical unless linked to a current evidence record.
+
+## Related
+
+- [[domains/MODELS]]
+- [[domains/FOOTBALL]]
+- [[domains/TENNIS]]
+- [[domains/NATIONS_LEAGUE]]
+- [[datasets/DAT-TENNIS-MEAS]]
+- [[tasks/records/TASK-MEAS-001]]
+- [[tasks/records/TASK-MODEL-001]]
+- [[tasks/records/TASK-MODEL-002]]
+- [[decisions/records/DEC-0029]]
+- [[runbooks/historical-research-data-ingestion]]

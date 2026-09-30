@@ -68,3 +68,11 @@ Keep current approved artifact and serving path active; new parity code can rema
 ## Builder report contract
 
 Return only: status; exact branch/head; changed files; invariant/finding evidence; exact test counts; CI evidence; production verification state; rollback note; remaining risks. Do not merge or broaden scope.
+
+## Related
+
+- [[domains/TENNIS]]
+- [[domains/MODEL_RESEARCH]]
+- [[models/MOD-TENNIS-LGBM]]
+- [[components/CMP-TENNIS-MODEL]]
+- [[workstreams/MODEL_INTEGRITY]]

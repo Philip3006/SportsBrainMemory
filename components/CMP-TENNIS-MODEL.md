@@ -12,3 +12,10 @@ source_paths:
 # Tennis Model Lifecycle
 
 Training, candidate creation, measurement, approval and production serving are distinct lifecycle phases.
+
+## Related
+
+- [[domains/TENNIS]]
+- [[domains/MODEL_RESEARCH]]
+- [[models/MOD-TENNIS-LGBM]]
+- [[tasks/records/TASK-MODEL-001]]

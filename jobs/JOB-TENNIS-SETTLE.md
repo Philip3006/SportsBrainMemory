@@ -11,3 +11,10 @@ schedule: "15 6-22/2 UTC"
 # tennis_settle
 
 Observed execution expectation from the P0-B source audit. P0-B implementation must reconcile this record against active workflow/launchd source at task start.
+
+## Related
+
+- [[domains/TENNIS]]
+- [[domains/LEDGER_AND_MEASUREMENT]]
+- [[components/CMP-BETTING]]
+- [[runbooks/incident-triage]]

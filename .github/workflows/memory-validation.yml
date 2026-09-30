@@ -30,6 +30,9 @@ jobs:
       - name: Run operational-memory validator
         run: python tools/validate_operational_memory.py
 
+      - name: Run graph-quality validator
+        run: python tools/validate_graph.py
+
       - name: Run memory acceptance gates
         run: python tools/memory.py acceptance
 

@@ -34,6 +34,14 @@ explicit minimum lead time, maximum lead time, maximum odds age, separate
 closing capture, idempotent dispatch, and bulk market reuse. Exact production
 timing values, provider semantics, and quota values are not approved.
 
+## Related
+
+- [[domains/TOP5]]
+- [[domains/DATA_AND_PROVIDERS]]
+- [[workstreams/TOP5-PRODUCTION]]
+- [[runbooks/top5-canary-preflight]]
+- [[decisions/records/DEC-0028]]
+
 
 ## workstreams/TOP5-PRODUCTION.md
 

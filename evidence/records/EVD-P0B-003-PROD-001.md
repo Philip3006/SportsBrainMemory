@@ -84,3 +84,11 @@ Monitoring terminology migrated; no healthy-state regression observed.
 
 1. Pre-existing JSONDecodeError race on `docs/data/health.json` during concurrent bot writes — deferred
 2. `re-test-vapid` and `force-refresh-signals` remain process-exit-only recovery bindings — deferred to P0-D3
+
+## Related
+
+- [[domains/MONITORING_AND_RECOVERY]]
+- [[domains/GOVERNANCE]]
+- [[workstreams/P0-B]]
+- [[workstreams/P0-D]]
+- [[verifications/records/VER-P0B-003-PROD-001]]

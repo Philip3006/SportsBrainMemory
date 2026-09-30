@@ -14,3 +14,14 @@ data/fixture universe → model probabilities → gates → market odds → cano
 
 Key rule:
 informational model tips or match-detail views cannot create canonical Value semantics independently from the registered signal contract.
+
+## Related
+
+- [[domains/TOP5]]
+- [[domains/NATIONS_LEAGUE]]
+- [[domains/MODELS]]
+- [[domains/MODEL_RESEARCH]]
+- [[domains/DATA_AND_PROVIDERS]]
+- [[domains/PRODUCTION_OPERATIONS]]
+- [[workstreams/TOP5-PRODUCTION]]
+- [[runbooks/stale-odds]]
