@@ -17,16 +17,16 @@ report is `views/visual_metadata.json`.
 
 | Domain | Recommended color | Meaning | Example notes |
 |---|---|---|---|
-| `top5` | blue `#2563EB` | Top-5 football planning, canary, rollback and activation path | [[domains/TOP5]], [[runbooks/top5-canary-preflight]] |
-| `nations-league` | purple `#7C3AED` | Nations League shadow work and verification | [[domains/NATIONS_LEAGUE]], [[runbooks/nl-shadow-verification]] |
-| `tennis` | green `#15803D` | Tennis model, data, jobs and settlement work | [[components/CMP-TENNIS-MODEL]], [[models/MOD-TENNIS-LGBM]] |
-| `production` | red `#DC2626` | Runtime, Worker, deployment and live operations | [[domains/PRODUCTION_OPERATIONS]], [[providers/PRV-WORKER]] |
-| `providers-data` | orange `#C2410C` | Provider identity, quota, freshness, ingestion and provenance | [[domains/DATA_AND_PROVIDERS]], [[runbooks/provider-auth-failure]] |
-| `model-research` | cyan `#0891B2` | Model quality, measurements, holdouts and negative evidence | [[domains/MODEL_RESEARCH]], [[findings/NEGATIVE_EVIDENCE]] |
-| `governance` | magenta `#C026D3` | Authority, safety boundaries, decisions and builder governance | [[domains/GOVERNANCE]], [[decisions/records/DEC-0031]] |
-| `observability` | yellow-brown `#A16207` | Monitoring, health, telemetry and product evidence | [[components/CMP-MONITORING]], [[decisions/records/DEC-0030]] |
-| `product` | teal `#0F766E` | PWA and public product contract | [[domains/PRODUCT_CONTRACT]], [[runbooks/pwa-publication-issue]] |
-| `memory` | gray `#4B5563` | Memory architecture, source-of-truth and operational knowledge | [[architecture/OPERATIONAL_KNOWLEDGE_BASE]], [[architecture/MEMORY_V2]] |
+| `top5` | blue `#2563EB` | Top-5 football planning, canary, rollback and activation path | `domains/TOP5.md`, `runbooks/top5-canary-preflight.md` |
+| `nations-league` | purple `#7C3AED` | Nations League shadow work and verification | `domains/NATIONS_LEAGUE.md`, `runbooks/nl-shadow-verification.md` |
+| `tennis` | green `#15803D` | Tennis model, data, jobs and settlement work | `components/CMP-TENNIS-MODEL.md`, `models/MOD-TENNIS-LGBM.md` |
+| `production` | red `#DC2626` | Runtime, Worker, deployment and live operations | `domains/PRODUCTION_OPERATIONS.md`, `providers/PRV-WORKER.md` |
+| `providers-data` | orange `#C2410C` | Provider identity, quota, freshness, ingestion and provenance | `domains/DATA_AND_PROVIDERS.md`, `runbooks/provider-auth-failure.md` |
+| `model-research` | cyan `#0891B2` | Model quality, measurements, holdouts and negative evidence | `domains/MODEL_RESEARCH.md`, `findings/NEGATIVE_EVIDENCE.md` |
+| `governance` | magenta `#C026D3` | Authority, safety boundaries, decisions and builder governance | `domains/GOVERNANCE.md`, `decisions/records/DEC-0031.md` |
+| `observability` | yellow-brown `#A16207` | Monitoring, health, telemetry and product evidence | `components/CMP-MONITORING.md`, `decisions/records/DEC-0030.md` |
+| `product` | teal `#0F766E` | PWA and public product contract | `domains/PRODUCT_CONTRACT.md`, `runbooks/pwa-publication-issue.md` |
+| `memory` | gray `#4B5563` | Memory architecture, source-of-truth and operational knowledge | `architecture/OPERATIONAL_KNOWLEDGE_BASE.md`, `architecture/MEMORY_V2.md` |
 
 The colors are recommendations for the Obsidian Graph Groups UI. Pair color
 with the domain name; do not rely on color alone for meaning.

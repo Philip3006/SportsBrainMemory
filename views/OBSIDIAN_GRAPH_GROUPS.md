@@ -72,4 +72,4 @@ graph_role:historical
 
 The exact current metadata coverage is recorded in
 `views/visual_metadata.json`. The semantic topology remains governed by
-[[views/GRAPH_HEALTH]] and `tools/validate_graph.py`.
+`views/GRAPH_HEALTH.md` and `tools/validate_graph.py`.
