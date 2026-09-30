@@ -3,7 +3,7 @@ type: "decision-index"
 tier: "warm"
 status: "active"
 last_updated: "2026-08-14T00:03:00+02:00"
-count: "26"
+count: "31"
 ---
 # Decision Index
 
@@ -33,3 +33,8 @@ count: "26"
 - [[decisions/records/DEC-0024]] — Signal-Time architecture shape
 - [[decisions/records/DEC-0025]] — Champions League sequencing
 - [[decisions/records/DEC-0026]] — Canonical Memory and near-live status are separate
+- [[decisions/records/DEC-0027]] — Operational truth hierarchy
+- [[decisions/records/DEC-0028]] — Top-5 timing and atomic batch semantics
+- [[decisions/records/DEC-0029]] — Research promotion and negative evidence
+- [[decisions/records/DEC-0030]] — PostHog privacy model (branch candidate)
+- [[decisions/records/DEC-0031]] — Fail-closed authority boundaries

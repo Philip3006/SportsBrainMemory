@@ -21,13 +21,18 @@ This packet is generated and bounded. Read only the listed canonical records; do
   "memory_version": 2,
   "schema_version": 2,
   "canonical_repository": "Philip3006/SportsBrainMemory",
+  "canonical_default_branch": "main",
+  "canonical_main_sha_observed": "7a3bef352bce88856c785ded519b4e3775980d7d",
+  "canonical_pr10_merge_base": "7a3bef352bce88856c785ded519b4e3775980d7d",
+  "canonical_vault_path": "/Users/philiprassillier/SportsBrain-Memory",
+  "obsidian_mirror_path": "/Users/philiprassillier/Downloads/SportsBrain-Memory",
   "source_repository": "Philip3006/sportsbrain",
-  "source_main_sha": "6493f14093aa08e457e610c2961da1e77b80bc76",
-  "source_latest_meaningful_sha": "8de9472644057656c50d900380a843909ff5a46b",
-  "source_latest_meaningful_at": "2026-09-13T23:14:02+02:00",
-  "source_runtime_head_observed": "6493f14093aa08e457e610c2961da1e77b80bc76",
+  "source_main_sha": "cdcfa2d57266cd3089d2910e6aa9d1a623a8300b",
+  "source_latest_meaningful_sha": "c6a7b7ed0c0824276650f241ec41ca53a27e63b7",
+  "source_latest_meaningful_at": "2026-09-28T23:34:07+02:00",
+  "source_runtime_head_observed": "cdcfa2d57266cd3089d2910e6aa9d1a623a8300b",
   "canonical_baseline_sha": "8edeb2a45434465fbb94b6882a0a677708103271",
-  "canonical_updated_at": "2026-09-13T23:48:38+02:00",
+  "canonical_updated_at": "2026-09-30T12:46:53+02:00",
   "canonical_status": "FRESH",
   "builder_platform": "CODEX",
   "builder_roles": {
@@ -44,7 +49,8 @@ This packet is generated and bounded. Read only the listed canonical records; do
     "stale_after_hours": 24,
     "runtime_status_is_not_canonical": true
   },
-  "status": "ready_for_ceo_review"
+  "status": "reconciled_for_operational_kb_review",
+  "reconciliation_note": "Current source and PR evidence refreshed on 2026-09-30; runtime-only commits remain distinct from the latest meaningful source release."
 }
 
 
@@ -250,7 +256,40 @@ observations and must not be treated as canonical history.
 No community plugins are required. Open the actual Vault once; the user-level
 sync service below updates files without requiring an Obsidian restart.
 
-## 3. CODEX builders
+## 3. Authoritative vault and Obsidian mirror
+
+The authoritative vault is:
+
+`/Users/philiprassillier/SportsBrain-Memory`
+
+The Obsidian UI mirror is:
+
+`/Users/philiprassillier/Downloads/SportsBrain-Memory`
+
+The authoritative Git repository always wins if the two locations diverge.
+Sync is one-way: reviewed records are written in the canonical Git repository,
+then the existing safe user-level synchronizer projects them into the Obsidian
+mirror. The mirror is for navigation and human editing only; it must never
+silently write back to the canonical repository.
+
+Before trusting the mirror, run the synchronizer's normal preflight and
+compare its reported canonical revision, manifest, and conflict state:
+
+```bash
+python tools/sync_memory.py --memory-repo /Users/philiprassillier/SportsBrain-Memory \
+  --vault /Users/philiprassillier/Downloads/SportsBrain-Memory \
+  --source-repo /Users/philiprassillier/sportsbrain --branch main
+```
+
+If the tool reports dirty mirror files, divergence, missing files, or a
+conflict, stop and preserve both sides. Resolve the conflict explicitly in
+the canonical repository, validate there, and only then sync the mirror. Do
+not copy files from the mirror back automatically, do not treat `.obsidian/`
+settings as canonical knowledge, and do not delete or overwrite historical
+records during recovery. The mirror is fresh only when the synchronizer's
+manifest and revision checks pass with no unresolved conflict.
+
+## 4. CODEX builders
 
 Keep a local clone next to the SportsBrain code checkout, for example:
 
@@ -275,6 +314,10 @@ Do not merge.
 Do not ask CODEX to recursively read the entire Memory. Use the numbered,
 role-bounded packet for Builder 1, 2, 3, or CEO.
 
+For onboarding, use [[builder/ONBOARDING_30_MIN]] and the current dependency
+map in [[domains/BUILDERS]]. Builder packets remain bounded even though the
+top-level operational knowledge base links the wider system.
+
 Before a Builder run, regenerate the packet:
 
 ```bash
@@ -282,7 +325,7 @@ python SportsBrain-Memory/tools/build_context.py
 python SportsBrain-Memory/tools/validate_memory.py
 ```
 
-## 4. ChatGPT / CEO decision ingestion
+## 5. ChatGPT / CEO decision ingestion
 
 Long-term shared access:
 1. push this Memory to a private GitHub repository;
@@ -319,7 +362,7 @@ secrets, duplicate IDs with changed payloads, invalid timestamps, and unsafe
 paths. A builder report uses `verification_state: builder_report` and is held
 under `events/pending/` until CEO or independent verification promotes it.
 
-## 5. Updating without an approved event
+## 6. Updating without an approved event
 
 Legacy bundles remain supported with:
 
@@ -330,7 +373,7 @@ python SportsBrain-Memory/tools/apply_update.py memory-update.json
 The V2 updater may modify only the Memory tree, renders generated views and
 packets, validates, rolls back on failure, and performs no push.
 
-## 6. Live sync and recovery
+## 7. Live sync and recovery
 
 The recommended cadence is 90 seconds through a user-level macOS LaunchAgent
 (`gui/501`, no sudo). Each run fetches the configured branch, refuses dirty
@@ -351,13 +394,13 @@ If Memory is older than six hours behind the latest meaningful source change,
 it is `AGING`; after 24 hours it is `STALE`. Runtime status can independently
 be `ONLINE`, `DEGRADED`, `STALE`, or `SYNC BLOCKED`.
 
-## 7. V1 compatibility
+## 8. V1 compatibility
 
 The V1 Markdown/context-packet workflow remains the canonical compatibility
 layer. V2 adds structured local event validation; it does not require MCP or a
 community Obsidian plugin.
 
-## 8. Daily usage
+## 9. Daily usage
 
 You can simply tell ChatGPT:
 - “SportsBrain weiter”

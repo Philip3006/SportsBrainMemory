@@ -9,20 +9,51 @@ generated: true
 
 ## Technical baseline
 
-- Source main SHA at last audit: `6493f14093aa08e457e610c2961da1e77b80bc76`
-- Latest meaningful source release/merge: `8de9472644057656c50d900380a843909ff5a46b`
-- Canonical Memory freshness: **FRESH**
+- Source release SHA: `c6a7b7ed0c0824276650f241ec41ca53a27e63b7`
+- Runtime/data HEAD observed: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
+- Audited source main SHA: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
+- Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa` — completion event `EVT-20260913-010`
+- 2425 and 2526: **SEALED**; Top-5 live activation: **NOT APPROVED**.
+- P0-A production verification: **VERIFIED**
 - Current Builder task: **TASK-MEM-V2-001**
-- P0-A through P0-C historical production gates remain recorded; later runtime and research evidence is classified separately.
+- Product score: **RECOMPUTE REQUIRED** — historical scores remain prior evidence only.
 
 ## Workstreams
 
-- **Stability Engineering** — technically complete; formal 72h soak deferred on external quota.
-- **Top-5 Research** — COMPLETE / CEO APPROVED / frozen at `6eaabbec7d0182103d815c72fae4976e261b40aa`; 2425/2526 SEALED.
-- Research completion event: `EVT-20260913-010`.
-- **Top-5 Production Architecture** — complete, disabled by default.
-- **Top-5 Shadow Readiness** — merged hardening; disabled-by-default with no live activation.
-- **Builder 1** — Top-5 Shadow Integration; **Builder 2** — Top-5 Production Activation Readiness; **Builder 3** — Memory V2.
-- **Top-5 live activation** — NOT APPROVED; Champions League not started and remains after Top-5.
+- **MEMORY-V2** — active
+- **MODEL-INTEGRITY** — planned_ready
+- **P0-A** — closed
+- **P0-B** — closed
+- **P0-C** — closed
+- **P0-D** — active
+- **STABILITY-ENGINEERING** — technically_complete_soak_deferred
+- **TOP5-ACTIVATION-READINESS** — active_preparation
+- **TOP5-PRODUCTION** — completed_disabled
+- **TOP5-RESEARCH** — completed_ceo_approved
+- **TOP5-SHADOW-INTEGRATION** — active
+- **TOP5-SHADOW-READINESS** — completed_disabled
+- **WAVE-3D** — planned
 
-Operational source health and runtime-only events belong in [[_live/LIVE_STATUS]], not canonical Memory history.
+## Open / merge-ready evidence
+
+- PR-10
+- PR-221
+
+## Active workstreams
+
+- Memory operational KB PR #10 is retargeted to main and not merged
+- Top-5 production safety remains disabled by default
+- Nations League public/shadow path is merged and non-actionable
+- PostHog PWA analytics is implemented on an unmerged branch
+
+## Blockers
+
+- PR #10 merge is pending review; repository-local CI is now configured
+- Real production PostHog traffic requires PR #221 merge and Pages deployment
+- Nations League causal/context research claims are not independently verified on main
+
+## Next production milestone
+
+Review and merge PR #10 only after its local CI passes; separately review/deploy PR #221 before verifying real PostHog ingestion.
+
+Canonical technical state: [[state/records/STATE-20260930-002]]
