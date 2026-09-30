@@ -21,6 +21,17 @@ def git(root, *args):
     return subprocess.check_output(["git", "-C", str(root), *args], text=True, stderr=subprocess.DEVNULL).strip()
 
 
+def independent_memory(source, destination):
+    shutil.copytree(source, destination, ignore=shutil.ignore_patterns(
+        ".git", "__pycache__", ".memory-build", ".pytest_cache"))
+    git(destination, "init", "--initial-branch=main")
+    git(destination, "config", "user.email", "test@example.invalid")
+    git(destination, "config", "user.name", "Test")
+    git(destination, "add", ".")
+    git(destination, "commit", "-m", "memory fixture")
+    return destination
+
+
 class AutomaticSyncTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -74,7 +85,8 @@ class AutomaticSyncTests(unittest.TestCase):
     def test_import_deterministic_noop_no_closure(self):
         memory = self.memory()
         other = self.root / "independent-memory"
-        shutil.copytree(memory, other)
+        independent_memory(memory, other)
+        self.assertNotEqual(git(memory, "rev-parse", "--absolute-git-dir"), git(other, "rev-parse", "--absolute-git-dir"))
         before = {str(p.relative_to(memory)): p.read_bytes() for p in (memory / "findings/records").rglob("*.md")}
         first = import_source(memory, self.source, validate=False)
         bytes_before = {p: (memory / p).read_bytes() for p in first["changed_files"]}
@@ -85,7 +97,7 @@ class AutomaticSyncTests(unittest.TestCase):
         self.assertEqual(first["changed_files"], independently["changed_files"])
         self.assertEqual(bytes_before, {p: (other / p).read_bytes() for p in first["changed_files"]})
         copy = self.root / "copy"
-        shutil.copytree(memory, copy)
+        independent_memory(memory, copy)
         self.assertEqual(import_source(copy, self.source, validate=False), {"status": "NO_OP"})
 
     def test_validation_failure_preserves_canonical_memory(self):
@@ -127,9 +139,48 @@ class AutomaticSyncTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             check(self.source)
 
+    def test_bot_main_merge_remains_guarded_with_clean_worktree(self):
+        git(self.source, "checkout", "-b", BRANCH)
+        git(self.source, "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
+        (self.source / "CURRENT_STATE.md").write_text("source-only observation")
+        git(self.source, "add", ".")
+        git(self.source, "commit", "-m", "memory: automatic source evidence sync")
+        git(self.source, "checkout", "main")
+        (self.source / "main-change.md").write_text("new main")
+        self.commit("main advance")
+        git(self.source, "checkout", BRANCH)
+        git(self.source, "merge", "--no-edit", "-m", "memory: automatic source evidence sync", "origin/main")
+        self.assertEqual(git(self.source, "status", "--porcelain"), "")
+        self.assertEqual(check(self.source), ["CURRENT_STATE.md"])
+
+    def test_no_automation_diff_is_clean_noop(self):
+        git(self.source, "checkout", "-b", BRANCH)
+        self.assertEqual(git(self.source, "diff", "--name-only", "origin/main...HEAD"), "")
+
+    def test_independent_memory_ignores_git_and_caches(self):
+        fixture = self.root / "minimal"
+        fixture.mkdir()
+        (fixture / "note.md").write_text("fixture")
+        for name in (".git", "__pycache__", ".memory-build", ".pytest_cache"):
+            (fixture / name).mkdir()
+            (fixture / name / "sentinel").write_text("never copy")
+        copied = independent_memory(fixture, self.root / "hermetic")
+        for name in (".git", "__pycache__", ".memory-build", ".pytest_cache"):
+            self.assertFalse((copied / name / "sentinel").exists())
+        self.assertEqual(git(copied, "branch", "--show-current"), "main")
+
     def test_automation_unexpected_file_rejected(self):
         git(self.source, "checkout", "-b", BRANCH)
         (self.source / "src/model.py").write_text("unsafe")
+        git(self.source, "add", ".")
+        git(self.source, "commit", "-m", "memory: automatic source evidence sync")
+        with self.assertRaises(ValueError):
+            check(self.source)
+
+    def test_automation_secret_in_allowlisted_file_rejected(self):
+        git(self.source, "checkout", "-b", BRANCH)
+        git(self.source, "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
+        (self.source / "CURRENT_STATE.md").write_text("ghp_" + "A" * 40)
         git(self.source, "add", ".")
         git(self.source, "commit", "-m", "memory: automatic source evidence sync")
         with self.assertRaises(ValueError):
