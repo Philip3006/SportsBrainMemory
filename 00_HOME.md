@@ -10,9 +10,9 @@ generated: true
 ## Now
 
 - Memory version: **V2 operational knowledge base**
-- Source release: `c6a7b7ed0c0824276650f241ec41ca53a27e63b7`
-- Runtime/data HEAD observed: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
-- Audited source main SHA: `cdcfa2d57266cd3089d2910e6aa9d1a623a8300b`
+- Source release: `40cf7500422dbc74d4f2089868deb6b67a35624a`
+- Runtime/data HEAD observed: `b4b52d50aab34455e04ec5546262ba1d68318748`
+- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`; completion event: `EVT-20260913-010`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 - Current Builder task: **TASK-MEM-V2-001**
@@ -28,7 +28,7 @@ generated: true
 - PWA and Worker/public surfaces are documented under [[domains/PRODUCTION_OPERATIONS]].
 - Nations League is shadow-only and non-actionable: [[domains/NATIONS_LEAGUE]].
 - Top-5 activation remains disabled and CEO-gated: [[domains/TOP5]].
-- PostHog PWA analytics is branch-only at PR #221 until merge/deploy.
+- PostHog PR #221 is squash-linked on inspected main; deployment and traffic are not inferred.
 
 ## Attention
 

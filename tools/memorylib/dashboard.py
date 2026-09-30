@@ -15,6 +15,18 @@ def _finding_rows(reg,statuses):
 
 def render_all(root:Path):
     reg=Registry(root).scan()
+    source_sync_path = root / '_meta/source_sync_status.json'
+    source_sync = {}
+    if source_sync_path.exists():
+        import json
+        source_sync = json.loads(source_sync_path.read_text(encoding='utf-8'))
+    source_rows = source_sync.get('source_changes', [])
+    source_observations = '\n'.join(
+        f'- Git commit `{row["commit_sha"]}`' +
+        (f' — squash-linked PR #{row["pr_number"]}' if row.get('pr_number') else '') +
+        f'; {row["source_path_count"]} source paths changed.'
+        for row in source_rows
+    )
     active=[o for o in reg.objects if o.object_type=='task' and o.status in {'approved','active'}]
     if len(active)>1:
         raise RuntimeError('multiple active tasks')
@@ -73,6 +85,10 @@ def render_all(root:Path):
         'Canonical technical state: [[state/records/STATE-20260816-001]]\n'
     )
     current_state = current_state.replace('[[state/records/STATE-20260816-001]]', f'[[{s.relpath[:-3]}]]')
+    if source_sync:
+        current_state = current_state.replace('## Open / merge-ready evidence', '## Prior manual PR evidence (not freshly reverified)')
+        current_state += ('\n## Source-backed Git advancement\n\n' + (source_observations or '- No new source release; runtime/data head advanced.') +
+                          '\n\nCode presence/merge is not deployment, provider health or production verification. CEO findings and decisions remain unchanged.\n')
     _write(root/'CURRENT_STATE.md',current_state)
 
     openf=_finding_rows(reg,{'open','observed','confirmed','accepted','in_progress','resolved_candidate'})
@@ -218,6 +234,9 @@ def render_all(root:Path):
         '## Maps of Content\n\n'
         + '\n'.join(f'- [[mocs/{n}]]' for n in mocs) + '\n'
     )
+    if any(row.get('pr_number') == 221 for row in source_rows):
+        home = home.replace('- PostHog PWA analytics is branch-only at PR #221 until merge/deploy.',
+                            '- PostHog PR #221 is squash-linked on inspected main; deployment and traffic are not inferred.')
     _write(root/'00_HOME.md',home)
     if active:
         ctx=build_context(root,active[0].object_id)
