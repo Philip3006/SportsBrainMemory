@@ -22,12 +22,12 @@ This packet is generated and bounded. Read only the listed canonical records; do
   "schema_version": 2,
   "canonical_repository": "Philip3006/SportsBrainMemory",
   "source_repository": "Philip3006/sportsbrain",
-  "source_main_sha": "6493f14093aa08e457e610c2961da1e77b80bc76",
-  "source_latest_meaningful_sha": "8de9472644057656c50d900380a843909ff5a46b",
-  "source_latest_meaningful_at": "2026-09-13T23:14:02+02:00",
-  "source_runtime_head_observed": "6493f14093aa08e457e610c2961da1e77b80bc76",
+  "source_main_sha": "cdcfa2d57266cd3089d2910e6aa9d1a623a8300b",
+  "source_latest_meaningful_sha": "c6a7b7ed0c0824276650f241ec41ca53a27e63b7",
+  "source_latest_meaningful_at": "2026-09-28T23:34:07+02:00",
+  "source_runtime_head_observed": "cdcfa2d57266cd3089d2910e6aa9d1a623a8300b",
   "canonical_baseline_sha": "8edeb2a45434465fbb94b6882a0a677708103271",
-  "canonical_updated_at": "2026-09-13T23:48:38+02:00",
+  "canonical_updated_at": "2026-09-30T12:46:53+02:00",
   "canonical_status": "FRESH",
   "builder_platform": "CODEX",
   "builder_roles": {
@@ -44,7 +44,8 @@ This packet is generated and bounded. Read only the listed canonical records; do
     "stale_after_hours": 24,
     "runtime_status_is_not_canonical": true
   },
-  "status": "ready_for_ceo_review"
+  "status": "reconciled_for_operational_kb_review",
+  "reconciliation_note": "Current source and PR evidence refreshed on 2026-09-30; runtime-only commits remain distinct from the latest meaningful source release."
 }
 
 
@@ -274,6 +275,10 @@ Do not merge.
 
 Do not ask CODEX to recursively read the entire Memory. Use the numbered,
 role-bounded packet for Builder 1, 2, 3, or CEO.
+
+For onboarding, use [[builder/ONBOARDING_30_MIN]] and the current dependency
+map in [[domains/BUILDERS]]. Builder packets remain bounded even though the
+top-level operational knowledge base links the wider system.
 
 Before a Builder run, regenerate the packet:
 

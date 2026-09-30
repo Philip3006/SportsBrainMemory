@@ -1,20 +1,16 @@
 ---
-type: "invariant-index"
-tier: "warm"
-status: "active"
-last_updated: "2026-08-14T00:03:00+02:00"
-freshness_class: "release-bound"
-count: "159"
+id: INVARIANTS-INDEX
+type: index
+tier: warm
+status: active
+last_updated: 2026-09-30T12:46:53+02:00
+freshness_class: stable
 ---
-# Invariant Index
+# Invariants Index
 
-Total canonical invariants: **159**.
-
-- [[invariants/BETTING_RISK]] — Betting + Risk
-- [[invariants/QUEUE_DATA]] — Queue + Data
-- [[invariants/ODDS_TENNIS]] — Odds + Tennis
-- [[invariants/MODELS_MEASUREMENT]] — Model + Measurement
-- [[invariants/RELEASE_MONITORING]] — Release + Monitoring + Operations
-- [[invariants/SECURITY_GOVERNANCE]] — Security + Governance + Product UX
-
-The split is for selective retrieval only; invariant IDs remain globally unique.
+- [[invariants/SECURITY_GOVERNANCE]]
+- [[invariants/BETTING_RISK]]
+- [[invariants/ODDS_TENNIS]]
+- [[invariants/MODELS_MEASUREMENT]]
+- [[invariants/QUEUE_DATA]]
+- [[invariants/RELEASE_MONITORING]]

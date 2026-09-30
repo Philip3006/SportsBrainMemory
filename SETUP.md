@@ -49,6 +49,10 @@ Do not merge.
 Do not ask CODEX to recursively read the entire Memory. Use the numbered,
 role-bounded packet for Builder 1, 2, 3, or CEO.
 
+For onboarding, use [[builder/ONBOARDING_30_MIN]] and the current dependency
+map in [[domains/BUILDERS]]. Builder packets remain bounded even though the
+top-level operational knowledge base links the wider system.
+
 Before a Builder run, regenerate the packet:
 
 ```bash

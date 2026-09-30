@@ -8,11 +8,14 @@ freshness_class: "stable"
 
 For a normal SportsBrain Builder session:
 
-1. Read the role packet under `builder/context/` and then `builder/CURRENT_CONTEXT_PACKET.md`.
-2. Verify its Task ID matches `CURRENT_TASK.md`.
-3. Inspect only the SportsBrain source files/direct callers/tests required by that task.
-4. Execute the task.
-5. Do not merge unless later explicitly approved.
+1. Read [[00_HOME]] and [[architecture/OPERATIONAL_KNOWLEDGE_BASE]].
+2. Read the role packet under `builder/context/` and then
+   `builder/CURRENT_CONTEXT_PACKET.md`.
+3. Verify its Task ID matches `CURRENT_TASK.md`.
+4. Inspect only the SportsBrain source files/direct callers/tests required by
+   that task, and distinguish merged main from branch-only evidence.
+5. Execute the task.
+6. Do not merge unless later explicitly approved.
 
 Minimal instruction from the owner can be:
 
@@ -26,5 +29,6 @@ Then validate:
 
 `python tools/validate_memory.py`
 
-CODEX is the sole builder platform. Builder 1/2/3 are numbered ownership
-roles, not permission to merge or bypass the CEO gate.
+CODEX is the sole builder platform. Numbered builder roles are ownership
+lanes, not permission to merge or bypass a CEO gate. The current ownership
+and dependency view is [[domains/BUILDERS]].
