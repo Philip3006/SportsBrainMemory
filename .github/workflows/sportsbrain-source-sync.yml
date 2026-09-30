@@ -21,6 +21,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Configure deterministic Git test defaults
+        run: git config --global init.defaultBranch main
       - name: Read public SportsBrain main without cross-repository credentials
         run: git clone --branch main https://github.com/Philip3006/sportsbrain.git "$RUNNER_TEMP/sportsbrain-source"
       - name: Prepare one guarded automation branch

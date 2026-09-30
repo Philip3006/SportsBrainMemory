@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 import sys
@@ -208,12 +210,21 @@ class MemoryV2Tests(unittest.TestCase):
 
     def test_fast_forward_only_remote_ahead(self):
         td = Path(tempfile.mkdtemp(prefix="sbmem-v2-git-"))
+        git_environment = patch.dict(os.environ, {
+            "GIT_CONFIG_GLOBAL": str(td / "global.gitconfig"),
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_CONFIG_COUNT": "0",
+        })
+        git_environment.start()
         try:
+            subprocess.run(["git", "config", "--global", "init.defaultBranch", "master"], check=True)
+            self.assertEqual(subprocess.check_output(
+                ["git", "config", "--global", "init.defaultBranch"], text=True).strip(), "master")
             bare = td / "remote.git"
             seed = td / "seed"
             clone = td / "memory"
-            subprocess.run(["git", "init", "--bare", str(bare)], check=True, capture_output=True)
-            subprocess.run(["git", "init", str(seed)], check=True, capture_output=True)
+            subprocess.run(["git", "init", "--bare", "--initial-branch=main", str(bare)], check=True, capture_output=True)
+            subprocess.run(["git", "init", "--initial-branch=main", str(seed)], check=True, capture_output=True)
             for args in (("user.email", "test@example.invalid"), ("user.name", "Memory Test")):
                 subprocess.run(["git", "-C", str(seed), "config", *args], check=True)
             (seed / "state.txt").write_text("one\n")
@@ -223,6 +234,10 @@ class MemoryV2Tests(unittest.TestCase):
             subprocess.run(["git", "-C", str(seed), "remote", "add", "origin", str(bare)], check=True)
             subprocess.run(["git", "-C", str(seed), "push", "-u", "origin", "main"], check=True, capture_output=True)
             subprocess.run(["git", "clone", str(bare), str(clone)], check=True, capture_output=True)
+            self.assertEqual(subprocess.check_output(
+                ["git", "-C", str(bare), "symbolic-ref", "HEAD"], text=True).strip(), "refs/heads/main")
+            self.assertEqual(subprocess.check_output(
+                ["git", "-C", str(clone), "branch", "--show-current"], text=True).strip(), "main")
             subprocess.run(["git", "-C", str(clone), "config", "user.email", "test@example.invalid"], check=True)
             subprocess.run(["git", "-C", str(clone), "config", "user.name", "Memory Test"], check=True)
             (seed / "state.txt").write_text("two\n")
@@ -232,7 +247,10 @@ class MemoryV2Tests(unittest.TestCase):
             self.assertEqual(state, "ONLINE")
             self.assertIn("Fast-forwarded", detail)
             self.assertEqual((clone / "state.txt").read_text(), "two\n")
+            subprocess.run(["git", "-C", str(clone), "switch", "-c", "wrong-branch"], check=True, capture_output=True)
+            self.assertEqual(sync_repo(clone, "main")[0], "SYNC BLOCKED")
         finally:
+            git_environment.stop()
             shutil.rmtree(td, ignore_errors=True)
 
 
