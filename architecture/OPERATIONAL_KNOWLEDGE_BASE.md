@@ -70,3 +70,26 @@ authorization payloads, or unverified production claims belong in Memory.
 Public client configuration may be described as architecture, but values are
 kept out of the vault unless they are explicitly intended as public product
 configuration.
+
+## Canonical vault contract
+
+The authoritative vault is `/Users/philiprassillier/SportsBrain-Memory`.
+The Obsidian mirror is `/Users/philiprassillier/Downloads/SportsBrain-Memory`.
+The canonical Git repository is the source of truth whenever their contents
+diverge. Sync flows from canonical Git to the mirror through the existing
+user-level synchronizer; `.obsidian/` configuration and mirror-only edits are
+not canonical records.
+
+For an update, fetch and inspect the canonical repository, update one
+canonical record, render generated views, run the local validators/tests,
+review the Memory-only diff, and open one narrow PR. After review, sync the
+mirror and confirm the synchronizer's manifest/revision and conflict checks.
+If either side is dirty or divergent, preserve both copies and stop for an
+explicit conflict resolution. Nothing may write from the mirror back to the
+canonical repository automatically unless that write-back is explicitly
+intended and reviewed.
+
+The current Memory repository `main` observed for PR #10 retargeting is
+`7a3bef352bce88856c785ded519b4e3775980d7d`; the retargeted PR merge base is
+that same SHA. This is Memory-repository provenance and must not be confused
+with the SportsBrain source/runtime SHAs in [[CURRENT_STATE]].

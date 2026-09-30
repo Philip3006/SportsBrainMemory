@@ -24,7 +24,40 @@ observations and must not be treated as canonical history.
 No community plugins are required. Open the actual Vault once; the user-level
 sync service below updates files without requiring an Obsidian restart.
 
-## 3. CODEX builders
+## 3. Authoritative vault and Obsidian mirror
+
+The authoritative vault is:
+
+`/Users/philiprassillier/SportsBrain-Memory`
+
+The Obsidian UI mirror is:
+
+`/Users/philiprassillier/Downloads/SportsBrain-Memory`
+
+The authoritative Git repository always wins if the two locations diverge.
+Sync is one-way: reviewed records are written in the canonical Git repository,
+then the existing safe user-level synchronizer projects them into the Obsidian
+mirror. The mirror is for navigation and human editing only; it must never
+silently write back to the canonical repository.
+
+Before trusting the mirror, run the synchronizer's normal preflight and
+compare its reported canonical revision, manifest, and conflict state:
+
+```bash
+python tools/sync_memory.py --memory-repo /Users/philiprassillier/SportsBrain-Memory \
+  --vault /Users/philiprassillier/Downloads/SportsBrain-Memory \
+  --source-repo /Users/philiprassillier/sportsbrain --branch main
+```
+
+If the tool reports dirty mirror files, divergence, missing files, or a
+conflict, stop and preserve both sides. Resolve the conflict explicitly in
+the canonical repository, validate there, and only then sync the mirror. Do
+not copy files from the mirror back automatically, do not treat `.obsidian/`
+settings as canonical knowledge, and do not delete or overwrite historical
+records during recovery. The mirror is fresh only when the synchronizer's
+manifest and revision checks pass with no unresolved conflict.
+
+## 4. CODEX builders
 
 Keep a local clone next to the SportsBrain code checkout, for example:
 
@@ -60,7 +93,7 @@ python SportsBrain-Memory/tools/build_context.py
 python SportsBrain-Memory/tools/validate_memory.py
 ```
 
-## 4. ChatGPT / CEO decision ingestion
+## 5. ChatGPT / CEO decision ingestion
 
 Long-term shared access:
 1. push this Memory to a private GitHub repository;
@@ -97,7 +130,7 @@ secrets, duplicate IDs with changed payloads, invalid timestamps, and unsafe
 paths. A builder report uses `verification_state: builder_report` and is held
 under `events/pending/` until CEO or independent verification promotes it.
 
-## 5. Updating without an approved event
+## 6. Updating without an approved event
 
 Legacy bundles remain supported with:
 
@@ -108,7 +141,7 @@ python SportsBrain-Memory/tools/apply_update.py memory-update.json
 The V2 updater may modify only the Memory tree, renders generated views and
 packets, validates, rolls back on failure, and performs no push.
 
-## 6. Live sync and recovery
+## 7. Live sync and recovery
 
 The recommended cadence is 90 seconds through a user-level macOS LaunchAgent
 (`gui/501`, no sudo). Each run fetches the configured branch, refuses dirty
@@ -129,13 +162,13 @@ If Memory is older than six hours behind the latest meaningful source change,
 it is `AGING`; after 24 hours it is `STALE`. Runtime status can independently
 be `ONLINE`, `DEGRADED`, `STALE`, or `SYNC BLOCKED`.
 
-## 7. V1 compatibility
+## 8. V1 compatibility
 
 The V1 Markdown/context-packet workflow remains the canonical compatibility
 layer. V2 adds structured local event validation; it does not require MCP or a
 community Obsidian plugin.
 
-## 8. Daily usage
+## 9. Daily usage
 
 You can simply tell ChatGPT:
 - “SportsBrain weiter”

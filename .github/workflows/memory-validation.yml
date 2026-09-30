@@ -1,0 +1,37 @@
+name: Memory validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -q
+
+      - name: Run strict memory validator
+        run: python tools/validate_memory.py
+
+      - name: Run operational-memory validator
+        run: python tools/validate_operational_memory.py
+
+      - name: Run memory acceptance gates
+        run: python tools/memory.py acceptance
+
+      - name: Check patch whitespace
+        run: git diff --check

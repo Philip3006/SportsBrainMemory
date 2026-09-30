@@ -25,6 +25,7 @@ current state card.
 | #209 | PWA | `9d3c2b550ca1b7b4e90b5d338a0ca5b1563d654b` | merged on main | Match detail integration |
 | #210 | Cloudflare observability | `c6a7b7ed0c0824276650f241ec41ca53a27e63b7` | merged on main | Workers Logs configuration |
 | #221 | Product analytics | `b67fde78e82ce169f9b23f109818ffca0ce0db20` | open / branch-only | PostHog PWA analytics; exact-head CI passed, no deploy |
+| #10 | Memory operational KB | see [[evidence/PR10_RETARGET]] | open / retargeted to `main` | Main merge-base verified; local CI added; not merged |
 
 ## Evidence handling
 

@@ -36,21 +36,24 @@ generated: true
 
 ## Open / merge-ready evidence
 
+- PR-10
 - PR-221
 
 ## Active workstreams
 
+- Memory operational KB PR #10 is retargeted to main and not merged
 - Top-5 production safety remains disabled by default
 - Nations League public/shadow path is merged and non-actionable
 - PostHog PWA analytics is implemented on an unmerged branch
 
 ## Blockers
 
+- PR #10 merge is pending review; repository-local CI is now configured
 - Real production PostHog traffic requires PR #221 merge and Pages deployment
 - Nations League causal/context research claims are not independently verified on main
 
 ## Next production milestone
 
-Merge and deploy PR #221 only after normal review; then verify real PostHog ingestion separately from controlled test ingestion.
+Review and merge PR #10 only after its local CI passes; separately review/deploy PR #221 before verifying real PostHog ingestion.
 
-Canonical technical state: [[state/records/STATE-20260930-001]]
+Canonical technical state: [[state/records/STATE-20260930-002]]

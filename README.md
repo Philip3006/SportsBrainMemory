@@ -16,6 +16,11 @@ evidence and must never be used to rewrite historical records.
 Installation and bootstrap references: [[BOOTSTRAP]], [[CLAUDE]], and
 [[SETUP]].
 
+The authoritative vault is `/Users/philiprassillier/SportsBrain-Memory`.
+The Obsidian mirror is `/Users/philiprassillier/Downloads/SportsBrain-Memory`.
+Canonical Git state wins on divergence; use [[SETUP]] for the one-way sync,
+conflict handling, and mirror-freshness contract.
+
 - **Human UI:** Obsidian, starting at [[00_HOME]], with near-live status at [[_live/LIVE_STATUS]].
 - **Persistence:** private Git repository for canonical Memory; `_live/` is generated operational state.
 - **Canonical truth:** first-class records; generated views never own volatile truth.
