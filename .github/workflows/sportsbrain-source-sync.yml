@@ -52,9 +52,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test -n "$(git status --porcelain)" || exit 0
-          git add --all
-          git commit -m 'memory: automatic source evidence sync'
+          if test -n "$(git status --porcelain)"; then
+            git add --all
+            git commit -m 'memory: automatic source evidence sync'
+          fi
+          git diff --quiet origin/main...HEAD && exit 0
           python "$RUNNER_TEMP/memory-sync-trusted-tools/check_source_sync_branch.py"
           git push -u origin automation/sportsbrain-source-sync
           pr=$(gh pr list --head automation/sportsbrain-source-sync --state open --json number --jq '.[0].number // empty')
@@ -62,13 +64,7 @@ jobs:
             gh pr create --base main --head automation/sportsbrain-source-sync --title 'Memory: automatic SportsBrain source evidence' --body 'Canonical source-sync workflow; validated source-only facts. No CEO auto-closure or inferred production truth.'
             pr=$(gh pr list --head automation/sportsbrain-source-sync --state open --json number --jq '.[0].number')
           fi
-          # Do not rely on automatic PR events: token-created runs may require approval.
-          gh workflow run memory-validation.yml --ref automation/sportsbrain-source-sync
-          # Never enable immediate merging on an unprotected branch.
-          test "$(gh api repos/${{ github.repository }} --jq .allow_auto_merge)" = true
-          test "$(gh api repos/${{ github.repository }}/branches/main --jq .protected)" = true
-          gh api repos/${{ github.repository }}/branches/main/protection/required_status_checks --jq '.contexts + [.checks[].context]' | grep -q '"validate"'
-          gh pr merge "$pr" --auto --squash --match-head-commit "$(git rev-parse HEAD)"
+          python "$RUNNER_TEMP/memory-sync-trusted-tools/validate_source_sync_head.py" --repo "$GITHUB_REPOSITORY" --pr "$pr" --head "$(git rev-parse HEAD)" --status-output "$RUNNER_TEMP/memory-sync-status.json"
       - name: Mark failed cloud gates without corrupting canonical last-success state
         if: failure()
         run: |
@@ -77,7 +73,7 @@ jobs:
           from pathlib import Path
           path = Path(os.environ['RUNNER_TEMP']) / 'memory-sync-status.json'
           status = json.loads(path.read_text()) if path.exists() else {}
-          status.update(status='SYNC_BLOCKED', failure_reason='WORKFLOW_PERMISSION_VALIDATION_OR_BRANCH_GATE', validation_status='CHECK_WORKFLOW_LOG')
+          status.update(status='SYNC_BLOCKED', failure_reason=status.get('failure_reason', 'BRANCH_OR_PR_PERMISSION_BLOCKED'), validation_status='BLOCKED')
           path.write_text(json.dumps(status, sort_keys=True) + '\n')
           PY
       - name: Expose operational status without credentials
