@@ -10,8 +10,8 @@ generated: true
 ## Technical baseline
 
 - Source release SHA: `79ad9df1b87024722051dcecdc76dcb84b3128d0`
-- Runtime/data HEAD observed: `d52d4468b7e46ce25be94949228dde2ed8911ba2`
-- Audited source main SHA: `d52d4468b7e46ce25be94949228dde2ed8911ba2`
+- Runtime/data HEAD observed: `ccd788a216bb4abfe3f5135ba0f01d5a621377ba`
+- Audited source main SHA: `ccd788a216bb4abfe3f5135ba0f01d5a621377ba`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa` — completion event `EVT-20260913-010`
 - 2425 and 2526: **SEALED**; Top-5 live activation: **NOT APPROVED**.
 - P0-A production verification: **VERIFIED**

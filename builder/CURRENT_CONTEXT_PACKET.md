@@ -30,7 +30,7 @@ This packet is generated and bounded. Read only the listed canonical records; do
   "canonical_pr10_merge_base": "7a3bef352bce88856c785ded519b4e3775980d7d",
   "canonical_repository": "Philip3006/SportsBrainMemory",
   "canonical_status": "FRESH",
-  "canonical_updated_at": "2026-10-01T01:31:30Z",
+  "canonical_updated_at": "2026-10-01T07:31:03Z",
   "canonical_vault_path": "/Users/philiprassillier/SportsBrain-Memory",
   "freshness_policy": {
     "aging_after_hours": 6,
@@ -47,9 +47,9 @@ This packet is generated and bounded. Read only the listed canonical records; do
   "schema_version": 2,
   "source_latest_meaningful_at": "2026-10-01T02:24:16+02:00",
   "source_latest_meaningful_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
-  "source_main_sha": "d52d4468b7e46ce25be94949228dde2ed8911ba2",
+  "source_main_sha": "ccd788a216bb4abfe3f5135ba0f01d5a621377ba",
   "source_repository": "Philip3006/sportsbrain",
-  "source_runtime_head_observed": "d52d4468b7e46ce25be94949228dde2ed8911ba2",
+  "source_runtime_head_observed": "ccd788a216bb4abfe3f5135ba0f01d5a621377ba",
   "status": "reconciled_for_operational_kb_review"
 }
 
