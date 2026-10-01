@@ -9,9 +9,9 @@ generated: true
 
 ## Technical baseline
 
-- Source release SHA: `e127b3af48b6e5141b2121566f55285925b1d1bc`
-- Runtime/data HEAD observed: `7674dcc5d05eb70c0efcd3a71b1395dde80420e8`
-- Audited source main SHA: `7674dcc5d05eb70c0efcd3a71b1395dde80420e8`
+- Source release SHA: `461936eebd0d8e19f9c11e8ba79519bc091a5bdf`
+- Runtime/data HEAD observed: `3e32fce5867b7a7ecca0b756c6b0e518c5f5e677`
+- Audited source main SHA: `3e32fce5867b7a7ecca0b756c6b0e518c5f5e677`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa` — completion event `EVT-20260913-010`
 - 2425 and 2526: **SEALED**; Top-5 live activation: **NOT APPROVED**.
 - P0-A production verification: **VERIFIED**
@@ -103,5 +103,8 @@ Canonical technical state: [[state/records/STATE-20260930-002]]
 - Git commit `9057495c6f0c181dffcddfb96ed89ef67110531a`; 1 source paths changed.
 - Git commit `e577ed417be204228184afe1b202b750991abc76`; 1 source paths changed.
 - Git commit `e127b3af48b6e5141b2121566f55285925b1d1bc`; 1 source paths changed.
+- Git commit `0c63e2cf6d361d872936a2f66a12e8a8bb111e90` — squash-linked PR #263; 5 source paths changed.
+- Git commit `4df3ade76dc9f850946ac8949178e17a884816fd` — squash-linked PR #264; 3 source paths changed.
+- Git commit `461936eebd0d8e19f9c11e8ba79519bc091a5bdf` — squash-linked PR #265; 5 source paths changed.
 
 Code presence/merge is not deployment, provider health or production verification. CEO findings and decisions remain unchanged.
