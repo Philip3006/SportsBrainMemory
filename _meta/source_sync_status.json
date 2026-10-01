@@ -1,10 +1,10 @@
 {
-  "evidence_timestamp": "2026-10-01T07:31:03Z",
+  "evidence_timestamp": "2026-10-01T14:46:32Z",
   "failure_reason": null,
-  "last_successful_import": "ccd788a216bb4abfe3f5135ba0f01d5a621377ba",
+  "last_successful_import": "393f63f9d790463987bd33606b752ab1ee800169",
   "no_auto_closure": true,
   "production_truth": "NOT_INFERRED_FROM_SOURCE",
-  "runtime_data_head": "ccd788a216bb4abfe3f5135ba0f01d5a621377ba",
+  "runtime_data_head": "393f63f9d790463987bd33606b752ab1ee800169",
   "schema": "sportsbrain-source-sync-v1",
   "source_changes": [
     {
@@ -131,11 +131,51 @@
       "commit_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
       "pr_number": 244,
       "source_path_count": 2
+    },
+    {
+      "commit_sha": "f045e383c76e6c0b1335addd7313a5a01ca43d7a",
+      "pr_number": null,
+      "source_path_count": 4
+    },
+    {
+      "commit_sha": "1fb99311104e366bee35160d6191c4d63fddc871",
+      "pr_number": null,
+      "source_path_count": 4
+    },
+    {
+      "commit_sha": "3931bbbf0441d751d5af8abb65fb8c95d55a5d14",
+      "pr_number": null,
+      "source_path_count": 3
+    },
+    {
+      "commit_sha": "13b21b33746eff3a148f1bb568412df004735feb",
+      "pr_number": null,
+      "source_path_count": 11
+    },
+    {
+      "commit_sha": "0fa242eccbeb7c0102c5c6bbdf0b8fae4390b2cc",
+      "pr_number": null,
+      "source_path_count": 6
+    },
+    {
+      "commit_sha": "232d3723e14f11b582de8cae738cb1dec685cb7d",
+      "pr_number": null,
+      "source_path_count": 5
+    },
+    {
+      "commit_sha": "635dde347c34d894cd5b7de2a3028184eb87ac71",
+      "pr_number": null,
+      "source_path_count": 5
+    },
+    {
+      "commit_sha": "940cd9e461d85a0523248b8c0ba9cedc0c1049a7",
+      "pr_number": null,
+      "source_path_count": 9
     }
   ],
-  "source_main_sha": "ccd788a216bb4abfe3f5135ba0f01d5a621377ba",
-  "source_marker_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
-  "source_release_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
+  "source_main_sha": "393f63f9d790463987bd33606b752ab1ee800169",
+  "source_marker_sha": "940cd9e461d85a0523248b8c0ba9cedc0c1049a7",
+  "source_release_sha": "940cd9e461d85a0523248b8c0ba9cedc0c1049a7",
   "status": "ONLINE",
   "validation_status": "PASS"
 }

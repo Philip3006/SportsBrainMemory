@@ -30,7 +30,7 @@ This packet is generated and bounded. Read only the listed canonical records; do
   "canonical_pr10_merge_base": "7a3bef352bce88856c785ded519b4e3775980d7d",
   "canonical_repository": "Philip3006/SportsBrainMemory",
   "canonical_status": "FRESH",
-  "canonical_updated_at": "2026-10-01T07:31:03Z",
+  "canonical_updated_at": "2026-10-01T14:46:32Z",
   "canonical_vault_path": "/Users/philiprassillier/SportsBrain-Memory",
   "freshness_policy": {
     "aging_after_hours": 6,
@@ -45,11 +45,11 @@ This packet is generated and bounded. Read only the listed canonical records; do
   "obsidian_mirror_path": "/Users/philiprassillier/Downloads/SportsBrain-Memory",
   "reconciliation_note": "Current source and PR evidence refreshed on 2026-09-30; runtime-only commits remain distinct from the latest meaningful source release.",
   "schema_version": 2,
-  "source_latest_meaningful_at": "2026-10-01T02:24:16+02:00",
-  "source_latest_meaningful_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
-  "source_main_sha": "ccd788a216bb4abfe3f5135ba0f01d5a621377ba",
+  "source_latest_meaningful_at": "2026-10-01T16:29:18+02:00",
+  "source_latest_meaningful_sha": "940cd9e461d85a0523248b8c0ba9cedc0c1049a7",
+  "source_main_sha": "393f63f9d790463987bd33606b752ab1ee800169",
   "source_repository": "Philip3006/sportsbrain",
-  "source_runtime_head_observed": "ccd788a216bb4abfe3f5135ba0f01d5a621377ba",
+  "source_runtime_head_observed": "393f63f9d790463987bd33606b752ab1ee800169",
   "status": "reconciled_for_operational_kb_review"
 }
 
