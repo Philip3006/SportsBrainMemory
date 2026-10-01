@@ -9,9 +9,9 @@ generated: true
 
 ## Technical baseline
 
-- Source release SHA: `940cd9e461d85a0523248b8c0ba9cedc0c1049a7`
-- Runtime/data HEAD observed: `393f63f9d790463987bd33606b752ab1ee800169`
-- Audited source main SHA: `393f63f9d790463987bd33606b752ab1ee800169`
+- Source release SHA: `e127b3af48b6e5141b2121566f55285925b1d1bc`
+- Runtime/data HEAD observed: `7674dcc5d05eb70c0efcd3a71b1395dde80420e8`
+- Audited source main SHA: `7674dcc5d05eb70c0efcd3a71b1395dde80420e8`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa` — completion event `EVT-20260913-010`
 - 2425 and 2526: **SEALED**; Top-5 live activation: **NOT APPROVED**.
 - P0-A production verification: **VERIFIED**
@@ -93,5 +93,15 @@ Canonical technical state: [[state/records/STATE-20260930-002]]
 - Git commit `232d3723e14f11b582de8cae738cb1dec685cb7d`; 5 source paths changed.
 - Git commit `635dde347c34d894cd5b7de2a3028184eb87ac71`; 5 source paths changed.
 - Git commit `940cd9e461d85a0523248b8c0ba9cedc0c1049a7`; 9 source paths changed.
+- Git commit `c4660e01dda5a661c1fd8fdf269ee37fe833691d`; 4 source paths changed.
+- Git commit `6d025fec63d34a307adc410572daadd9bfe4aa61`; 10 source paths changed.
+- Git commit `1c8e92b7db97adb9022d7da3bdc0028947ba9ae1`; 2 source paths changed.
+- Git commit `c191490838b9ea2f327e43121abac813ad6eabc7`; 2 source paths changed.
+- Git commit `83845476893ebfec205ef86bf36d6666da85c6ea`; 2 source paths changed.
+- Git commit `4a9d46588e8be937b38c4678adfd3424ff63676a`; 4 source paths changed.
+- Git commit `8af38073ae24a1476194867e291329eb51ad8583`; 11 source paths changed.
+- Git commit `9057495c6f0c181dffcddfb96ed89ef67110531a`; 1 source paths changed.
+- Git commit `e577ed417be204228184afe1b202b750991abc76`; 1 source paths changed.
+- Git commit `e127b3af48b6e5141b2121566f55285925b1d1bc`; 1 source paths changed.
 
 Code presence/merge is not deployment, provider health or production verification. CEO findings and decisions remain unchanged.

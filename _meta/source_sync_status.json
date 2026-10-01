@@ -1,10 +1,10 @@
 {
-  "evidence_timestamp": "2026-10-01T14:46:32Z",
+  "evidence_timestamp": "2026-10-01T19:34:58Z",
   "failure_reason": null,
-  "last_successful_import": "393f63f9d790463987bd33606b752ab1ee800169",
+  "last_successful_import": "7674dcc5d05eb70c0efcd3a71b1395dde80420e8",
   "no_auto_closure": true,
   "production_truth": "NOT_INFERRED_FROM_SOURCE",
-  "runtime_data_head": "393f63f9d790463987bd33606b752ab1ee800169",
+  "runtime_data_head": "7674dcc5d05eb70c0efcd3a71b1395dde80420e8",
   "schema": "sportsbrain-source-sync-v1",
   "source_changes": [
     {
@@ -171,11 +171,61 @@
       "commit_sha": "940cd9e461d85a0523248b8c0ba9cedc0c1049a7",
       "pr_number": null,
       "source_path_count": 9
+    },
+    {
+      "commit_sha": "c4660e01dda5a661c1fd8fdf269ee37fe833691d",
+      "pr_number": null,
+      "source_path_count": 4
+    },
+    {
+      "commit_sha": "6d025fec63d34a307adc410572daadd9bfe4aa61",
+      "pr_number": null,
+      "source_path_count": 10
+    },
+    {
+      "commit_sha": "1c8e92b7db97adb9022d7da3bdc0028947ba9ae1",
+      "pr_number": null,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "c191490838b9ea2f327e43121abac813ad6eabc7",
+      "pr_number": null,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "83845476893ebfec205ef86bf36d6666da85c6ea",
+      "pr_number": null,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "4a9d46588e8be937b38c4678adfd3424ff63676a",
+      "pr_number": null,
+      "source_path_count": 4
+    },
+    {
+      "commit_sha": "8af38073ae24a1476194867e291329eb51ad8583",
+      "pr_number": null,
+      "source_path_count": 11
+    },
+    {
+      "commit_sha": "9057495c6f0c181dffcddfb96ed89ef67110531a",
+      "pr_number": null,
+      "source_path_count": 1
+    },
+    {
+      "commit_sha": "e577ed417be204228184afe1b202b750991abc76",
+      "pr_number": null,
+      "source_path_count": 1
+    },
+    {
+      "commit_sha": "e127b3af48b6e5141b2121566f55285925b1d1bc",
+      "pr_number": null,
+      "source_path_count": 1
     }
   ],
-  "source_main_sha": "393f63f9d790463987bd33606b752ab1ee800169",
-  "source_marker_sha": "940cd9e461d85a0523248b8c0ba9cedc0c1049a7",
-  "source_release_sha": "940cd9e461d85a0523248b8c0ba9cedc0c1049a7",
+  "source_main_sha": "7674dcc5d05eb70c0efcd3a71b1395dde80420e8",
+  "source_marker_sha": "e127b3af48b6e5141b2121566f55285925b1d1bc",
+  "source_release_sha": "e127b3af48b6e5141b2121566f55285925b1d1bc",
   "status": "ONLINE",
   "validation_status": "PASS"
 }
