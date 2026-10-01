@@ -12,7 +12,7 @@
   "canonical_pr10_merge_base": "7a3bef352bce88856c785ded519b4e3775980d7d",
   "canonical_repository": "Philip3006/SportsBrainMemory",
   "canonical_status": "FRESH",
-  "canonical_updated_at": "2026-09-30T23:00:54Z",
+  "canonical_updated_at": "2026-10-01T01:31:30Z",
   "canonical_vault_path": "/Users/philiprassillier/SportsBrain-Memory",
   "freshness_policy": {
     "aging_after_hours": 6,
@@ -27,10 +27,10 @@
   "obsidian_mirror_path": "/Users/philiprassillier/Downloads/SportsBrain-Memory",
   "reconciliation_note": "Current source and PR evidence refreshed on 2026-09-30; runtime-only commits remain distinct from the latest meaningful source release.",
   "schema_version": 2,
-  "source_latest_meaningful_at": "2026-09-30T23:50:48+02:00",
-  "source_latest_meaningful_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
-  "source_main_sha": "327c1e654121eac10dfe76b259b9e7bca1aa11e5",
+  "source_latest_meaningful_at": "2026-10-01T02:24:16+02:00",
+  "source_latest_meaningful_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
+  "source_main_sha": "d52d4468b7e46ce25be94949228dde2ed8911ba2",
   "source_repository": "Philip3006/sportsbrain",
-  "source_runtime_head_observed": "327c1e654121eac10dfe76b259b9e7bca1aa11e5",
+  "source_runtime_head_observed": "d52d4468b7e46ce25be94949228dde2ed8911ba2",
   "status": "reconciled_for_operational_kb_review"
 }

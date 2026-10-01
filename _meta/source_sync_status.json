@@ -1,10 +1,10 @@
 {
-  "evidence_timestamp": "2026-09-30T23:00:54Z",
+  "evidence_timestamp": "2026-10-01T01:31:30Z",
   "failure_reason": null,
-  "last_successful_import": "327c1e654121eac10dfe76b259b9e7bca1aa11e5",
+  "last_successful_import": "d52d4468b7e46ce25be94949228dde2ed8911ba2",
   "no_auto_closure": true,
   "production_truth": "NOT_INFERRED_FROM_SOURCE",
-  "runtime_data_head": "327c1e654121eac10dfe76b259b9e7bca1aa11e5",
+  "runtime_data_head": "d52d4468b7e46ce25be94949228dde2ed8911ba2",
   "schema": "sportsbrain-source-sync-v1",
   "source_changes": [
     {
@@ -111,11 +111,31 @@
       "commit_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
       "pr_number": 240,
       "source_path_count": 9
+    },
+    {
+      "commit_sha": "2c26d396f7def4f563393c9a86798be22fef5b38",
+      "pr_number": 241,
+      "source_path_count": 27
+    },
+    {
+      "commit_sha": "5c16b91b311f7a4ae48d4900527d5048dd1b4ae8",
+      "pr_number": 242,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "231f6b361985d58ff7458fd57d1b767ba93ce109",
+      "pr_number": 243,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
+      "pr_number": 244,
+      "source_path_count": 2
     }
   ],
-  "source_main_sha": "327c1e654121eac10dfe76b259b9e7bca1aa11e5",
-  "source_marker_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
-  "source_release_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
+  "source_main_sha": "d52d4468b7e46ce25be94949228dde2ed8911ba2",
+  "source_marker_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
+  "source_release_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
   "status": "ONLINE",
   "validation_status": "PASS"
 }
