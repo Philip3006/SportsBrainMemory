@@ -1,10 +1,10 @@
 {
-  "evidence_timestamp": "2026-09-30T22:27:09+00:00",
+  "evidence_timestamp": "2026-10-02T20:57:55Z",
   "failure_reason": null,
-  "last_successful_import": "b4b52d50aab34455e04ec5546262ba1d68318748",
+  "last_successful_import": "cfec0acd8f484a40d0693ff9153fc881466261dc",
   "no_auto_closure": true,
   "production_truth": "NOT_INFERRED_FROM_SOURCE",
-  "runtime_data_head": "b4b52d50aab34455e04ec5546262ba1d68318748",
+  "runtime_data_head": "cfec0acd8f484a40d0693ff9153fc881466261dc",
   "schema": "sportsbrain-source-sync-v1",
   "source_changes": [
     {
@@ -111,11 +111,166 @@
       "commit_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
       "pr_number": 240,
       "source_path_count": 9
+    },
+    {
+      "commit_sha": "2c26d396f7def4f563393c9a86798be22fef5b38",
+      "pr_number": 241,
+      "source_path_count": 27
+    },
+    {
+      "commit_sha": "5c16b91b311f7a4ae48d4900527d5048dd1b4ae8",
+      "pr_number": 242,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "231f6b361985d58ff7458fd57d1b767ba93ce109",
+      "pr_number": 243,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
+      "pr_number": 244,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "f045e383c76e6c0b1335addd7313a5a01ca43d7a",
+      "pr_number": null,
+      "source_path_count": 4
+    },
+    {
+      "commit_sha": "1fb99311104e366bee35160d6191c4d63fddc871",
+      "pr_number": null,
+      "source_path_count": 4
+    },
+    {
+      "commit_sha": "3931bbbf0441d751d5af8abb65fb8c95d55a5d14",
+      "pr_number": null,
+      "source_path_count": 3
+    },
+    {
+      "commit_sha": "13b21b33746eff3a148f1bb568412df004735feb",
+      "pr_number": null,
+      "source_path_count": 11
+    },
+    {
+      "commit_sha": "0fa242eccbeb7c0102c5c6bbdf0b8fae4390b2cc",
+      "pr_number": null,
+      "source_path_count": 6
+    },
+    {
+      "commit_sha": "232d3723e14f11b582de8cae738cb1dec685cb7d",
+      "pr_number": null,
+      "source_path_count": 5
+    },
+    {
+      "commit_sha": "635dde347c34d894cd5b7de2a3028184eb87ac71",
+      "pr_number": null,
+      "source_path_count": 5
+    },
+    {
+      "commit_sha": "940cd9e461d85a0523248b8c0ba9cedc0c1049a7",
+      "pr_number": null,
+      "source_path_count": 9
+    },
+    {
+      "commit_sha": "c4660e01dda5a661c1fd8fdf269ee37fe833691d",
+      "pr_number": null,
+      "source_path_count": 4
+    },
+    {
+      "commit_sha": "6d025fec63d34a307adc410572daadd9bfe4aa61",
+      "pr_number": null,
+      "source_path_count": 10
+    },
+    {
+      "commit_sha": "1c8e92b7db97adb9022d7da3bdc0028947ba9ae1",
+      "pr_number": null,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "c191490838b9ea2f327e43121abac813ad6eabc7",
+      "pr_number": null,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "83845476893ebfec205ef86bf36d6666da85c6ea",
+      "pr_number": null,
+      "source_path_count": 2
+    },
+    {
+      "commit_sha": "4a9d46588e8be937b38c4678adfd3424ff63676a",
+      "pr_number": null,
+      "source_path_count": 4
+    },
+    {
+      "commit_sha": "8af38073ae24a1476194867e291329eb51ad8583",
+      "pr_number": null,
+      "source_path_count": 11
+    },
+    {
+      "commit_sha": "9057495c6f0c181dffcddfb96ed89ef67110531a",
+      "pr_number": null,
+      "source_path_count": 1
+    },
+    {
+      "commit_sha": "e577ed417be204228184afe1b202b750991abc76",
+      "pr_number": null,
+      "source_path_count": 1
+    },
+    {
+      "commit_sha": "e127b3af48b6e5141b2121566f55285925b1d1bc",
+      "pr_number": null,
+      "source_path_count": 1
+    },
+    {
+      "commit_sha": "0c63e2cf6d361d872936a2f66a12e8a8bb111e90",
+      "pr_number": 263,
+      "source_path_count": 5
+    },
+    {
+      "commit_sha": "4df3ade76dc9f850946ac8949178e17a884816fd",
+      "pr_number": 264,
+      "source_path_count": 3
+    },
+    {
+      "commit_sha": "461936eebd0d8e19f9c11e8ba79519bc091a5bdf",
+      "pr_number": 265,
+      "source_path_count": 5
+    },
+    {
+      "commit_sha": "d90a619052f51e61b15160c94e4c8739687e32a9",
+      "pr_number": 266,
+      "source_path_count": 6
+    },
+    {
+      "commit_sha": "3d143f48ebfc8036a9383915c79df5d41c2f9acc",
+      "pr_number": null,
+      "source_path_count": 6
+    },
+    {
+      "commit_sha": "42fdaea0d1e6ada346acac0da64e3d2634a75694",
+      "pr_number": null,
+      "source_path_count": 3
+    },
+    {
+      "commit_sha": "d2115c815493792e84e0c13373e1441c242d0c37",
+      "pr_number": null,
+      "source_path_count": 11
+    },
+    {
+      "commit_sha": "3eda2eda7d04f73c721ea89a6be53d5cf8c4c4f2",
+      "pr_number": null,
+      "source_path_count": 8
+    },
+    {
+      "commit_sha": "09ba71d954643fbf1aeebe83c69b0ea35b83b986",
+      "pr_number": 272,
+      "source_path_count": 3
     }
   ],
-  "source_main_sha": "b4b52d50aab34455e04ec5546262ba1d68318748",
-  "source_marker_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
-  "source_release_sha": "40cf7500422dbc74d4f2089868deb6b67a35624a",
+  "source_main_sha": "cfec0acd8f484a40d0693ff9153fc881466261dc",
+  "source_marker_sha": "09ba71d954643fbf1aeebe83c69b0ea35b83b986",
+  "source_release_sha": "09ba71d954643fbf1aeebe83c69b0ea35b83b986",
   "status": "ONLINE",
   "validation_status": "PASS"
 }

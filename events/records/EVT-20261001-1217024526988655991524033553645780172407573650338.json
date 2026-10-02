@@ -1,0 +1,22 @@
+{
+  "affected_workstreams": [],
+  "builder": "SYSTEM",
+  "builder_number": "SYSTEM",
+  "canonical": true,
+  "ceo_gate_state": "UNCHANGED",
+  "domain": "source-observation",
+  "event_id": "EVT-20261001-1217024526988655991524033553645780172407573650338",
+  "evidence": [
+    "Git main d52d4468b7e46ce25be94949228dde2ed8911ba2",
+    "Source release 79ad9df1b87024722051dcecdc76dcb84b3128d0"
+  ],
+  "findings": [],
+  "invariants": [],
+  "source_repository": "Philip3006/sportsbrain",
+  "source_sha": "79ad9df1b87024722051dcecdc76dcb84b3128d0",
+  "summary": "Git source identities observed; no production or CEO closure claim.",
+  "supersedes": [],
+  "timestamp": "2026-10-01T01:31:30Z",
+  "type": "RESEARCH_GATE",
+  "verification_state": "merged_source"
+}

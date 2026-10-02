@@ -28,9 +28,9 @@ generated: true
 ## Now
 
 - Memory version: **V2 operational knowledge base**
-- Source release: `40cf7500422dbc74d4f2089868deb6b67a35624a`
-- Runtime/data HEAD observed: `b4b52d50aab34455e04ec5546262ba1d68318748`
-- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
+- Source release: `09ba71d954643fbf1aeebe83c69b0ea35b83b986`
+- Runtime/data HEAD observed: `cfec0acd8f484a40d0693ff9153fc881466261dc`
+- Audited source main SHA: `cfec0acd8f484a40d0693ff9153fc881466261dc`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`; completion event: `EVT-20260913-010`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 - Current Builder task: **TASK-MEM-V2-001**
@@ -95,9 +95,9 @@ generated: true
 
 ## Technical baseline
 
-- Source release SHA: `40cf7500422dbc74d4f2089868deb6b67a35624a`
-- Runtime/data HEAD observed: `b4b52d50aab34455e04ec5546262ba1d68318748`
-- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
+- Source release SHA: `09ba71d954643fbf1aeebe83c69b0ea35b83b986`
+- Runtime/data HEAD observed: `cfec0acd8f484a40d0693ff9153fc881466261dc`
+- Audited source main SHA: `cfec0acd8f484a40d0693ff9153fc881466261dc`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa` — completion event `EVT-20260913-010`
 - 2425 and 2526: **SEALED**; Top-5 live activation: **NOT APPROVED**.
 - P0-A production verification: **VERIFIED**
@@ -167,8 +167,41 @@ Canonical technical state: [[state/records/STATE-20260930-002]]
 - Git commit `d84948c64840a025a1a17eb9497f1ad36e5ffc0c` — squash-linked PR #237; 2 source paths changed.
 - Git commit `a9bb3706a3a3e2d5f54b4cf69b34f434da689e25` — squash-linked PR #238; 7 source paths changed.
 - Git commit `40cf7500422dbc74d4f2089868deb6b67a35624a` — squash-linked PR #240; 9 source paths changed.
+- Git commit `2c26d396f7def4f563393c9a86798be22fef5b38` — squash-linked PR #241; 27 source paths changed.
+- Git commit `5c16b91b311f7a4ae48d4900527d5048dd1b4ae8` — squash-linked PR #242; 2 source paths changed.
+- Git commit `231f6b361985d58ff7458fd57d1b767ba93ce109` — squash-linked PR #243; 2 source paths changed.
+- Git commit `79ad9df1b87024722051dcecdc76dcb84b3128d0` — squash-linked PR #244; 2 source paths changed.
+- Git commit `f045e383c76e6c0b1335addd7313a5a01ca43d7a`; 4 source paths changed.
+- Git commit `1fb99311104e366bee35160d6191c4d63fddc871`; 4 source paths changed.
+- Git commit `3931bbbf0441d751d5af8abb65fb8c95d55a5d14`; 3 source paths changed.
+- Git commit `13b21b33746eff3a148f1bb568412df004735feb`; 11 source paths changed.
+- Git commit `0fa242eccbeb7c0102c5c6bbdf0b8fae4390b2cc`; 6 source paths changed.
+- Git commit `232d3723e14f11b582de8cae738cb1dec685cb7d`; 5 source paths changed.
+- Git commit `635dde347c34d894cd5b7de2a3028184eb87ac71`; 5 source paths changed.
+- Git commit `940cd9e461d85a0523248b8c0ba9cedc0c1049a7`; 9 source paths changed.
+- Git commit `c4660e01dda5a661c1fd8fdf269ee37fe833691d`; 4 source paths changed.
+- Git commit `6d025fec63d34a307adc410572daadd9bfe4aa61`; 10 source paths changed.
+- Git commit `1c8e92b7db97adb9022d7da3bdc0028947ba9ae1`; 2 source paths changed.
+- Git commit `c191490838b9ea2f327e43121abac813ad6eabc7`; 2 source paths changed.
+- Git commit `83845476893ebfec205ef86bf36d6666da85c6ea`; 2 source paths changed.
+- Git commit `4a9d46588e8be937b38c4678adfd3424ff63676a`; 4 source paths changed.
+- Git commit `8af38073ae24a1476194867e291329eb51ad8583`; 11 source paths changed.
+- Git commit `9057495c6f0c181dffcddfb96ed89ef67110531a`; 1 source paths changed.
+- Git commit `e577ed417be204228184afe1b202b750991abc76`; 1 source paths changed.
+- Git commit `e127b3af48b6e5141b2121566f55285925b1d1bc`; 1 source paths changed.
+- Git commit `0c63e2cf6d361d872936a2f66a12e8a8bb111e90` — squash-linked PR #263; 5 source paths changed.
+- Git commit `4df3ade76dc9f850946ac8949178e17a884816fd` — squash-linked PR #264; 3 source paths changed.
+- Git commit `461936eebd0d8e19f9c11e8ba79519bc091a5bdf` — squash-linked PR #265; 5 source paths changed.
+- Git commit `d90a619052f51e61b15160c94e4c8739687e32a9` — squash-linked PR #266; 6 source paths changed.
+- Git commit `3d143f48ebfc8036a9383915c79df5d41c2f9acc`; 6 source paths changed.
+- Git commit `42fdaea0d1e6ada346acac0da64e3d2634a75694`; 3 source paths changed.
+- Git commit `d2115c815493792e84e0c13373e1441c242d0c37`; 11 source paths changed.
+- Git commit `3eda2eda7d04f73c721ea89a6be53d5cf8c4c4f2`; 8 source paths changed.
+- Git commit `09ba71d954643fbf1aeebe83c69b0ea35b83b986` — squash-linked PR #272; 3 source paths changed.
 
-Code presence/merge is not deployment, provider health or production verification. CEO findings and decisions remain unchanged.
+C
+
+[packet truncated at bounded source limit]
 
 
 ## CURRENT_BLOCKERS.md
@@ -191,7 +224,7 @@ generated: true
 - [[findings/records/FND-20260814-021]]
 - [[findings/records/FND-20260814-022]]
 
-- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
+- Audited source main SHA: `cfec0acd8f484a40d0693ff9153fc881466261dc`
 - Research completion event: `EVT-20260913-010`; frozen SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 
@@ -209,7 +242,7 @@ generated: true
 <!-- GENERATED BY SportsBrainMemory V2: DO NOT EDIT -->
 # Current Priorities
 
-- Audited source main SHA: `b4b52d50aab34455e04ec5546262ba1d68318748`
+- Audited source main SHA: `cfec0acd8f484a40d0693ff9153fc881466261dc`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`; completion event: `EVT-20260913-010`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 
