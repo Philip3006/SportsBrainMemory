@@ -10,9 +10,9 @@ generated: true
 ## Now
 
 - Memory version: **V2 operational knowledge base**
-- Source release: `3d143f48ebfc8036a9383915c79df5d41c2f9acc`
-- Runtime/data HEAD observed: `19d09a20a60817d1232a2d99fb22bef216667aba`
-- Audited source main SHA: `19d09a20a60817d1232a2d99fb22bef216667aba`
+- Source release: `42fdaea0d1e6ada346acac0da64e3d2634a75694`
+- Runtime/data HEAD observed: `42fdaea0d1e6ada346acac0da64e3d2634a75694`
+- Audited source main SHA: `42fdaea0d1e6ada346acac0da64e3d2634a75694`
 - Frozen Research SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`; completion event: `EVT-20260913-010`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 - Current Builder task: **TASK-MEM-V2-001**
