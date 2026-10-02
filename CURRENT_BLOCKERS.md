@@ -16,7 +16,7 @@ generated: true
 - [[findings/records/FND-20260814-021]]
 - [[findings/records/FND-20260814-022]]
 
-- Audited source main SHA: `3b65c3672da87567a152dd991cb2c2fe711dd9ce`
+- Audited source main SHA: `cfec0acd8f484a40d0693ff9153fc881466261dc`
 - Research completion event: `EVT-20260913-010`; frozen SHA: `6eaabbec7d0182103d815c72fae4976e261b40aa`.
 - 2425 and 2526 remain **SEALED**; Top-5 live activation remains **NOT APPROVED**.
 
